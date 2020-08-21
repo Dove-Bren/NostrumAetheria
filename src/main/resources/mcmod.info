@@ -1,0 +1,16 @@
+[
+{
+  "modid": "nostrumaetheria",
+  "name": "Nostrum Aetheria",
+  "description": "Magical energy add-on for Nostrum Magica",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Skyler Manzanares"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
