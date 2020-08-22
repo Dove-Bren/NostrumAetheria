@@ -2,6 +2,8 @@ package com.smanzana.nostrumaetheria;
 
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,6 +13,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -62,5 +66,15 @@ public class NostrumAetheria
     public void postinit(FMLPostInitializationEvent event) {
     	proxy.postinit();
     	MinecraftForge.EVENT_BUS.register(this);
+    }
+    
+    public static @Nullable World getWorld(int dimension) {
+		for (World world : DimensionManager.getWorlds()) {
+			if (world.provider.getDimension() == dimension) {
+				return world;
+			}
+		}
+    	
+    	return null;
     }
 }

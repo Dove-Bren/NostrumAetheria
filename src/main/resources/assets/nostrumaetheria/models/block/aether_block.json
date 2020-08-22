@@ -1,0 +1,6 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "all": "nostrumaetheria:blocks/aether_block"
+    }
+}

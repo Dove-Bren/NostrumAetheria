@@ -1,6 +1,9 @@
 package com.smanzana.nostrumaetheria.proxy;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
+import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
+import com.smanzana.nostrumaetheria.blocks.AetherBlock;
+import com.smanzana.nostrumaetheria.client.render.TileEntityAetherDebugRenderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -22,7 +25,8 @@ public class ClientProxy extends CommonProxy {
 	public void preinit() {
 		super.preinit();
 		
-		//StorageMonitor.StorageMonitorRenderer.init();
+		TileEntityAetherDebugRenderer.registerFor(AetherBlock.AetherBlockEntity.class);
+		TileEntityAetherDebugRenderer.registerFor(AetherBatteryBlock.AetherBatteryEntity.class);
 		
 //		RenderingRegistry.registerEntityRenderingHandler(EntityTestFairy.class, new IRenderFactory<EntityTestFairy>() {
 //			@Override
@@ -36,9 +40,21 @@ public class ClientProxy extends CommonProxy {
 	public void init() {
 		super.init();
 		
-//		registerModel(Item.getItemFromBlock(StorageLogisticsChest.instance()),
-//				0,
-//				StorageLogisticsChest.ID);
+		registerModel(Item.getItemFromBlock(AetherBlock.instance()),
+				0,
+				AetherBlock.ID);
+		registerModel(Item.getItemFromBlock(AetherBatteryBlock.small()),
+				0,
+				AetherBatteryBlock.small().getID());
+		registerModel(Item.getItemFromBlock(AetherBatteryBlock.medium()),
+				0,
+				AetherBatteryBlock.medium().getID());
+		registerModel(Item.getItemFromBlock(AetherBatteryBlock.large()),
+				0,
+				AetherBatteryBlock.large().getID());
+		registerModel(Item.getItemFromBlock(AetherBatteryBlock.giant()),
+				0,
+				AetherBatteryBlock.giant().getID());
 	}
 	
 	@Override
