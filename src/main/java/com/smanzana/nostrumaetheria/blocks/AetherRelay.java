@@ -1,5 +1,8 @@
 package com.smanzana.nostrumaetheria.blocks;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -7,11 +10,9 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
-import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConnection;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
 import com.smanzana.nostrumaetheria.api.blocks.IAetherCapableBlock;
 
@@ -28,6 +29,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -186,7 +189,8 @@ public class AetherRelay extends BlockContainer {
 			TileEntity ent = worldIn.getTileEntity(pos);
 			if (ent != null && ent instanceof AetherRelayEntity) {
 				AetherRelayEntity relay = (AetherRelayEntity) ent;
-				System.out.println(relay.incomingLinks == null ? "Not initialized" : (relay.incomingLinks.isEmpty() ? "EMPTY!" : "Linked!"));
+				System.out.println(relay.missingLinks.isEmpty() ? ("Fully linked") : (relay.linkCache.isEmpty() ? "Fully UNLINKED" : "Mixed link status"));
+				System.out.println(relay.links.size() + " " + relay.links.toString());
 			}
 			return true;
 		}
@@ -196,18 +200,25 @@ public class AetherRelay extends BlockContainer {
 	
 	public static class AetherRelayEntity extends AetherTileEntity {
 
-		private static final String NBT_LINK = "relay_link";
+		private static final String NBT_LINK = "relay_links";
 		
 		protected final int range;
 		protected EnumFacing side;
-		private BlockPos link;
+		
+		private Set<BlockPos> links;
 		
 		// Transient list of relays for easy cleanup
-		private List<AetherRelayEntity> incomingLinks;
+		private List<AetherRelayEntity> linkCache;
+		
+		// transient list of the links we haven't fixed up yet
+		private List<BlockPos> missingLinks;
 		
 		public AetherRelayEntity(int range) {
 			super(0, 0);
 			this.range = range;
+			this.links = new HashSet<>();
+			this.linkCache = new LinkedList<>();
+			this.missingLinks = new LinkedList<>();
 		}
 		
 		public AetherRelayEntity() {
@@ -263,11 +274,10 @@ public class AetherRelay extends BlockContainer {
 		@Override
 		public void updateContainingBlockInfo() {
 			super.updateContainingBlockInfo();
-			
 			refreshSideInfo();
 			
-			if (!worldObj.isRemote) {
-				getPairedRelay(); // re-init connection if needed.
+			if (links.isEmpty()) {
+				autoLink();
 			}
 		}
 		
@@ -277,95 +287,187 @@ public class AetherRelay extends BlockContainer {
 			worldObj.notifyBlockUpdate(pos, state, state, 2);
 		}
 		
-		public @Nullable AetherRelayEntity getPairedRelay() {
-			// Hack in some stupid initialization here to avoid making this a ticking entity for only init tick
-			if (!worldObj.isRemote && incomingLinks == null) { // stupid init flag
-				incomingLinks = new LinkedList<>();
-				
-				if (link == null) {
-					autoLink();
-				} else {
-					// link up with the tile entity
-					repairLink();
-				}
-			}
-			
-			if (link != null && worldObj.isBlockLoaded(link)) {
-				TileEntity ent = worldObj.getTileEntity(link);
-				if (ent != null && ent instanceof AetherRelayEntity) {
-					return (AetherRelayEntity) ent;
-				}
-			}
-			return null;
-		}
-		
-		public @Nullable BlockPos getLinkedPosition() {
-			return link;
-		}
-		
-		public EnumFacing getSide() {
-			return side;
-		}
-		
-		protected void link(AetherRelayEntity other) {
-			AetherRelayEntity current = getPairedRelay();
-			if (current != other) {
-				unlink();
-				
-				if (other != null) {
-					link = other.pos.toImmutable(); // getOther() will now return 'other'
+		protected void repairLinks() {
+			if (!missingLinks.isEmpty()) {
+				Iterator<BlockPos> it = missingLinks.iterator();
+				while (it.hasNext()) {
+					BlockPos pos = it.next();
 					
-					if (other.link == null || !other.link.equals(pos)) {
-						// we don't have to be the exclusive connection of the other.
-						if (other.link == null) {
-							other.link(this);
-						} else {
-							other.addAetherConnection(this, null);
-							other.addWeakLink(this);
-						}
+					// Try to load it up
+					if (!worldObj.isBlockLoaded(pos)) {
+						continue;
 					}
 					
-					this.dirty();
-					this.addAetherConnection(other, null);
-				}
-			}
-		}
-		
-		protected void unlink() {
-			if (link != null) {
-				AetherRelayEntity other = getPairedRelay();
-				link = null;
-				if (other != null) {
-					other.removeAetherConnection(this, null);
-					if (other.link != null && other.link.equals(this.pos)) {
-						other.unlink();
+					TileEntity ent = worldObj.getTileEntity(pos);
+					if (ent != null && ent instanceof AetherRelayEntity) {
+						AetherRelayEntity relay = (AetherRelayEntity) ent;
+						this.linkCache.add(relay);
+						this.addAetherConnection(relay, null);
+						
 					} else {
-						other.removeWeakLink(this);
+						this.links.remove(pos);
 					}
+					
+					// Either way, the block was loaded. Either we re-added the link or removed it from mlink list.
+					// It can come out of trhis 'uninitialized' missing link list
+					it.remove();
 				}
+			}
+		}
+		
+		/**
+		 * The provided relay has indicated that it's being unloaded and will require linking again once the chunk is loaded again
+		 * @param relay
+		 */
+		protected void addUnloadedLink(AetherRelayEntity relay) {
+			if (linkCache.remove(relay)) {
+				missingLinks.add(relay.pos);
+				this.removeAetherConnection(relay, null);
+			}
+		}
+		
+		@Override
+		public void onChunkUnload() {
+			super.onChunkUnload();
+			
+			// For any linked relays, let them know we're going away (but weren't destroyed)
+			for (AetherRelayEntity relay : linkCache) {
+				relay.addUnloadedLink(this);
+			}
+			linkCache.clear();
+			missingLinks.clear();
+			missingLinks.addAll(links);
+		}
+		
+		/**
+		 * Add this relay to our linked relays.
+		 * @param relay
+		 */
+		public void link(AetherRelayEntity relay) {
+			repairLinks();
+			if (links.add(relay.getPos().toImmutable())) {
+				this.linkCache.add(relay);
+				this.addAetherConnection(relay, null);
+				
+				// Add ourselves as link on their side, too
+				relay.link(this);
 				this.dirty();
 			}
 		}
 		
-		protected void addWeakLink(AetherRelayEntity relay) {
-			getPairedRelay();
-			incomingLinks.add(relay);
+		/**
+		 * Permanently remove the relay from our list of linked relays.
+		 * @param relay
+		 */
+		public void unlink(AetherRelayEntity relay) {
+			if (links.remove(relay.getPos().toImmutable())) {
+				linkCache.remove(relay);
+				missingLinks.remove(relay);
+				this.removeAetherConnection(relay, null);
+				
+				// Dissolve their link to us if not already done
+				relay.unlink(this);
+				this.dirty();
+			}
 		}
 		
-		protected void removeWeakLink(AetherRelayEntity relay) {
-			getPairedRelay();
-			incomingLinks.remove(relay);
+//		public @Nullable AetherRelayEntity getPairedRelay() {
+//			// Hack in some stupid initialization here to avoid making this a ticking entity for only init tick
+//			if (!worldObj.isRemote && incomingLinks == null) { // stupid init flag
+//				incomingLinks = new LinkedList<>();
+//				
+//				if (link == null) {
+//					autoLink();
+//				} else {
+//					// link up with the tile entity
+//					repairLink();
+//				}
+//			}
+//			
+//			if (link != null && worldObj.isBlockLoaded(link)) {
+//				TileEntity ent = worldObj.getTileEntity(link);
+//				if (ent != null && ent instanceof AetherRelayEntity) {
+//					return (AetherRelayEntity) ent;
+//				}
+//			}
+//			return null;
+//		}
+		
+		public Collection<BlockPos> getLinkedPositions() {
+			repairLinks();
+			return links;
 		}
+		
+		public EnumFacing getSide() {
+			if (side == null) {
+				refreshSideInfo();
+			}
+			return side;
+		}
+		
+//		protected void link(AetherRelayEntity other) {
+//			AetherRelayEntity current = getPairedRelay();
+//			if (current != other) {
+//				unlink();
+//				
+//				if (other != null) {
+//					link = other.pos.toImmutable(); // getOther() will now return 'other'
+//					
+//					if (other.link == null || !other.link.equals(pos)) {
+//						// we don't have to be the exclusive connection of the other.
+//						if (other.link == null) {
+//							other.link(this);
+//						} else {
+//							other.addAetherConnection(this, null);
+//							other.addWeakLink(this);
+//						}
+//					}
+//					
+//					this.dirty();
+//					this.addAetherConnection(other, null);
+//				}
+//			}
+//		}
+//		
+//		protected void unlink() {
+//			if (link != null) {
+//				AetherRelayEntity other = getPairedRelay();
+//				link = null;
+//				if (other != null) {
+//					other.removeAetherConnection(this, null);
+//					if (other.link != null && other.link.equals(this.pos)) {
+//						other.unlink();
+//					} else {
+//						other.removeWeakLink(this);
+//					}
+//				}
+//				this.dirty();
+//			}
+//		}
+//		
+//		protected void addWeakLink(AetherRelayEntity relay) {
+//			getPairedRelay();
+//			incomingLinks.add(relay);
+//		}
+//		
+//		protected void removeWeakLink(AetherRelayEntity relay) {
+//			getPairedRelay();
+//			incomingLinks.remove(relay);
+//		}
 		
 		protected void unlinkAll() {
-			unlink();
-			if (incomingLinks != null) {
-				for (AetherRelayEntity relays : incomingLinks) {
-					// Each of these is pointing to us. Let them know we're going away.
-					relays.unlink();
-				}
-				incomingLinks.clear();
+			repairLinks();
+			for (AetherRelayEntity relay : Lists.newArrayList(linkCache)) {
+				// For any we were able to actually find and link to, let them know we're going away
+				unlink(relay);
 			}
+			
+			// Any links that aren't loaded yet in our missingLinks list will eventually notice we're gone when they're
+			// back and loaded.
+			
+			links.clear();
+			missingLinks.clear();
+			linkCache.clear();
 		}
 		
 		protected void autoLink() {
@@ -387,24 +489,10 @@ public class AetherRelay extends BlockContainer {
 						TileEntity te = worldObj.getTileEntity(cursor);
 						if (te != null && te != this && te instanceof AetherRelayEntity) {
 							this.link((AetherRelayEntity) te);
-							return;
 						}
 					}
 				}
 				
-			}
-		}
-		
-		protected void repairLink() {
-			if (link != null) {
-				System.out.println("Attempting to repair link...");
-				TileEntity te = worldObj.getTileEntity(link);
-				if (te != null && te != this && te instanceof AetherRelayEntity) {
-					this.link = null; // to force the repair
-					this.link((AetherRelayEntity) te);
-					System.out.println("Successfully repaired link!");
-					return;
-				}
 			}
 		}
 		
@@ -440,45 +528,58 @@ public class AetherRelay extends BlockContainer {
 		 * @return
 		 */
 		protected boolean canForward(int amount, Set<AetherRelayEntity> visitted) {
-			if (visitted.contains(this)) {
-				return false;
+			if (visitted == null) {
+				visitted = new HashSet<>(); // first-time entry, so just make it and recurse.
+			} else {
+				if (visitted.contains(this)) {
+					return false;
+				}
+				
+				IAetherHandler handler = getAttached();
+				if (handler != null) {
+					if (handler.canAdd(side, amount)) {
+						visitted.add(this); // for good measure
+						return true;
+					}
+				}
 			}
 			visitted.add(this);
 			
-			IAetherHandler handler = getAttached();
-			if (handler != null) {
-				if (handler.canAdd(side, amount)) {
-					return true;
-				}
-			}
+			repairLinks();
 			
 			// Try linked relay
-			AetherRelayEntity linked = this.getPairedRelay();
-			if (linked != null) {
-				return linked.canForward(amount, visitted);
+			for (AetherRelayEntity relay : linkCache) {
+				if (relay.canForward(amount, visitted)) {
+					return true;
+				}
 			}
 				
 			return false;
 		}
 		
 		protected int forwardAether(int amount, Set<AetherRelayEntity> visitted) {
-			if (visitted.contains(this)) {
-				return amount;
+			if (visitted == null) {
+				visitted = new HashSet<>(); // first-time entry, so just make it and recurse.
+			} else {
+				if (visitted.contains(this)) {
+					return amount;
+				}
+				
+				IAetherHandler handler = getAttached();
+				if (handler != null) {
+					amount = handler.addAether(side, amount);
+				}
 			}
-			visitted.add(this);
 			
-			IAetherHandler handler = getAttached();
-			if (handler != null) {
-				amount = handler.addAether(side, amount);
-			}
+			visitted.add(this);
+			repairLinks();
 			
 			if (amount != 0) {
-				// Try linked relay
-				// TODO if this just did all linked relays, there'd be no reason for 'link'
-				// and relays could have their own little networks
-				AetherRelayEntity linked = this.getPairedRelay();
-				if (linked != null) {
-					linked.forwardAether(amount, visitted);
+				for (AetherRelayEntity relay : linkCache) {
+					amount = relay.forwardAether(amount, visitted);
+					if (amount <= 0) {
+						break;
+					}
 				}
 			}
 			
@@ -488,11 +589,7 @@ public class AetherRelay extends BlockContainer {
 		@Override
 		public boolean canAdd(EnumFacing side, int amount) {
 			if (canAcceptOnSide(side)) {
-				// Check if our paired relay can accept it
-				AetherRelayEntity other = getPairedRelay();
-				if (other != null) {
-					return other.canForward(amount, Sets.newHashSet(this));
-				}
+				return canForward(amount, null);
 			}
 			
 			return false;
@@ -502,10 +599,7 @@ public class AetherRelay extends BlockContainer {
 		public int addAether(EnumFacing side, int amount) {
 			// We don't store aether and try to push it instead
 			if (canAcceptOnSide(side)) {
-				AetherRelayEntity other = getPairedRelay();
-				if (other != null) {
-					return other.forwardAether(amount, Sets.newHashSet(this));
-				}
+				return forwardAether(amount, null);
 			}
 			
 			return amount;
@@ -513,7 +607,7 @@ public class AetherRelay extends BlockContainer {
 		
 		@Override
 		protected List<AetherFlowConnection> getConnections() {
-			// Refresh links if we haven't done that yet
+			repairLinks();
 			return super.getConnections();
 		}
 		
@@ -537,9 +631,11 @@ public class AetherRelay extends BlockContainer {
 		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 			nbt = super.writeToNBT(nbt);
 			
-			if (link != null) {
-				nbt.setLong(NBT_LINK, link.toLong());
+			NBTTagList list = new NBTTagList();
+			for (BlockPos link : links) {
+				list.appendTag(new NBTTagLong(link.toLong()));
 			}
+			nbt.setTag(NBT_LINK, list);
 			
 			return nbt;
 		}
@@ -548,16 +644,16 @@ public class AetherRelay extends BlockContainer {
 		public void readFromNBT(NBTTagCompound nbt) {
 			super.readFromNBT(nbt);
 			
-			if (nbt.hasKey(NBT_LINK, NBT.TAG_LONG)) {
-				BlockPos newlink = BlockPos.fromLong(nbt.getLong(NBT_LINK));
-				if (!Objects.equal(newlink, this.link)) {
-					this.link = newlink; // will be fixed up when validated
-//					if (this.worldObj != null && !isInvalid()) {
-//						repairLink();
-//					}
+			links.clear();
+			linkCache.clear();
+			missingLinks.clear();
+			NBTTagList list = nbt.getTagList(NBT_LINK, NBT.TAG_LONG);
+			for (int i = 0; i < list.tagCount(); i++) {
+				NBTTagLong lTag = (NBTTagLong) list.get(i);
+				BlockPos pos = BlockPos.fromLong(lTag.getLong());
+				if (links.add(pos)) { // prevents dupes :)
+					missingLinks.add(pos);
 				}
-			} else {
-				this.link = null;
 			}
 		}
 

@@ -264,13 +264,13 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 		super.invalidate();
 		
 		// Clean up connections
-		for (AetherFlowConnection conn : remoteConnections) {
-			// remove ourselves from them, in case it's two way
-			if (conn.handler instanceof AetherTileEntity) {
-				((AetherTileEntity) conn.handler).removeAetherConnection(this, conn.face);
-			}
-		}
-		remoteConnections.clear();
+		cleanConnections();
+	}
+	
+	@Override
+	public void onChunkUnload() {
+		super.onChunkUnload();
+		cleanConnections();
 	}
 	
 	@Override
