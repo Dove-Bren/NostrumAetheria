@@ -66,7 +66,7 @@ public class AetherTileEntityMessage implements IMessage {
 	}
 	
 	public AetherTileEntityMessage(AetherTileEntity te) {
-		this(te.getWorld(), te.getPos(), te.getAether(null));
+		this(te.getWorld(), te.getPos(), te.getHandler().getAether(null));
 	}
 
 	@Override

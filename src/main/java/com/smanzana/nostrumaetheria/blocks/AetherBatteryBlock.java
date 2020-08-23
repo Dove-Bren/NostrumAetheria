@@ -139,11 +139,6 @@ public class AetherBatteryBlock extends BlockContainer {
 		public void readFromNBT(NBTTagCompound nbt) {
 			super.readFromNBT(nbt);
 		}
-
-		@Override
-		protected void onAetherFlowTick(int diff, boolean added, boolean taken) {
-			;
-		}
 	}
 
 	@Override

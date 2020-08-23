@@ -79,7 +79,7 @@ public class InfineAetherBlock extends BlockContainer {
 		@Override
 		public void update() {
 			if (!worldObj.isRemote) {
-				int leftoverGen = this.addAether(null, 10000);
+				int leftoverGen = this.handler.addAether(null, 10000);
 				
 //				if (ticksExisted == 1 || ticksExisted % 20 == 0) {
 //					// Validate existing connections done in super.update() already
@@ -102,10 +102,10 @@ public class InfineAetherBlock extends BlockContainer {
 //					}
 //				}
 				
-				this.pushAether(10000);
+				this.handler.pushAether(10000);
 				// Fix issue where a deficit at the start will never be recouped:
 				if (leftoverGen > 0) {
-					this.addAether(null, leftoverGen);
+					this.handler.addAether(null, leftoverGen);
 				}
 			}
 			super.update();
@@ -119,11 +119,6 @@ public class InfineAetherBlock extends BlockContainer {
 		@Override
 		public void readFromNBT(NBTTagCompound nbt) {
 			super.readFromNBT(nbt);
-		}
-
-		@Override
-		protected void onAetherFlowTick(int diff, boolean added, boolean taken) {
-			;
 		}
 	}
 

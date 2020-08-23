@@ -2,6 +2,8 @@ package com.smanzana.nostrumaetheria.client.render;
 
 import org.lwjgl.opengl.GL11;
 
+import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
+import com.smanzana.nostrumaetheria.api.component.AetherRelayComponent;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay.AetherRelayEntity;
 import com.smanzana.nostrummagica.utils.Curves;
@@ -35,6 +37,13 @@ public class AetherRelayRenderer extends TileEntitySpecialRenderer<AetherRelayEn
 		// Additionally, all points on the curve are unchanging.
 		// I could cache the HECK out of this... but is it worth it? Its just a bunch of math!
 		
+		IAetherHandler handler = te.getHandler();
+		if (handler == null || !(handler instanceof AetherRelayComponent)) {
+			return;
+		}
+		
+		AetherRelayComponent relay = (AetherRelayComponent) handler;
+		
 		final int intervals = 50;
 		final double period = (20 * 3);
 		final Vec3d origin = Vec3d.ZERO;
@@ -57,7 +66,7 @@ public class AetherRelayRenderer extends TileEntitySpecialRenderer<AetherRelayEn
 		GlStateManager.glLineWidth(3f);
 		GlStateManager.color(1f, 1f, 1f, 1f);
 		
-		for (BlockPos linked : te.getLinkedPositions()) {
+		for (BlockPos linked : relay.getLinkedPositions()) {
 		
 			// TODO have some capability system to turn this on or off
 			

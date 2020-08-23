@@ -22,8 +22,8 @@ public class TileEntityAetherDebugRenderer<T extends AetherTileEntity> extends T
 	@Override
 	public void renderTileEntityAt(AetherTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 
-		final int aether = te.getAether(null);
-		final int maxAether = te.getMaxAether(null);
+		final int aether = te.getHandler().getAether(null);
+		final int maxAether = te.getHandler().getMaxAether(null);
 		final String str = aether + " / " + maxAether;
 		final FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
 		

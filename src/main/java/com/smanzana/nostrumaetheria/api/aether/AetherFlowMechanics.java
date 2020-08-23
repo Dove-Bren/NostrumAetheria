@@ -105,7 +105,7 @@ public final class AetherFlowMechanics {
 	}
 	
 	private static boolean IsRunning = false;
-	public static final int drawFromHandler(@Nullable IAetherHandler originHandler, @Nullable EnumFacing originFace,
+	public static final int drawFromHandler(@Nullable IAetherHandler originHandler,
 			IAetherHandler handler, EnumFacing face, int amount, boolean depthFirst) {
 		if (IsRunning) {
 			// This indicates that trying to draw from an aether handler ended up invoking a NEW handler walk.
@@ -119,7 +119,6 @@ public final class AetherFlowMechanics {
 		AetherIterateContext context = depthFirst ? new DepthFirst(start) : new BreadthFirst(start);
 		
 		if (originHandler != null) {
-			int unused; // hmmmmmmmmm should we EVER visit the origin on any face?
 			context.visit(new AetherFlowConnection(originHandler, null));
 			for (EnumFacing originOtherFace : EnumFacing.values()) {
 				context.visit(new AetherFlowConnection(originHandler, originOtherFace));
@@ -142,7 +141,7 @@ public final class AetherFlowMechanics {
 	}
 	
 	public static final int drawFromHandler(IAetherHandler handler, EnumFacing face, int amount, boolean depthFirst) {
-		return drawFromHandler(null, null, handler, face, amount, depthFirst);
+		return drawFromHandler(null, handler, face, amount, depthFirst);
 	}
 	
 	public static final int drawFromHandler(IAetherHandler handler, EnumFacing face, int amount) {
