@@ -98,6 +98,10 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 		}
 	}
 	
+	protected void clearConnections() {
+		remoteConnections.clear();
+	}
+	
 	/**
 	 * Returns whether or not this side can accept incoming aether.
 	 * @param side
@@ -294,9 +298,10 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	private static final byte configToByte(boolean[] config) {
 		byte b = 0;
 		b |= (config[EnumFacing.values().length] ? 1 : 0);
-		for (EnumFacing facing : EnumFacing.values()) {
+		EnumFacing values[] = EnumFacing.values();
+		for (int i = values.length - 1; i >= 0; i--) { // backwards to counter how we write
 			b <<= 1;
-			b |= (config[facing.ordinal()] ? 1 : 0);
+			b |= (config[i] ? 1 : 0);
 		}
 		return b;
 	}

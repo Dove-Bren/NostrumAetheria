@@ -2,13 +2,16 @@ package com.smanzana.nostrumaetheria.proxy;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherBlock;
+import com.smanzana.nostrumaetheria.blocks.AetherRelay;
+import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
+import com.smanzana.nostrumaetheria.client.render.AetherRelayRenderer;
 import com.smanzana.nostrumaetheria.client.render.TileEntityAetherDebugRenderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -25,8 +28,9 @@ public class ClientProxy extends CommonProxy {
 	public void preinit() {
 		super.preinit();
 		
-		TileEntityAetherDebugRenderer.registerFor(AetherBlock.AetherBlockEntity.class);
+		TileEntityAetherDebugRenderer.registerFor(InfineAetherBlock.InfiniteAetherBlockEntity.class);
 		TileEntityAetherDebugRenderer.registerFor(AetherBatteryBlock.AetherBatteryEntity.class);
+		AetherRelayRenderer.init();
 		
 //		RenderingRegistry.registerEntityRenderingHandler(EntityTestFairy.class, new IRenderFactory<EntityTestFairy>() {
 //			@Override
@@ -34,15 +38,17 @@ public class ClientProxy extends CommonProxy {
 //				return new RenderTestFairy(manager, 1.0f);
 //			}
 //		});
+		
+		OBJLoader.INSTANCE.addDomain(NostrumAetheria.MODID);
 	}
 	
 	@Override
 	public void init() {
 		super.init();
 		
-		registerModel(Item.getItemFromBlock(AetherBlock.instance()),
+		registerModel(Item.getItemFromBlock(InfineAetherBlock.instance()),
 				0,
-				AetherBlock.ID);
+				InfineAetherBlock.ID);
 		registerModel(Item.getItemFromBlock(AetherBatteryBlock.small()),
 				0,
 				AetherBatteryBlock.small().getID());
@@ -55,6 +61,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(AetherBatteryBlock.giant()),
 				0,
 				AetherBatteryBlock.giant().getID());
+		registerModel(Item.getItemFromBlock(AetherRelay.instance()),
+				0,
+				AetherRelay.ID);
 	}
 	
 	@Override

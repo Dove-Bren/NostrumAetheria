@@ -1,5 +1,5 @@
 {
-    "parent":"nostrumaetheria:block/aether_block",
+    "parent":"nostrumaetheria:block/aether_relay",
     "display": {
         "thirdperson": {
             "rotation": [ 10, -45, 170 ],

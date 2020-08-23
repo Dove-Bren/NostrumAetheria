@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
-import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -19,25 +18,24 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class AetherBlock extends BlockContainer {
+public class InfineAetherBlock extends BlockContainer {
 	
-	public static final String ID = "aether_block";
+	public static final String ID = "infinite_aether_block";
 	
-	private static AetherBlock instance = null;
-	public static AetherBlock instance() {
+	private static InfineAetherBlock instance = null;
+	public static InfineAetherBlock instance() {
 		if (instance == null)
-			instance = new AetherBlock();
+			instance = new InfineAetherBlock();
 		
 		return instance;
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(AetherBlockEntity.class, "aether_block_te");
+		GameRegistry.registerTileEntity(InfiniteAetherBlockEntity.class, "infinite_aether_block_te");
 //		GameRegistry.addShapedRecipe(new ItemStack(instance()),
 //				"WPW", "WCW", "WWW",
 //				'W', new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
@@ -45,7 +43,7 @@ public class AetherBlock extends BlockContainer {
 //				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
 	}
 	
-	public AetherBlock() {
+	public InfineAetherBlock() {
 		super(Material.ROCK, MapColor.OBSIDIAN);
 		this.setUnlocalizedName(ID);
 		this.setHardness(3.0f);
@@ -71,9 +69,9 @@ public class AetherBlock extends BlockContainer {
 		return false;
 	}
 	
-	public static class AetherBlockEntity extends AetherTickingTileEntity {
+	public static class InfiniteAetherBlockEntity extends AetherTickingTileEntity {
 
-		public AetherBlockEntity() {
+		public InfiniteAetherBlockEntity() {
 			super(0, 10000);
 			this.setAutoSync(5);
 		}
@@ -81,30 +79,30 @@ public class AetherBlock extends BlockContainer {
 		@Override
 		public void update() {
 			if (!worldObj.isRemote) {
-				int leftoverGen = this.addAether(null, 10);
+				int leftoverGen = this.addAether(null, 10000);
 				
-				if (ticksExisted == 1 || ticksExisted % 20 == 0) {
-					// Validate existing connections done in super.update() already
-					
-					// Add new ones
-					final int radius = 5;
-					MutableBlockPos cursor = new MutableBlockPos();
-					for (int x = -radius; x <= radius; x++)
-					for (int y = -radius; y <= radius; y++)
-					for (int z = -radius; z <= radius; z++) {
-						cursor.setPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
-						if (!worldObj.isBlockLoaded(cursor)) {
-							continue;
-						}
-						
-						TileEntity te = worldObj.getTileEntity(cursor);
-						if (te != null && te != this && te instanceof AetherTileEntity) {
-							this.addAetherConnection((AetherTileEntity) te, EnumFacing.UP);
-						}
-					}
-				}
+//				if (ticksExisted == 1 || ticksExisted % 20 == 0) {
+//					// Validate existing connections done in super.update() already
+//					
+//					// Add new ones
+//					final int radius = 5;
+//					MutableBlockPos cursor = new MutableBlockPos();
+//					for (int x = -radius; x <= radius; x++)
+//					for (int y = -radius; y <= radius; y++)
+//					for (int z = -radius; z <= radius; z++) {
+//						cursor.setPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
+//						if (!worldObj.isBlockLoaded(cursor)) {
+//							continue;
+//						}
+//						
+//						TileEntity te = worldObj.getTileEntity(cursor);
+//						if (te != null && te != this && te instanceof AetherTileEntity) {
+//							this.addAetherConnection((AetherTileEntity) te, EnumFacing.UP);
+//						}
+//					}
+//				}
 				
-				this.pushAether(50);
+				this.pushAether(10000);
 				// Fix issue where a deficit at the start will never be recouped:
 				if (leftoverGen > 0) {
 					this.addAether(null, leftoverGen);
@@ -131,7 +129,7 @@ public class AetherBlock extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new AetherBlockEntity();
+		return new InfiniteAetherBlockEntity();
 	}
 	
 	@Override

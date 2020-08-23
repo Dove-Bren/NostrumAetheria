@@ -3,7 +3,8 @@ package com.smanzana.nostrumaetheria.proxy;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherBlock;
+import com.smanzana.nostrumaetheria.blocks.AetherRelay;
+import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -44,14 +45,14 @@ public class CommonProxy {
     }
     
     private void registerBlocks() {
-    	GameRegistry.register(AetherBlock.instance(),
-    			new ResourceLocation(NostrumAetheria.MODID, AetherBlock.ID));
+    	GameRegistry.register(InfineAetherBlock.instance(),
+    			new ResourceLocation(NostrumAetheria.MODID, InfineAetherBlock.ID));
     	GameRegistry.register(
-    			(new ItemBlock(AetherBlock.instance()).setRegistryName(AetherBlock.ID)
-    					.setCreativeTab(NostrumAetheria.creativeTab).setUnlocalizedName(AetherBlock.ID))
+    			(new ItemBlock(InfineAetherBlock.instance()).setRegistryName(InfineAetherBlock.ID)
+    					.setCreativeTab(NostrumAetheria.creativeTab).setUnlocalizedName(InfineAetherBlock.ID))
     			);
-    	AetherBlock.init();
-    	AetheriaBlocks.InfiniteAetherBlock = AetherBlock.instance();
+    	InfineAetherBlock.init();
+    	AetheriaBlocks.InfiniteAetherBlock = InfineAetherBlock.instance();
     	
     	for (AetherBatteryBlock block : new AetherBatteryBlock[]{
     			AetherBatteryBlock.small(),
@@ -72,6 +73,15 @@ public class CommonProxy {
     	AetheriaBlocks.AetherBatteryMediumBlock = AetherBatteryBlock.medium();
     	AetheriaBlocks.AetherBatteryLargeBlock = AetherBatteryBlock.large();
     	AetheriaBlocks.AetherBatteryGiantBlock = AetherBatteryBlock.giant();
+    	
+    	GameRegistry.register(AetherRelay.instance(),
+    			new ResourceLocation(NostrumAetheria.MODID, AetherRelay.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(AetherRelay.instance()).setRegistryName(AetherRelay.ID)
+    					.setCreativeTab(NostrumAetheria.creativeTab).setUnlocalizedName(AetherRelay.ID))
+    			);
+    	AetherRelay.init();
+    	AetheriaBlocks.AetherRelay = AetherRelay.instance();
     }
 
 	public EntityPlayer getPlayer() {

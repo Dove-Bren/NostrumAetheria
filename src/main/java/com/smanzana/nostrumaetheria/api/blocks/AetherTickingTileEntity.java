@@ -1,14 +1,12 @@
 package com.smanzana.nostrumaetheria.api.blocks;
 
-import com.smanzana.nostrumaetheria.network.NetworkHandler;
-import com.smanzana.nostrumaetheria.network.messages.AetherTileEntityMessage;
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
-import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 
 public abstract class AetherTickingTileEntity extends AetherTileEntity implements ITickable {
 
@@ -80,9 +78,8 @@ public abstract class AetherTickingTileEntity extends AetherTileEntity implement
 		return amount;
 	}
 	
-	protected void syncAether() {
-		NetworkHandler.getSyncChannel().sendToAllAround(new AetherTileEntityMessage(this),
-				new TargetPoint(worldObj.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 64));
+	protected void syncServerAether() {
+		APIProxy.syncTEAether(this);
 	}
 	
 	protected int getMaxAetherFill() {
@@ -98,10 +95,11 @@ public abstract class AetherTickingTileEntity extends AetherTileEntity implement
 	public void update() {
 		ticksExisted++;
 		
-		this.cleanConnections();
-		
-		if (autoFill) {
-			this.fillAether(getMaxAetherFill());
+		if (!worldObj.isRemote) {
+			this.cleanConnections();
+			if (autoFill) {
+				this.fillAether(getMaxAetherFill());
+			}
 		}
 		
 		int aetherDiff = this.getAether(null) - aetherLastTick;
@@ -112,9 +110,9 @@ public abstract class AetherTickingTileEntity extends AetherTileEntity implement
 			}
 		}
 		
-		if (aetherDirtyFlag && autoSyncPeriod > 0 && (ticksExisted == 1 || ticksExisted % autoSyncPeriod == 0)) {
+		if (!worldObj.isRemote && aetherDirtyFlag && autoSyncPeriod > 0 && (ticksExisted == 1 || ticksExisted % autoSyncPeriod == 0)) {
 			//worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 2);
-			syncAether();
+			syncServerAether();
 			aetherDirtyFlag = false;
 		}
 		

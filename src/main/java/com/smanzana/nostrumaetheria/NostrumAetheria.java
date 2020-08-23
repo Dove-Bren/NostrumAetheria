@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.proxy.AetheriaAPIProxy;
 import com.smanzana.nostrumaetheria.proxy.CommonProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 
@@ -46,6 +48,7 @@ public class NostrumAetheria
     @EventHandler
     public void preinit(FMLPreInitializationEvent event) {
     	instance = this;
+    	APIProxy.handler = new AetheriaAPIProxy();
     	
 //	    if (Loader.isModLoaded("Baubles")) {
 //	    	baubles.enable();

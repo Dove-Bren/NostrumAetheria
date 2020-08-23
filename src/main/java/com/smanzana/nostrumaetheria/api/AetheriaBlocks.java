@@ -9,5 +9,6 @@ public final class AetheriaBlocks {
 	public static Block AetherBatteryMediumBlock = null;
 	public static Block AetherBatteryLargeBlock = null;
 	public static Block AetherBatteryGiantBlock = null;
+	public static Block AetherRelay = null;
 	
 }

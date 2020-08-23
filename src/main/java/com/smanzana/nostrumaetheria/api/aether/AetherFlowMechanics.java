@@ -119,8 +119,11 @@ public final class AetherFlowMechanics {
 		AetherIterateContext context = depthFirst ? new DepthFirst(start) : new BreadthFirst(start);
 		
 		if (originHandler != null) {
-			AetherFlowConnection self = new AetherFlowConnection(originHandler, originFace);
-			context.visit(self);
+			int unused; // hmmmmmmmmm should we EVER visit the origin on any face?
+			context.visit(new AetherFlowConnection(originHandler, null));
+			for (EnumFacing originOtherFace : EnumFacing.values()) {
+				context.visit(new AetherFlowConnection(originHandler, originOtherFace));
+			}
 		}
 		
 		int left = amount;
