@@ -15,6 +15,7 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
 import com.smanzana.nostrumaetheria.api.blocks.IAetherCapableBlock;
+import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
@@ -294,7 +295,7 @@ public class AetherRelay extends BlockContainer {
 					BlockPos pos = it.next();
 					
 					// Try to load it up
-					if (!worldObj.isBlockLoaded(pos)) {
+					if (!NostrumMagica.isBlockLoaded(worldObj, pos)) {
 						continue;
 					}
 					
@@ -479,7 +480,7 @@ public class AetherRelay extends BlockContainer {
 					int yRadius = innerRadius - Math.abs(j);
 					for (int k = -yRadius; k <= yRadius; k++) {
 						cursor.setPos(pos.getX() + i, pos.getY() + j, pos.getZ() + k);
-						if (!worldObj.isBlockLoaded(cursor)) {
+						if (!NostrumMagica.isBlockLoaded(worldObj, pos)) {
 							continue;
 						}
 						if (cursor.equals(pos)) {
