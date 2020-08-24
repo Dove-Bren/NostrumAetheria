@@ -30,7 +30,7 @@ public class TileEntityAetherDebugRenderer<T extends AetherTileEntity> extends T
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x + .5, y + 1.5, z + .5);
 		GlStateManager.scale(.05, .05, .05);
-		GlStateManager.rotate(90f + (float) (360.0 * (Math.atan2(z, x) / (2 * Math.PI))), 0, -1, 0);
+		GlStateManager.rotate(90f + (float) (360.0 * (Math.atan2(z + .5, x + .5) / (2 * Math.PI))), 0, -1, 0);
 		GlStateManager.translate(0, 0, 0);
 		GlStateManager.rotate(180, 1, 0, 0);
 		// Make billboard

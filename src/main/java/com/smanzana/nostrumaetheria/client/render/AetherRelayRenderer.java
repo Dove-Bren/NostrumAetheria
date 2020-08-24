@@ -42,14 +42,29 @@ public class AetherRelayRenderer extends TileEntitySpecialRenderer<AetherRelayEn
 			return;
 		}
 		
-		AetherRelayComponent relay = (AetherRelayComponent) handler;
+		boolean debug = true;
 		
-		final int intervals = 50;
-		final double period = (20 * 3);
+		AetherRelayComponent relay = (AetherRelayComponent) handler;
+
 		final Vec3d origin = Vec3d.ZERO;
-		final float dotLength = 10;
-		final float[] dotColor = {1f, 0f, 0f, 1f};
-		final float[] notColor = {0f, 0f, 0f, 0f};
+		final int intervals = 50;
+		double period = (20 * 3);
+		float dotLength = 10;
+		float[] dotColor = {1f, 0f, 0f, 1f};
+		float[] notColor = {0f, 0f, 0f, 0f};
+		
+		if (debug) {
+			period = (20 * 3);
+			dotLength = 10;
+			dotColor = new float[]{1f, 0f, 0f, 1f};
+			notColor = new float[]{0f, 0f, 0f, 0f};
+		} else {
+			period = (20 * 5);
+			dotLength = 4;
+			dotColor = new float[]{1f, .3f, .3f, .2f};
+			notColor = new float[]{0f, 0f, 0f, 0f};
+		}
+		
 		final float[] dotDelta = {dotColor[0] - notColor[0], dotColor[1] - notColor[1], dotColor[2] - notColor[2], dotColor[3] - notColor[3]};
 		final float perI = (1f / dotLength);
 		
