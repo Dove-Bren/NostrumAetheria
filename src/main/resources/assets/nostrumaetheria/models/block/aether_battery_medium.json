@@ -1,0 +1,31 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "nostrumaetheria:blocks/aether_battery_medium"
+    }, "elements": [{
+        "from": [ 0, 0, 0 ],
+        "to": [ 16, 16, 16 ],
+        "shade": false,
+        "faces": {
+            "up": { "texture": "#all" },
+            "down": { "texture": "#all" },
+            "north": { "texture": "#all" },
+            "south": { "texture": "#all" },
+            "east": { "texture": "#all" },
+            "west": { "texture": "#all" }
+        }
+    }, {
+        "from": [ 15.99, 15.99, 15.99 ],
+        "to": [ 0.01, 0.01, 0.01 ],
+        "shade": false,
+        "faces": {
+            "up": { "texture": "#all" },
+            "down": { "texture": "#all" },
+            "north": { "texture": "#all" },
+            "south": { "texture": "#all" },
+            "east": { "texture": "#all" },
+            "west": { "texture": "#all" }
+        }
+    }
+    ]
+}

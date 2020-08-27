@@ -29,6 +29,7 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 	private static final String NBT_AETHER = "aether";
 	private static final String NBT_MAX_AETHER = "max_aether";
 	private static final String NBT_SIDE_CONFIG = "side_config";
+	private static final String NBT_INOUTBOUND_CONFIG = "inout_config";
 	
 	private int maxAether;
 	private int aether;
@@ -36,6 +37,10 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 	protected boolean autoFill;
 	// side configuration
 	protected boolean sideConnections[];
+	// Global disable switch on in-flowing aether
+	protected boolean allowInboundAether;
+	// "" but for outbound aether
+	protected boolean allowOutboundAether;
 	// Connections set via code instead of from parent (usually distant blocks, like relays)
 	private Set<AetherFlowConnection> remoteConnections;
 	private int maxAetherFill;
@@ -59,6 +64,8 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 			sideConnections[i] = true;
 		}
 		
+		this.allowInboundAether = this.allowOutboundAether = true;
+		
 		if (listener == null) {
 			throw new IllegalArgumentException("listener cannot be null");
 		}
@@ -76,6 +83,29 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 	
 	public void setAutoFill(boolean fill) {
 		this.setAutoFill(fill, Integer.MAX_VALUE);
+	}
+	
+	public void setInboundEnabled(boolean enabled) {
+		allowInboundAether = enabled;
+		this.dirty();
+	}
+	
+	protected boolean getInboundAllowed() {
+		return allowInboundAether;
+	}
+	
+	public void setOutboundEnabled(boolean enabled) {
+		allowOutboundAether = enabled;
+		this.dirty();
+	}
+	
+	protected boolean getOutboundAllowed() {
+		return allowOutboundAether;
+	}
+	
+	public void configureInOut(boolean inputAllowed, boolean outputAllowed) {
+		setInboundEnabled(inputAllowed);
+		setOutboundEnabled(outputAllowed);
 	}
 	
 	private void fixAether() {
@@ -149,7 +179,7 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 	 * @return
 	 */
 	protected boolean canAcceptOnSide(EnumFacing side) {
-		return sideConnections[getSideIndex(side)];
+		return allowInboundAether && sideConnections[getSideIndex(side)];
 	}
 	
 	/**
@@ -158,7 +188,7 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 	 * @return
 	 */
 	protected boolean canDrawOnSide(EnumFacing side) {
-		return sideConnections[getSideIndex(side)];
+		return allowOutboundAether && sideConnections[getSideIndex(side)];
 	}
 	
 	@Override
@@ -171,9 +201,8 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 		return maxAether;
 	}
 
-	@Override
-	public int addAether(EnumFacing side, int amount) {
-		if (canAcceptOnSide(side)) {
+	public int addAether(EnumFacing side, int amount, boolean force) {
+		if (force || canAcceptOnSide(side)) {
 			int start = aether;
 			aether += amount;
 			if (aether > maxAether) {
@@ -193,12 +222,17 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 	}
 	
 	@Override
+	public int addAether(EnumFacing side, int amount) {
+		return this.addAether(side, amount, false);
+	}
+	
+	@Override
 	public boolean canAdd(EnumFacing side, int amount) {
 		return (canAcceptOnSide(side) && maxAether - aether >= amount);
 	}
 	
-	protected int drawAetherFromMyself(EnumFacing side, int amount) {
-		if (amount != 0 && canDrawOnSide(side) && aether != 0) {
+	protected int drawAetherFromMyself(EnumFacing side, int amount, boolean internal) {
+		if (amount != 0 && (internal || canDrawOnSide(side)) && aether != 0) {
 			amount = Math.min(amount, aether);
 			aether -= amount;
 			dirty();
@@ -220,11 +254,17 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 	@Override
 	public int drawAether(EnumFacing side, int amount, AetherIterateContext context) {
 		context.addConnections(getConnections());
-		return this.drawAetherFromMyself(side, amount);
+		return this.drawAetherFromMyself(side, amount, false);
 	}
 
 	@Override
 	public int drawAether(EnumFacing side, int amount) {
+		// Check if have enough ourselves before using the iterative approach
+		amount -= drawAetherFromMyself(side, amount, true);
+		if (amount <= 0) {
+			return 0;
+		}
+		
 		return AetherFlowMechanics.drawFromHandler(this, side, amount, false);
 	}
 	
@@ -263,7 +303,7 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 					break;
 				}
 			}
-			this.drawAetherFromMyself(null, (start - amt));
+			this.drawAetherFromMyself(null, (start - amt), true);
 		}
 	}
 	
@@ -337,10 +377,21 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 		return b;
 	}
 	
+	private static final void inoutConfigFromByte(AetherHandlerComponent comp, byte b) {
+		// ugh I'll just set them from here
+		comp.configureInOut(((b >> 1) & 1) == 1, ((b >> 0) & 1) == 1);
+	}
+	
+	private static final byte inoutConfigToByte(boolean input, boolean output) {
+		return (byte) ((input ? 1 : 0) << 1
+				| (output ? 1 : 0) << 0);
+	}
+	
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		compound.setInteger(NBT_AETHER, aether);
 		compound.setInteger(NBT_MAX_AETHER, maxAether);
 		compound.setByte(NBT_SIDE_CONFIG, configToByte(sideConnections));
+		compound.setByte(NBT_INOUTBOUND_CONFIG, inoutConfigToByte(allowInboundAether, allowOutboundAether));
 		
 		return compound;
 	}
@@ -349,6 +400,7 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 		this.aether = compound.getInteger(NBT_AETHER);
 		this.maxAether = compound.getInteger(NBT_MAX_AETHER);
 		configFromByte(sideConnections, compound.getByte(NBT_SIDE_CONFIG));
+		inoutConfigFromByte(this, compound.getByte(NBT_INOUTBOUND_CONFIG));
 		fixAether();
 	}
 	

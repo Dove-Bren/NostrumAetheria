@@ -1,7 +1,11 @@
 package com.smanzana.nostrumaetheria.blocks;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 
@@ -14,6 +18,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -21,6 +26,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class AetherBatteryBlock extends BlockContainer {
 	
@@ -116,28 +123,117 @@ public class AetherBatteryBlock extends BlockContainer {
 	
 	public static class AetherBatteryEntity extends AetherTickingTileEntity {
 
+		private static final String NBT_SIZE = "battery_size";
+		
+		private Size size;
+		
 		public AetherBatteryEntity(Size size) {
 			super(0, size.capacity);
+			this.size = size;
 			this.setAutoSync(5);
 		}
 		
 		public AetherBatteryEntity() {
 			this(Size.SMALL);
 		}
+		
+		public Size getSize() {
+			return size;
+		}
 
 		@Override
 		public void update() {
+			if (this.ticksExisted % 5 == 0) {
+				this.flowIntoNearby();
+			}
+			
 			super.update();
+		}
+		
+		protected void flowIntoNearby() {
+			// Look for adjacent batteries to flow into or fill from.
+			// Get total sum'ed aether to figure out how much it looks like each should have.
+			AetherBatteryEntity[] batteries = new AetherBatteryEntity[EnumFacing.values().length];
+			int totalAether = this.handler.getAether(null);
+			int neighborCount = 0;
+			int max = totalAether;
+			int min = totalAether;
+			for (EnumFacing dir : EnumFacing.values()) {
+				if (!handler.getSideEnabled(dir)) {
+					continue;
+				}
+				
+				BlockPos neighbor = pos.offset(dir);
+				
+				// First check for a TileEntity
+				TileEntity te = worldObj.getTileEntity(neighbor);
+				if (te != null && te instanceof AetherBatteryEntity) {
+					AetherBatteryEntity other = (AetherBatteryEntity) te;
+					batteries[dir.ordinal()] = other;
+					int aether = other.getHandler().getAether(dir.getOpposite());
+					totalAether += aether;
+					if (aether > max) {
+						max = aether;
+					}
+					if (aether < min) {
+						min = aether;
+					}
+					neighborCount++;
+				}
+			}
+			
+			if (neighborCount > 0 && totalAether > 0 && (max - min) > 2) {
+				// Found neighbors. How much should be in each?
+				int each = totalAether / (neighborCount + 1);
+				int spillover = (totalAether % (neighborCount + 1));
+				int i = 0;
+				
+				//System.out.println(String.format("Evening out. Total %d (%d neighbors). I have %d", totalAether, neighborCount, handler.getAether(null)));
+				
+				// Repeat for each found battery
+				// Note: Using a shuffled list to prevent spillover from causing bad surface tension
+				List<AetherBatteryEntity> entities = Lists.newArrayList(batteries);
+				entities.add(this);
+				Collections.shuffle(entities);
+				for (AetherBatteryEntity other : entities) {
+					if (other != null) {
+						int amt = (other.handler.getAether(null) - each + (spillover > i ? 1 : 0));
+						if (amt > 0) {
+							other.handler.drawAether(null, amt);
+						} else if (amt < 0) {
+							other.handler.addAether(null, -amt, true);
+						}
+						i++;
+					}
+				}
+				
+				// Hmmm I should be checking returns here and make sure not to vanish aether if
+				// something wants to rate limit how much can flow per tick or something...
+			}
+		}
+		
+		@Override
+		public void onAetherFlowTick(int diff, boolean added, boolean taken) {
+			super.onAetherFlowTick(diff, added, taken);
 		}
 		
 		@Override
 		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-			return super.writeToNBT(nbt);
+			nbt = super.writeToNBT(nbt);
+			
+			nbt.setString(NBT_SIZE, this.size.name());
+			return nbt;
 		}
 		
 		@Override
 		public void readFromNBT(NBTTagCompound nbt) {
 			super.readFromNBT(nbt);
+			
+			try {
+				this.size = Size.valueOf(nbt.getString(NBT_SIZE));
+			} catch (Exception e) {
+				this.size = Size.SMALL;
+			}
 		}
 	}
 
@@ -149,6 +245,38 @@ public class AetherBatteryBlock extends BlockContainer {
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState state) {
 		return EnumBlockRenderType.MODEL;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.CUTOUT;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean isTranslucent(IBlockState state) {
+		return true;
+	}
+	
+	@Override
+	public boolean isFullyOpaque(IBlockState state) {
+		return false;
+	}
+	
+	@Override
+	public boolean isFullBlock(IBlockState state) {
+		return false;
+	}
+	
+	@Override
+	public boolean isOpaqueCube(IBlockState state) {
+		return false;
+	}
+	
+	@Override
+	public boolean isFullCube(IBlockState state) {
+		return false;
 	}
 	
 	@Override

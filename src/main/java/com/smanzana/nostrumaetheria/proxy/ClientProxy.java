@@ -4,6 +4,7 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
+import com.smanzana.nostrumaetheria.client.render.AetherBatteryRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherRelayRenderer;
 import com.smanzana.nostrumaetheria.client.render.TileEntityAetherDebugRenderer;
 
@@ -31,6 +32,7 @@ public class ClientProxy extends CommonProxy {
 		TileEntityAetherDebugRenderer.registerFor(InfineAetherBlock.InfiniteAetherBlockEntity.class);
 		TileEntityAetherDebugRenderer.registerFor(AetherBatteryBlock.AetherBatteryEntity.class);
 		AetherRelayRenderer.init();
+		AetherBatteryRenderer.init();
 		
 //		RenderingRegistry.registerEntityRenderingHandler(EntityTestFairy.class, new IRenderFactory<EntityTestFairy>() {
 //			@Override

@@ -74,38 +74,18 @@ public class InfineAetherBlock extends BlockContainer {
 		public InfiniteAetherBlockEntity() {
 			super(0, 10000);
 			this.setAutoSync(5);
+			this.handler.configureInOut(false, true);
 		}
 
 		@Override
 		public void update() {
 			if (!worldObj.isRemote) {
-				int leftoverGen = this.handler.addAether(null, 10000);
-				
-//				if (ticksExisted == 1 || ticksExisted % 20 == 0) {
-//					// Validate existing connections done in super.update() already
-//					
-//					// Add new ones
-//					final int radius = 5;
-//					MutableBlockPos cursor = new MutableBlockPos();
-//					for (int x = -radius; x <= radius; x++)
-//					for (int y = -radius; y <= radius; y++)
-//					for (int z = -radius; z <= radius; z++) {
-//						cursor.setPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
-//						if (!worldObj.isBlockLoaded(cursor)) {
-//							continue;
-//						}
-//						
-//						TileEntity te = worldObj.getTileEntity(cursor);
-//						if (te != null && te != this && te instanceof AetherTileEntity) {
-//							this.addAetherConnection((AetherTileEntity) te, EnumFacing.UP);
-//						}
-//					}
-//				}
+				int leftoverGen = this.handler.addAether(null, 10000, true); // 'force' to disable having aether added by others but force ourselves.
 				
 				this.handler.pushAether(10000);
 				// Fix issue where a deficit at the start will never be recouped:
 				if (leftoverGen > 0) {
-					this.handler.addAether(null, leftoverGen);
+					this.handler.addAether(null, leftoverGen, true);
 				}
 			}
 			super.update();
