@@ -1,0 +1,15 @@
+{
+    "forge_marker": 1,
+    "variants": {
+        "facing": {
+            "north": {  },
+            "south": { "y": 180 },
+            "west":  { "y": 270 },
+            "east":  { "y": 90 }
+        },
+        "on": {
+            "true": { "model": "nostrumaetheria:aether_boiler_block_on" },
+            "false": { "model": "nostrumaetheria:aether_boiler_block_off" }
+        }
+    }
+}

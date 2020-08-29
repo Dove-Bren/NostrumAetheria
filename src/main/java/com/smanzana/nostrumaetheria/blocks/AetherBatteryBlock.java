@@ -1,6 +1,7 @@
 package com.smanzana.nostrumaetheria.blocks;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -97,7 +98,7 @@ public class AetherBatteryBlock extends BlockContainer {
 		this.setHardness(3.0f);
 		this.setResistance(10.0f);
 		this.setCreativeTab(NostrumAetheria.creativeTab);
-		this.setSoundType(SoundType.STONE);
+		this.setSoundType(SoundType.GLASS);
 		this.setHarvestLevel("axe", 0);
 	}
 	
@@ -154,61 +155,92 @@ public class AetherBatteryBlock extends BlockContainer {
 			// Look for adjacent batteries to flow into or fill from.
 			// Get total sum'ed aether to figure out how much it looks like each should have.
 			AetherBatteryEntity[] batteries = new AetherBatteryEntity[EnumFacing.values().length];
-			int totalAether = this.handler.getAether(null);
-			int neighborCount = 0;
-			int max = totalAether;
-			int min = totalAether;
-			for (EnumFacing dir : EnumFacing.values()) {
-				if (!handler.getSideEnabled(dir)) {
-					continue;
-				}
-				
-				BlockPos neighbor = pos.offset(dir);
-				
-				// First check for a TileEntity
-				TileEntity te = worldObj.getTileEntity(neighbor);
+			int myAether = this.handler.getAether(null);
+			
+			// First, try to flow down.
+			if (handler.getSideEnabled(EnumFacing.DOWN)) {
+				TileEntity te = worldObj.getTileEntity(pos.down());
 				if (te != null && te instanceof AetherBatteryEntity) {
 					AetherBatteryEntity other = (AetherBatteryEntity) te;
-					batteries[dir.ordinal()] = other;
-					int aether = other.getHandler().getAether(dir.getOpposite());
-					totalAether += aether;
-					if (aether > max) {
-						max = aether;
-					}
-					if (aether < min) {
-						min = aether;
-					}
-					neighborCount++;
+					final int startAether = myAether;
+					myAether = other.handler.addAether(null, myAether, true);
+					this.handler.drawAether(null, startAether - myAether);
 				}
 			}
 			
-			if (neighborCount > 0 && totalAether > 0 && (max - min) > 2) {
-				// Found neighbors. How much should be in each?
-				int each = totalAether / (neighborCount + 1);
-				int spillover = (totalAether % (neighborCount + 1));
-				int i = 0;
-				
-				//System.out.println(String.format("Evening out. Total %d (%d neighbors). I have %d", totalAether, neighborCount, handler.getAether(null)));
-				
-				// Repeat for each found battery
-				// Note: Using a shuffled list to prevent spillover from causing bad surface tension
-				List<AetherBatteryEntity> entities = Lists.newArrayList(batteries);
-				entities.add(this);
-				Collections.shuffle(entities);
-				for (AetherBatteryEntity other : entities) {
-					if (other != null) {
-						int amt = (other.handler.getAether(null) - each + (spillover > i ? 1 : 0));
-						if (amt > 0) {
-							other.handler.drawAether(null, amt);
-						} else if (amt < 0) {
-							other.handler.addAether(null, -amt, true);
+			if (myAether > 0) {
+				int totalAether = myAether;
+				int neighborCount = 0;
+				int max = totalAether;
+				int min = totalAether;
+				for (EnumFacing dir : new EnumFacing[]{EnumFacing.SOUTH, EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.WEST}) {
+					if (!handler.getSideEnabled(dir)) {
+						continue;
+					}
+					
+					BlockPos neighbor = pos.offset(dir);
+					
+					// First check for a TileEntity
+					TileEntity te = worldObj.getTileEntity(neighbor);
+					if (te != null && te instanceof AetherBatteryEntity) {
+						AetherBatteryEntity other = (AetherBatteryEntity) te;
+						batteries[dir.ordinal()] = other;
+						int aether = other.getHandler().getAether(dir.getOpposite());
+						totalAether += aether;
+						if (aether > max) {
+							max = aether;
 						}
-						i++;
+						if (aether < min) {
+							min = aether;
+						}
+						neighborCount++;
 					}
 				}
 				
-				// Hmmm I should be checking returns here and make sure not to vanish aether if
-				// something wants to rate limit how much can flow per tick or something...
+				List<AetherBatteryEntity> entities = Lists.newArrayList(batteries);
+				entities.add(this);
+				neighborCount++;
+				while (neighborCount > 0 && totalAether > 0 && (max - min) > 2) {
+					// Found neighbors. How much should be in each?
+					int each = totalAether / (neighborCount);
+					int spillover = (totalAether % (neighborCount));
+					int i = 0;
+					totalAether = 0;
+					
+					// Repeat for each found battery
+					// Note: Using a shuffled list to prevent spillover from causing bad surface tension
+					Collections.shuffle(entities);
+					Iterator<AetherBatteryEntity> iter = entities.iterator();
+					while (iter.hasNext()) {
+						AetherBatteryEntity other = iter.next();
+						if (other != null) {
+							int amt = (other.handler.getAether(null) - each + (spillover > i ? 1 : 0));
+							if (amt > 0) {
+								other.handler.drawAether(null, amt);
+								amt = 0;
+							} else if (amt < 0) {
+								amt = other.handler.addAether(null, -amt, true);
+							}
+							
+							// if any 'amt' is leftover, block couldn't fit it all
+							if (amt > 0) {
+								totalAether += amt;
+								neighborCount--;
+								iter.remove(); // remove because we know this one can't fit any more
+							}
+							
+							i++;
+						} else {
+							iter.remove();
+						}
+					}
+					
+					if (totalAether > 0) {
+						// at least one block couldn't fit all aether. Repeat loop.
+						// Add (count * each + leftover) to arrive at total for new subset
+						totalAether += (each * (neighborCount)) + spillover;
+					}
+				}
 			}
 		}
 		

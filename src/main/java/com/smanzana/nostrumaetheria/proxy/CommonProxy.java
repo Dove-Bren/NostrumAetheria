@@ -3,13 +3,17 @@ package com.smanzana.nostrumaetheria.proxy;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
+import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock;
+import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
+import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CommonProxy {
@@ -31,7 +35,7 @@ public class CommonProxy {
 	}
 	
 	public void init() {
-    	//NetworkRegistry.INSTANCE.registerGuiHandler(NostrumFairies.instance, new NostrumFairyGui());
+		NetworkRegistry.INSTANCE.registerGuiHandler(NostrumAetheria.instance, new NostrumAetheriaGui());
 	}
 	
 	public void postinit() {
@@ -82,6 +86,29 @@ public class CommonProxy {
     			);
     	AetherRelay.init();
     	AetheriaBlocks.AetherRelay = AetherRelay.instance();
+    	
+    	GameRegistry.register(AetherFurnaceBlock.instance(),
+    			new ResourceLocation(NostrumAetheria.MODID, AetherFurnaceBlock.ID));
+    	ItemBlock furnaceItem = new ItemBlock(AetherFurnaceBlock.instance());
+    	furnaceItem.setRegistryName(AetherFurnaceBlock.ID)
+				.setCreativeTab(NostrumAetheria.creativeTab)
+				.setUnlocalizedName(AetherFurnaceBlock.ID)
+				.setHasSubtypes(true);
+    	furnaceItem.addPropertyOverride(new ResourceLocation("on"), AetherFurnaceBlock.ON_GETTER);
+    	furnaceItem.addPropertyOverride(new ResourceLocation("size"), AetherFurnaceBlock.SIZE_GETTER);
+    	GameRegistry.register(furnaceItem);
+    	
+    	AetherFurnaceBlock.init();
+    	AetheriaBlocks.AetherFurnaceBlock = AetherFurnaceBlock.instance();
+    	
+    	GameRegistry.register(AetherBoilerBlock.instance(),
+    			new ResourceLocation(NostrumAetheria.MODID, AetherBoilerBlock.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(AetherBoilerBlock.instance()).setRegistryName(AetherBoilerBlock.ID)
+    					.setCreativeTab(NostrumAetheria.creativeTab).setUnlocalizedName(AetherBoilerBlock.ID))
+    			);
+    	AetherBoilerBlock.init();
+    	AetheriaBlocks.AetherBoilerBlock = AetherBoilerBlock.instance();
     }
 
 	public EntityPlayer getPlayer() {

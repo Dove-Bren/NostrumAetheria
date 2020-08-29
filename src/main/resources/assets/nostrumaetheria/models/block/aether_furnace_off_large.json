@@ -1,0 +1,6 @@
+{
+    "parent": "nostrumaetheria:block/aether_furnace_base",
+    "textures": {
+        "side": "nostrumaetheria:blocks/aether_furnace_front_off_large"
+    }
+}

@@ -2,6 +2,8 @@ package com.smanzana.nostrumaetheria.proxy;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
+import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock;
+import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
 import com.smanzana.nostrumaetheria.client.render.AetherBatteryRenderer;
@@ -66,6 +68,14 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(AetherRelay.instance()),
 				0,
 				AetherRelay.ID);
+		for (AetherFurnaceBlock.Type type : AetherFurnaceBlock.Type.values()) {
+			registerModel(Item.getItemFromBlock(AetherFurnaceBlock.instance()),
+					type.ordinal(),
+					AetherFurnaceBlock.ID);
+		}
+		registerModel(Item.getItemFromBlock(AetherBoilerBlock.instance()),
+				0,
+				AetherBoilerBlock.ID);
 	}
 	
 	@Override

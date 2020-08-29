@@ -1,0 +1,7 @@
+{
+    "parent": "block/orientable",
+    "textures": {
+        "top": "nostrumaetheria:blocks/aether_furnace_top",
+        "front": "#side"
+    }
+}

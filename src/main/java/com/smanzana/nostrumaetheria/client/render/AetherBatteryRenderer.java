@@ -3,7 +3,6 @@ package com.smanzana.nostrumaetheria.client.render;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock.AetherBatteryEntity;
-import com.smanzana.nostrummagica.utils.OpenGLDebugging;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
@@ -54,9 +53,7 @@ public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherB
 		//GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 		GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA,
 				SourceFactor.ONE, DestFactor.ZERO);
-		//D8D17D
 		//Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-		//GlStateManager.color(.83f, .81f, .5f, .4f + (.2f * glow));
 		GlStateManager.enableBlend();
 		GlStateManager.enableAlpha();
 		GlStateManager.disableColorMaterial();
@@ -102,17 +99,10 @@ public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherB
 		
 		tessellator.draw();
 		
-		if (!trigger) {
-			OpenGLDebugging.dumpAllIsEnabled();
-			trigger = true;
-		}
-		
 		GlStateManager.enableCull();
 		GlStateManager.popAttrib();
 		GlStateManager.popMatrix();
 		
 	}
-	
-	public boolean trigger = false;
 	
 }
