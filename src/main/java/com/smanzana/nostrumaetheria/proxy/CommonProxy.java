@@ -52,7 +52,7 @@ public class CommonProxy {
     	GameRegistry.register(InfineAetherBlock.instance(),
     			new ResourceLocation(NostrumAetheria.MODID, InfineAetherBlock.ID));
     	GameRegistry.register(
-    			(new ItemBlock(InfineAetherBlock.instance()).setRegistryName(InfineAetherBlock.ID)
+    			(InfineAetherBlock.instance().itemBlock.setRegistryName(InfineAetherBlock.ID)
     					.setCreativeTab(NostrumAetheria.creativeTab).setUnlocalizedName(InfineAetherBlock.ID))
     			);
     	InfineAetherBlock.init();

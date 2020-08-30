@@ -8,13 +8,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
 import com.smanzana.nostrumaetheria.proxy.AetheriaAPIProxy;
 import com.smanzana.nostrumaetheria.proxy.CommonProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -58,9 +59,10 @@ public class NostrumAetheria
 	    	@Override
 	        @SideOnly(Side.CLIENT)
 	        public Item getTabIconItem(){
-	    		return Items.REDSTONE;
+	    		return InfineAetherBlock.instance().itemBlock;
 	        }
 	    };
+	    InfineAetherBlock.instance().setCreativeTab(NostrumAetheria.creativeTab);
 	    
     	proxy.preinit();
     }

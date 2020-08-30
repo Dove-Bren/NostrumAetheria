@@ -2,7 +2,6 @@ package com.smanzana.nostrumaetheria.blocks;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 
 import net.minecraft.block.BlockContainer;
@@ -11,6 +10,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -43,14 +43,19 @@ public class InfineAetherBlock extends BlockContainer {
 //				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
 	}
 	
+	// Doing things weird here to allow this to be the creative tab icon
+	public final ItemBlock itemBlock;
+	
 	public InfineAetherBlock() {
 		super(Material.ROCK, MapColor.OBSIDIAN);
 		this.setUnlocalizedName(ID);
 		this.setHardness(3.0f);
 		this.setResistance(10.0f);
-		this.setCreativeTab(NostrumAetheria.creativeTab);
+		//this.setCreativeTab(NostrumAetheria.creativeTab);
 		this.setSoundType(SoundType.STONE);
 		this.setHarvestLevel("axe", 0);
+		
+		itemBlock = new ItemBlock(this);
 	}
 	
 	@Override
