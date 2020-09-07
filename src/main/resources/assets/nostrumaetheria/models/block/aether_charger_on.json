@@ -1,0 +1,6 @@
+{
+    "parent": "nostrumaetheria:block/aether_charger_off",
+    "textures": {
+        "front": "nostrumaetheria:blocks/aether_charger_front_on"
+    }
+}

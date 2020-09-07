@@ -1,6 +1,7 @@
 package com.smanzana.nostrumaetheria.blocks;
 
 import java.util.List;
+import java.util.Random;
 
 import javax.annotation.Nullable;
 
@@ -22,6 +23,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -29,6 +31,8 @@ import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -286,5 +290,46 @@ public class AetherBoilerBlock extends BlockContainer {
 			}
 		}
 		
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		if (null == stateIn || !stateIn.getValue(ON))
+			return;
+		
+		if (rand.nextBoolean()) {
+			EnumFacing facing = stateIn.getValue(FACING);
+			double d0 = (double)pos.getX() + 0.5D;
+			double d1 = (double)pos.getY() + 0.95D;
+			double d2 = (double)pos.getZ() + 0.5D;
+			
+			switch (facing) {
+			case EAST:
+				d0 += .6;
+		        break;
+			case NORTH:
+				d2 -= .6;
+		        break;
+			case SOUTH:
+		        d2 += .6;
+		        break;
+			case WEST:
+				d0 -= .6;
+		        break;
+			case UP:
+			case DOWN:
+			default:
+		        break;
+			}
+			
+			worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
+			worldIn.spawnParticle(EnumParticleTypes.FLAME, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
+		}
+		
+		if (rand.nextFloat() < .2f) {
+			worldIn.playSound((double)pos.getX() + 0.5D, (double)pos.getY(), (double)pos.getZ() + 0.5D, SoundEvents.BLOCK_FURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 1.0F, 0.25F, false);
+			worldIn.playSound((double)pos.getX() + 0.5D, (double)pos.getY(), (double)pos.getZ() + 0.5D, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.05F, 0.25F, false);
+		}
 	}
 }

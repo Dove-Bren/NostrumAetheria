@@ -5,8 +5,10 @@ import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherBathBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock;
+import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
+import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
 import com.smanzana.nostrumaetheria.items.ActivePendant;
@@ -130,6 +132,26 @@ public class CommonProxy {
     			);
     	AetherBathBlock.init();
     	APIProxy.AetherBathBlock = AetherBathBlock.instance();
+    	
+    	
+    	GameRegistry.register(AetherChargerBlock.instance(),
+    			new ResourceLocation(NostrumAetheria.MODID, AetherChargerBlock.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(AetherChargerBlock.instance()).setRegistryName(AetherChargerBlock.ID)
+    					.setCreativeTab(APIProxy.creativeTab).setUnlocalizedName(AetherChargerBlock.ID))
+    			);
+    	AetherChargerBlock.init();
+    	APIProxy.AetherChargerBlock = AetherChargerBlock.instance();
+    	
+    	
+    	GameRegistry.register(AetherRepairerBlock.instance(),
+    			new ResourceLocation(NostrumAetheria.MODID, AetherRepairerBlock.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(AetherRepairerBlock.instance()).setRegistryName(AetherRepairerBlock.ID)
+    					.setCreativeTab(APIProxy.creativeTab).setUnlocalizedName(AetherRepairerBlock.ID))
+    			);
+    	AetherRepairerBlock.init();
+    	APIProxy.AetherRepairerBlock = AetherRepairerBlock.instance();
     }
 
 	public EntityPlayer getPlayer() {

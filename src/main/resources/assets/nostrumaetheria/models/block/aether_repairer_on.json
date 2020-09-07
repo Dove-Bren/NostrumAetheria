@@ -1,0 +1,6 @@
+{
+    "parent": "nostrumaetheria:block/aether_repairer_off",
+    "textures": {
+        "top": "nostrumaetheria:blocks/aether_repairer_top_on"
+    }
+}

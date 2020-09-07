@@ -1,0 +1,8 @@
+{
+    "parent": "block/orientable",
+    "textures": {
+        "top": "nostrumaetheria:blocks/aether_repairer_top_off",
+        "side": "nostrumaetheria:blocks/aether_repairer_side",
+        "front": "nostrumaetheria:blocks/aether_repairer_side"
+    }
+}

@@ -4,8 +4,10 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.blocks.AetherBathBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock;
+import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
+import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
 import com.smanzana.nostrumaetheria.client.render.AetherBathRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherBatteryRenderer;
@@ -94,7 +96,12 @@ public class ClientProxy extends CommonProxy {
 		registerModel(AetherGem.instance(),
 				0,
 				AetherGem.ID);
-		
+		registerModel(Item.getItemFromBlock(AetherChargerBlock.instance()),
+				0,
+				AetherChargerBlock.ID);
+		registerModel(Item.getItemFromBlock(AetherRepairerBlock.instance()),
+				0,
+				AetherRepairerBlock.ID);
 	}
 	
 	@Override

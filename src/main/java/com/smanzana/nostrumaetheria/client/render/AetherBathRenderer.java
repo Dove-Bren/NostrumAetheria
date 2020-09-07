@@ -31,7 +31,9 @@ public class AetherBathRenderer extends TileEntitySpecialRenderer<AetherBathTile
 	private void renderPoolFilm(double radius) {
 		final int points = 8;
 		
+		GlStateManager.disableBlend();
 		GlStateManager.enableBlend();
+		GlStateManager.disableAlpha();
 		GlStateManager.enableAlpha();
 		GlStateManager.disableLighting();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
@@ -86,6 +88,7 @@ public class AetherBathRenderer extends TileEntitySpecialRenderer<AetherBathTile
 			GlStateManager.color(.83f, .81f, .5f, alpha);
 			renderPoolFilm(radius);
 			GlStateManager.popMatrix();
+			GlStateManager.enableTexture2D();
 		}
 		
 		ItemStack item = te.getItem();
@@ -112,6 +115,7 @@ public class AetherBathRenderer extends TileEntitySpecialRenderer<AetherBathTile
 		Minecraft.getMinecraft().getRenderItem()
 			.renderItem(item, TransformType.GROUND);
 		GlStateManager.popMatrix();
+		GlStateManager.enableTexture2D();
 	}
 	
 }

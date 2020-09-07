@@ -1,6 +1,7 @@
 package com.smanzana.nostrumaetheria.blocks;
 
 import java.util.List;
+import java.util.Random;
 
 import javax.annotation.Nullable;
 
@@ -20,6 +21,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -28,7 +30,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -297,6 +301,57 @@ public class AetherFurnaceBlock extends BlockContainer {
 			}
 		}
 		
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		if (null == stateIn || !stateIn.getValue(ON))
+			return;
+		
+		final double d0 = (double)pos.getX() + 0.5D;
+		final double d1 = (double)pos.getY() + 0.2D;
+		final double d2 = (double)pos.getZ() + 0.5D;
+		
+		for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+			if (!rand.nextBoolean()) {
+				continue;
+			}
+			
+			double x = d0;
+			double y = d1;
+			double z = d2;
+			
+			switch (facing) {
+			case EAST:
+				x += .6;
+		        break;
+			case NORTH:
+				z -= .6;
+		        break;
+			case SOUTH:
+		        z += .6;
+		        break;
+			case WEST:
+				x -= .6;
+		        break;
+			case UP:
+			case DOWN:
+			default:
+		        break;
+			}
+			
+			worldIn.spawnParticle(EnumParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
+			worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0D, 0.0D, 0.0D, new int[0]);
+			worldIn.spawnParticle(EnumParticleTypes.CRIT_MAGIC, x, y + .5, z, 0.0D, 0.0D, 0.0D, new int[0]);
+		}
+		
+		if (rand.nextFloat() < .1f) {
+			worldIn.playSound((double)pos.getX() + 0.5D, (double)pos.getY(), (double)pos.getZ() + 0.5D, SoundEvents.BLOCK_FURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 1.0F, 1F, false);
+		}
+		if (rand.nextFloat() < .1f) {
+			worldIn.playSound((double)pos.getX() + 0.5D, (double)pos.getY(), (double)pos.getZ() + 0.5D, SoundEvents.BLOCK_PORTAL_AMBIENT, SoundCategory.BLOCKS, 0.05F, 2F, false);
+		}
 	}
 	
 	public static final IItemPropertyGetter SIZE_GETTER = new IItemPropertyGetter() {

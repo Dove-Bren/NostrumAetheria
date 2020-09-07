@@ -8,6 +8,7 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
+import com.smanzana.nostrumaetheria.api.item.AetherItem;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.block.Block;
@@ -405,15 +406,28 @@ public class AetherBathBlock extends Block implements ITileEntityProvider {
 			return handler == null || handler.getAether(null) >= handler.getMaxAether(null);
 		}
 		
+		protected int maxAetherPerTick() {
+			return 2;
+		}
+		
 		@Override
 		public void update() {
 			// If we have an item, try to add aether to it
 			if (!worldObj.isRemote) {
-				IAetherHandler handler = getHeldHandler();
-				if (handler != null) {
-					int start = this.handler.getAether(null);
-					int leftover = handler.addAether(null, start);
-					this.handler.drawAether(null, start - leftover);
+				
+				if (stack != null && stack.getItem() instanceof AetherItem) {
+					// Pretty dumb thing I'm doing here for these special items.
+					AetherItem aetherItem = (AetherItem) stack.getItem();
+					int start = Math.min(maxAetherPerTick(), handler.getAether(null));
+					int leftover = aetherItem.addAether(stack, start);
+					handler.drawAether(null, start - leftover);
+				} else {
+					IAetherHandler handler = getHeldHandler();
+					if (handler != null) {
+						int start = Math.min(maxAetherPerTick(), this.handler.getAether(null));
+						int leftover = handler.addAether(null, start);
+						this.handler.drawAether(null, start - leftover);
+					}
 				}
 			}
 			
