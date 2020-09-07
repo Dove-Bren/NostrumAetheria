@@ -6,8 +6,11 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
+import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
+import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.component.AetherHandlerComponent;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 import com.smanzana.nostrumaetheria.network.messages.AetherTileEntityMessage;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -21,6 +24,11 @@ import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 
 public class AetheriaAPIProxy extends APIProxy {
 
+	@Override
+	public boolean handleIsEnabled() {
+		return true;
+	}
+	
 	@Override
 	protected void handleSyncTEAether(AetherTileEntity te) {
 		NetworkHandler.getSyncChannel().sendToAllAround(new AetherTileEntityMessage(te),
@@ -65,6 +73,12 @@ public class AetheriaAPIProxy extends APIProxy {
 		}
 		
 		return 0;
+	}
+
+	@Override
+	protected IAetherHandlerComponent handleCreateHandlerComponent(IAetherComponentListener listener, int defaultAether,
+			int defaultMaxAether) {
+		return new AetherHandlerComponent(listener, defaultAether, defaultMaxAether);
 	}
 	
 }

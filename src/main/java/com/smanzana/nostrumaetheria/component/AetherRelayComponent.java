@@ -1,4 +1,4 @@
-package com.smanzana.nostrumaetheria.api.component;
+package com.smanzana.nostrumaetheria.component;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
 import com.smanzana.nostrumaetheria.api.blocks.IAetherCapableBlock;
+import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.block.Block;
@@ -29,7 +30,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 
 public class AetherRelayComponent extends AetherHandlerComponent {
 	
-	public static interface AetherRelayListener extends AetherComponentListener {
+	public static interface AetherRelayListener extends IAetherComponentListener {
 		
 		public void onLinkChange();
 		

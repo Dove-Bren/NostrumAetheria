@@ -3,6 +3,8 @@ package com.smanzana.nostrumaetheria.api.proxy;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
+import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
+import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -35,6 +37,19 @@ public abstract class APIProxy {
 	public static Object ResearchTab = null;
 	
 	public static APIProxy handler = null;
+	
+	/**
+	 * Check whether Nostrum Aetheria is loaded, functioning, and enabled!
+	 * Not safe to call before init.
+	 * @return
+	 */
+	public static boolean isEnabled() {
+		if (handler != null) {
+			return handler.handleIsEnabled();
+		}
+		
+		return false;
+	}
 	
 	/**
 	 * Sync aether between two aether tile entities.
@@ -79,6 +94,17 @@ public abstract class APIProxy {
 		return 0;
 	}
 	
+	public static IAetherHandlerComponent createHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
+		if (handler != null) {
+			return handler.handleCreateHandlerComponent(listener, defaultAether, defaultMaxAether);
+		}
+		
+		// Could consider returning a shell here? Would that be easier?
+		return null;
+	}
+	
+	protected abstract boolean handleIsEnabled();
+	protected abstract IAetherHandlerComponent handleCreateHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether);
 	protected abstract void handleSyncTEAether(AetherTileEntity te);
 	protected abstract boolean handleIsBlockLoaded(World world, BlockPos pos);
 	protected abstract int handleDrawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nullable ItemStack ignore);

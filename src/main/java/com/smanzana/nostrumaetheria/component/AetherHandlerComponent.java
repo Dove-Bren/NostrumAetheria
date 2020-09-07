@@ -1,4 +1,4 @@
-package com.smanzana.nostrumaetheria.api.component;
+package com.smanzana.nostrumaetheria.component;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,24 +8,16 @@ import java.util.Set;
 
 import com.smanzana.nostrumaetheria.api.aether.AetherFlowMechanics;
 import com.smanzana.nostrumaetheria.api.aether.AetherFlowMechanics.AetherIterateContext;
-import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler;
+import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
+import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandler {
+public class AetherHandlerComponent implements IAetherHandlerComponent {
 	
-	public static interface AetherComponentListener {
-		
-		public void dirty();
-		
-		public void addConnections(List<AetherFlowConnection> connections);
-		
-		public void onAetherFlowTick(int diff, boolean added, boolean taken);
-	}
-
 	private static final String NBT_AETHER = "aether";
 	private static final String NBT_MAX_AETHER = "max_aether";
 	private static final String NBT_SIDE_CONFIG = "side_config";
@@ -45,7 +37,7 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 	private Set<AetherFlowConnection> remoteConnections;
 	private int maxAetherFill;
 	
-	protected final AetherComponentListener listener;
+	protected final IAetherComponentListener listener;
 	
 	// Transient tick variables
 	protected int ticksExisted;
@@ -53,7 +45,7 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 	protected boolean gaveAetherThisTick;
 	protected int aetherLastTick;
 	
-	public AetherHandlerComponent(AetherComponentListener listener, int defaultAether, int defaultMaxAether) {
+	public AetherHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
 		maxAether = defaultMaxAether;
 		aether = defaultAether;
 		sideConnections = new boolean[EnumFacing.values().length + 1]; // +1 for NULL
@@ -72,7 +64,7 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 		this.listener = listener;
 	}
 	
-	public AetherHandlerComponent(AetherComponentListener listener) {
+	public AetherHandlerComponent(IAetherComponentListener listener) {
 		this(listener, 0, 0);
 	}
 	

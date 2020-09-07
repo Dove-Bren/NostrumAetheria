@@ -3,9 +3,9 @@ package com.smanzana.nostrumaetheria.client.render;
 import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
-import com.smanzana.nostrumaetheria.api.component.AetherRelayComponent;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay.AetherRelayEntity;
+import com.smanzana.nostrumaetheria.component.AetherRelayComponent;
 import com.smanzana.nostrummagica.utils.Curves;
 
 import net.minecraft.client.renderer.GlStateManager;

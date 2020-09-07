@@ -5,10 +5,10 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
-import com.smanzana.nostrumaetheria.api.component.AetherHandlerComponent;
-import com.smanzana.nostrumaetheria.api.component.AetherRelayComponent;
-import com.smanzana.nostrumaetheria.api.component.AetherRelayComponent.AetherRelayListener;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.component.AetherHandlerComponent;
+import com.smanzana.nostrumaetheria.component.AetherRelayComponent;
+import com.smanzana.nostrumaetheria.component.AetherRelayComponent.AetherRelayListener;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;

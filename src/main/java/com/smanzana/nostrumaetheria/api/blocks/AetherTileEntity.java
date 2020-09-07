@@ -3,10 +3,11 @@ package com.smanzana.nostrumaetheria.api.blocks;
 import java.util.List;
 
 import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConnection;
-import com.smanzana.nostrumaetheria.api.component.AetherHandlerComponent;
-import com.smanzana.nostrumaetheria.api.component.AetherHandlerComponent.AetherComponentListener;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
+import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
+import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -17,11 +18,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public abstract class AetherTileEntity extends TileEntity implements IAetherHandlerProvider, AetherComponentListener {
+public abstract class AetherTileEntity extends TileEntity implements IAetherHandlerProvider, IAetherComponentListener {
 
 	private static final String NBT_HANDLER = "aether_handler";
 	
-	protected AetherHandlerComponent handler;
+	protected IAetherHandlerComponent handler;
 	
 	public AetherTileEntity(int defaultAether, int defaultMaxAether) {
 		handler = createComponent(defaultAether, defaultMaxAether);
@@ -31,8 +32,8 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 		this(0, 0);
 	}
 	
-	protected AetherHandlerComponent createComponent(int defaultAether, int defaultMaxAether) {
-		return new AetherHandlerComponent(this, defaultAether, defaultMaxAether);
+	protected IAetherHandlerComponent createComponent(int defaultAether, int defaultMaxAether) {
+		return APIProxy.createHandlerComponent(this, defaultAether, defaultMaxAether);
 	}
 	
 	@Override

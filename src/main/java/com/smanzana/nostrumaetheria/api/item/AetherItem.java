@@ -10,8 +10,8 @@ import javax.annotation.Nullable;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConnection;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
-import com.smanzana.nostrumaetheria.api.component.AetherHandlerComponent;
-import com.smanzana.nostrumaetheria.api.component.AetherHandlerComponent.AetherComponentListener;
+import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
+import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.client.resources.I18n;
@@ -45,14 +45,14 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 			return;
 		
 		if (shouldShowAether(stack, playerIn, advanced)) {
-			AetherHandlerComponent comp = getAetherHandler(stack);
+			IAetherHandlerComponent comp = getAetherHandler(stack);
 			int aether = comp.getAether(null);
 			int maxAether = comp.getMaxAether(null);
 			tooltip.add(ChatFormatting.GREEN + I18n.format("item.info.aether", new Object[] {aether, maxAether}));
 		}
 	}
 	
-	public AetherHandlerComponent getAetherHandler(ItemStack stack) {
+	public IAetherHandlerComponent getAetherHandler(ItemStack stack) {
 		return getCachedHandlerItem(stack).component;
 	}
 
@@ -61,7 +61,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 			return 0;
 		}
 		
-		AetherHandlerComponent comp = getAetherHandler(stack);
+		IAetherHandlerComponent comp = getAetherHandler(stack);
 		int aether = comp.getAether(null);
 		
 		return aether;
@@ -72,7 +72,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 			return 0;
 		}
 		
-		AetherHandlerComponent comp = getAetherHandler(stack);
+		IAetherHandlerComponent comp = getAetherHandler(stack);
 		int taken = comp.drawAether(null, amount);
 		commitHandler(stack);
 		
@@ -88,7 +88,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 			return amount;
 		}
 		
-		AetherHandlerComponent comp = getAetherHandler(stack);
+		IAetherHandlerComponent comp = getAetherHandler(stack);
 		int leftover = comp.addAether(null, amount);
 		commitHandler(stack);
 		
@@ -121,7 +121,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 		if (adapter == null) {
 			adapter = new StackHandlerItem();
 			final StackHandlerItem ref = adapter;
-			adapter.component = new AetherHandlerComponent(new AetherComponentListener() {
+			adapter.component = APIProxy.createHandlerComponent(new IAetherComponentListener() {
 
 				@Override
 				public void dirty() {
@@ -214,7 +214,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 		}
 		
 		if (!worldIn.isRemote && entityIn.ticksExisted % 20 == 0 && shouldAutoFill(stack, worldIn, entityIn)) {
-			final AetherHandlerComponent comp = getAetherHandler(stack);
+			final IAetherHandlerComponent comp = getAetherHandler(stack);
 			final int aether = comp.getAether(null);
 			final int maxAether = comp.getMaxAether(null);
 			final int missing = Math.min(maxAether - aether, getMaxAutoFill(stack, worldIn, entityIn));
@@ -253,7 +253,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	private Map<UUID, StackHandlerItem> StackHandlerCache = new HashMap<>();
 	
 	private static final class StackHandlerItem {
-		private AetherHandlerComponent component;
+		private IAetherHandlerComponent component;
 		private boolean dirty;
 	}
 }
