@@ -1,14 +1,19 @@
 package com.smanzana.nostrumaetheria.proxy;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
+import com.smanzana.nostrumaetheria.blocks.AetherBathBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
+import com.smanzana.nostrumaetheria.client.render.AetherBathRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherBatteryRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherRelayRenderer;
 import com.smanzana.nostrumaetheria.client.render.TileEntityAetherDebugRenderer;
+import com.smanzana.nostrumaetheria.items.ActivePendant;
+import com.smanzana.nostrumaetheria.items.AetherGem;
+import com.smanzana.nostrumaetheria.items.PassivePendant;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -35,6 +40,7 @@ public class ClientProxy extends CommonProxy {
 		TileEntityAetherDebugRenderer.registerFor(AetherBatteryBlock.AetherBatteryEntity.class);
 		AetherRelayRenderer.init();
 		AetherBatteryRenderer.init();
+		AetherBathRenderer.init();
 		
 //		RenderingRegistry.registerEntityRenderingHandler(EntityTestFairy.class, new IRenderFactory<EntityTestFairy>() {
 //			@Override
@@ -76,6 +82,19 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(AetherBoilerBlock.instance()),
 				0,
 				AetherBoilerBlock.ID);
+		registerModel(ActivePendant.instance(),
+				0,
+				ActivePendant.ID);
+		registerModel(PassivePendant.instance(),
+				0,
+				PassivePendant.ID);
+		registerModel(Item.getItemFromBlock(AetherBathBlock.instance()),
+				0,
+				AetherBathBlock.ID);
+		registerModel(AetherGem.instance(),
+				0,
+				AetherGem.ID);
+		
 	}
 	
 	@Override

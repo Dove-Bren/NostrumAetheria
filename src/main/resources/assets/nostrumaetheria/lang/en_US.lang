@@ -1,0 +1,8 @@
+
+
+item.info.lyon.desc=Charged up by slowly consuming reagents. Provides reagent-free casts.
+item.info.aen.desc=Charged up with Aether. Provides reagent-free casts.
+item.info.pendant.charges=%d Charges
+item.info.aether=%d / %d Aether
+
+research.tab.aether.name=Aetheria

@@ -8,14 +8,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
 import com.smanzana.nostrumaetheria.proxy.AetheriaAPIProxy;
 import com.smanzana.nostrumaetheria.proxy.CommonProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -38,7 +40,6 @@ public class NostrumAetheria
     @SidedProxy(clientSide="com.smanzana.nostrumaetheria.proxy.ClientProxy", serverSide="com.smanzana.nostrumaetheria.proxy.CommonProxy")
     public static CommonProxy proxy;
     public static Logger logger = LogManager.getLogger(MODID);
-    public static CreativeTabs creativeTab;
     public static Random random = new Random();
     
     @EventHandler
@@ -55,16 +56,17 @@ public class NostrumAetheria
 //	    	baubles.enable();
 //	    }
     	
-    	NostrumAetheria.creativeTab = new CreativeTabs(MODID){
+    	APIProxy.creativeTab = new CreativeTabs(MODID){
 	    	@Override
 	        @SideOnly(Side.CLIENT)
 	        public Item getTabIconItem(){
 	    		return InfineAetherBlock.instance().itemBlock;
 	        }
 	    };
-	    InfineAetherBlock.instance().setCreativeTab(NostrumAetheria.creativeTab);
+	    InfineAetherBlock.instance().setCreativeTab(APIProxy.creativeTab);
 	    
     	proxy.preinit();
+    	APIProxy.ResearchTab = new NostrumResearchTab("aether", new ItemStack(AetherRelay.instance()));
     }
     
     @EventHandler

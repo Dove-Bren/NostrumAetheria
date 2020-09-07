@@ -111,6 +111,8 @@ public final class AetherFlowMechanics {
 			// This indicates that trying to draw from an aether handler ended up invoking a NEW handler walk.
 			// This is usuaully avoided by overriding the IAetherFlowHandler interface and providing a selfish that-handler-only
 			// draw method (as well as an easy place to add any connections for iteration!).
+			// If you crash here but don't see another draw attempt in the callstack, you probably have a server/client issue.
+			// For example, did you accidentally tell your client-side handler to auto fill??
 			throw new RuntimeException("Handler iteration already running! Did you forget to make your flow-channeling aether handler a 'IAetherFlowHandler' ?");
 		}
 		IsRunning = true;

@@ -1,0 +1,32 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+      "model": "nostrumaetheria:pedestal_with_plate.obj"
+    },
+    "variants": {
+        "normal": [{"x": 270 }],
+        "inventory": [{
+            "transform": {
+                "thirdperson_righthand": {
+                    "translation": [0, 0.3, -0.1],
+                    "rotation": [ 180, 0, 0, 0 ]
+                },
+                "firstperson_righthand": {
+                    "rotation": [90, 0, 0, 0]
+                },
+                "firstperson_lefthand": {
+                    "rotation": [180, 0, 0, 0]
+                },
+                "gui": {
+                    "rotation": [0, 0, 90, 0]
+                },
+                "ground": {
+                    "rotation": [0, 270, 0, 0]
+                },
+                "fixed": {
+                    "rotation": [0, 90, 0, 0]
+                }
+            }
+        }]
+    }
+}

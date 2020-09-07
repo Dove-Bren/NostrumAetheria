@@ -1,13 +1,17 @@
 package com.smanzana.nostrumaetheria.proxy;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
-import com.smanzana.nostrumaetheria.api.AetheriaBlocks;
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.blocks.AetherBathBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrumaetheria.items.ActivePendant;
+import com.smanzana.nostrumaetheria.items.AetherGem;
+import com.smanzana.nostrumaetheria.items.PassivePendant;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,9 +47,17 @@ public class CommonProxy {
 	}
     
     private void registerItems() {
-//    	GameRegistry.register(
-//    			FeyStone.instance().setRegistryName(FeyStone.ID));
-//    	FeyStone.init();
+    	GameRegistry.register(
+    			ActivePendant.instance().setRegistryName(ActivePendant.ID));
+    	APIProxy.ActivePendantItem = ActivePendant.instance();
+    	
+    	GameRegistry.register(
+    			PassivePendant.instance().setRegistryName(PassivePendant.ID));
+    	APIProxy.PassivePendantItem = PassivePendant.instance();
+    	
+    	GameRegistry.register(
+    			AetherGem.instance().setRegistryName(AetherGem.ID));
+    	APIProxy.AetherGemItem = AetherGem.instance();
     }
     
     private void registerBlocks() {
@@ -53,10 +65,10 @@ public class CommonProxy {
     			new ResourceLocation(NostrumAetheria.MODID, InfineAetherBlock.ID));
     	GameRegistry.register(
     			(InfineAetherBlock.instance().itemBlock.setRegistryName(InfineAetherBlock.ID)
-    					.setCreativeTab(NostrumAetheria.creativeTab).setUnlocalizedName(InfineAetherBlock.ID))
+    					.setCreativeTab(APIProxy.creativeTab).setUnlocalizedName(InfineAetherBlock.ID))
     			);
     	InfineAetherBlock.init();
-    	AetheriaBlocks.InfiniteAetherBlock = InfineAetherBlock.instance();
+    	APIProxy.InfiniteAetherBlock = InfineAetherBlock.instance();
     	
     	for (AetherBatteryBlock block : new AetherBatteryBlock[]{
     			AetherBatteryBlock.small(),
@@ -68,30 +80,30 @@ public class CommonProxy {
         			new ResourceLocation(NostrumAetheria.MODID, block.getID()));
         	GameRegistry.register(
         			(new ItemBlock(block).setRegistryName(block.getID())
-        					.setCreativeTab(NostrumAetheria.creativeTab).setUnlocalizedName(block.getID()))
+        					.setCreativeTab(APIProxy.creativeTab).setUnlocalizedName(block.getID()))
         			);
         	
     	}
     	AetherBatteryBlock.init();
-    	AetheriaBlocks.AetherBatterySmallBlock = AetherBatteryBlock.small();
-    	AetheriaBlocks.AetherBatteryMediumBlock = AetherBatteryBlock.medium();
-    	AetheriaBlocks.AetherBatteryLargeBlock = AetherBatteryBlock.large();
-    	AetheriaBlocks.AetherBatteryGiantBlock = AetherBatteryBlock.giant();
+    	APIProxy.AetherBatterySmallBlock = AetherBatteryBlock.small();
+    	APIProxy.AetherBatteryMediumBlock = AetherBatteryBlock.medium();
+    	APIProxy.AetherBatteryLargeBlock = AetherBatteryBlock.large();
+    	APIProxy.AetherBatteryGiantBlock = AetherBatteryBlock.giant();
     	
     	GameRegistry.register(AetherRelay.instance(),
     			new ResourceLocation(NostrumAetheria.MODID, AetherRelay.ID));
     	GameRegistry.register(
     			(new ItemBlock(AetherRelay.instance()).setRegistryName(AetherRelay.ID)
-    					.setCreativeTab(NostrumAetheria.creativeTab).setUnlocalizedName(AetherRelay.ID))
+    					.setCreativeTab(APIProxy.creativeTab).setUnlocalizedName(AetherRelay.ID))
     			);
     	AetherRelay.init();
-    	AetheriaBlocks.AetherRelay = AetherRelay.instance();
+    	APIProxy.AetherRelay = AetherRelay.instance();
     	
     	GameRegistry.register(AetherFurnaceBlock.instance(),
     			new ResourceLocation(NostrumAetheria.MODID, AetherFurnaceBlock.ID));
     	ItemBlock furnaceItem = new ItemBlock(AetherFurnaceBlock.instance());
     	furnaceItem.setRegistryName(AetherFurnaceBlock.ID)
-				.setCreativeTab(NostrumAetheria.creativeTab)
+				.setCreativeTab(APIProxy.creativeTab)
 				.setUnlocalizedName(AetherFurnaceBlock.ID)
 				.setHasSubtypes(true);
     	furnaceItem.addPropertyOverride(new ResourceLocation("on"), AetherFurnaceBlock.ON_GETTER);
@@ -99,16 +111,25 @@ public class CommonProxy {
     	GameRegistry.register(furnaceItem);
     	
     	AetherFurnaceBlock.init();
-    	AetheriaBlocks.AetherFurnaceBlock = AetherFurnaceBlock.instance();
+    	APIProxy.AetherFurnaceBlock = AetherFurnaceBlock.instance();
     	
     	GameRegistry.register(AetherBoilerBlock.instance(),
     			new ResourceLocation(NostrumAetheria.MODID, AetherBoilerBlock.ID));
     	GameRegistry.register(
     			(new ItemBlock(AetherBoilerBlock.instance()).setRegistryName(AetherBoilerBlock.ID)
-    					.setCreativeTab(NostrumAetheria.creativeTab).setUnlocalizedName(AetherBoilerBlock.ID))
+    					.setCreativeTab(APIProxy.creativeTab).setUnlocalizedName(AetherBoilerBlock.ID))
     			);
     	AetherBoilerBlock.init();
-    	AetheriaBlocks.AetherBoilerBlock = AetherBoilerBlock.instance();
+    	APIProxy.AetherBoilerBlock = AetherBoilerBlock.instance();
+    	
+    	GameRegistry.register(AetherBathBlock.instance(),
+    			new ResourceLocation(NostrumAetheria.MODID, AetherBathBlock.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(AetherBathBlock.instance()).setRegistryName(AetherBathBlock.ID)
+    					.setCreativeTab(APIProxy.creativeTab).setUnlocalizedName(AetherBathBlock.ID))
+    			);
+    	AetherBathBlock.init();
+    	APIProxy.AetherBathBlock = AetherBathBlock.instance();
     }
 
 	public EntityPlayer getPlayer() {

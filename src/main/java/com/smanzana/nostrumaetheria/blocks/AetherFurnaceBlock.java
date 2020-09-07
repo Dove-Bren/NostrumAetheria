@@ -5,11 +5,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
-import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
-import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -23,7 +20,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -43,14 +39,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AetherFurnaceBlock extends BlockContainer {
 	
 	public static enum Type implements IStringSerializable {
-		SMALL(1),
-		MEDIUM(2),
-		LARGE(3);
+		SMALL(1, 1),
+		MEDIUM(1, 1.2f),
+		LARGE(1, 1.5f);
 		
-		private final int multiplier;
+		private float aetherMultiplier;
+		private float durationMultiplier;
 		
-		private Type(int multiplier) {
-			this.multiplier = multiplier;
+		private Type(float aetherMultiplier, float durationMultiplier) {
+			this.aetherMultiplier = aetherMultiplier;
+			this.durationMultiplier = durationMultiplier;
 		}
 		
 		@Override
@@ -63,8 +61,12 @@ public class AetherFurnaceBlock extends BlockContainer {
 			return this.getName();
 		}
 		
-		public int getMultiplier() {
-			return this.multiplier;
+		public float getAetherMultiplier() {
+			return this.aetherMultiplier;
+		}
+		
+		public float getDurationMultiplier() {
+			return this.durationMultiplier;
 		}
 	}
 	
@@ -95,7 +97,7 @@ public class AetherFurnaceBlock extends BlockContainer {
 		this.setUnlocalizedName(ID);
 		this.setHardness(3.0f);
 		this.setResistance(10.0f);
-		this.setCreativeTab(NostrumAetheria.creativeTab);
+		this.setCreativeTab(APIProxy.creativeTab);
 		this.setSoundType(SoundType.STONE);
 		this.setHarvestLevel("pickaxe", 0);
 	}
@@ -170,134 +172,27 @@ public class AetherFurnaceBlock extends BlockContainer {
 			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherFurnaceID, worldIn, pos.getX(), pos.getY(), pos.getZ());
 		}
 		
-		return false;
+		return true;
 	}
 	
-	public static class AetherFurnaceBlockEntity extends AetherTickingTileEntity implements IInventory {
+	public static class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 
-		private static final String NBT_INVENTORY = "inventory";
 		private static final String NBT_TYPE = "type";
-		private static final String NBT_PROGRESS = "progress";
-		
-		private final static float REAGENT_PER_TICK_BASE = 1f / (20f * 20f); // 1 reagent per 20 seconds
-		private final static int AETHER_PER_TICK_BASE = 1;
 		
 		private Type type;
-		private ItemStack[] slots;
-		private float progress;
-		private boolean burning;
 		
 		public AetherFurnaceBlockEntity() {
 			this(Type.SMALL);
 		}
 		
 		public AetherFurnaceBlockEntity(Type type) {
-			super(0, 500);
-			this.handler.configureInOut(false, true);
+			super(getFurnaceSlotsForType(type), 0, 500);
 			this.type = type;
 			
-			this.initInventory();
-		}
-		
-		public float getBurnProgress() {
-			return progress;
 		}
 		
 		public Type getType() {
 			return this.type;
-		}
-		
-		protected static float ReagentPerTick(Type type) {
-			return REAGENT_PER_TICK_BASE / type.multiplier; // get smaller with bigger furnaces, meaning reagents burn longer
-		}
-		
-		protected static int AetherPerTick(Type type) {
-			return AETHER_PER_TICK_BASE; // We burn longer instead of releasing aether faster
-		}
-		
-		/**
-		 * Checks whether this furnace's slots are filled with unique reagents that can be consumed.
-		 */
-		public boolean allReagentsValid(ReagentType type, boolean allowEmpty) {
-			boolean[] seen = new boolean[ReagentType.values().length];
-			if (type != null) {
-				seen[type.ordinal()] = true;
-			}
-			for (int i = 0; i < getSizeInventory(); i++) {
-				@Nullable ItemStack stack = slots[i];
-				if (stack == null) {
-					if (!allowEmpty) {
-						return false;
-					}
-					
-					continue;
-				}
-				
-				ReagentType reagentType = ReagentItem.findType(stack);
-				if (reagentType == null || seen[reagentType.ordinal()]) {
-					return false;
-				}
-				
-				seen[reagentType.ordinal()] = true;
-			}
-			
-			return true;
-		}
-		
-		protected void consumeReagentStack() {
-			for (int i = 0; i < getSizeInventory(); i++) {
-				this.decrStackSize(i, 1);
-			}
-		}
-		
-		/**
-		 * Attempts to consume reagents from the inventory (or eat up progress). Returns true if
-		 * there is fuel that was consumed and the furnace is still powered.
-		 * @return
-		 */
-		protected boolean consumeTick() {
-			if (progress > 0) {
-				progress = Math.max(0f, progress - ReagentPerTick(type));
-				this.markDirty();
-				return true;
-			} else if (allReagentsValid(null, false)) {
-				consumeReagentStack();
-				progress = 1f;
-				this.markDirty();
-				return true;
-			}
-			
-			return false;
-		}
-
-		@Override
-		public void update() {
-			if (!worldObj.isRemote) {
-				this.handler.pushAether(500);
-				if (handler.getAether(null) < handler.getMaxAether(null) && consumeTick()) {
-					this.handler.addAether(null, AetherPerTick(this.type), true); // 'force' to disable having aether added by others but force ourselves.
-					
-					if (!burning) {
-						worldObj.setBlockState(pos, instance().getDefaultState().withProperty(TYPE, this.type).withProperty(ON, true));
-						burning = true;
-					}
-				} else {
-					if (burning) {
-						worldObj.setBlockState(pos, instance().getDefaultState().withProperty(TYPE, this.type).withProperty(ON, false));
-						burning = false;
-					}
-				}
-			}
-			super.update();
-		}
-		
-		@Override
-		public int getSizeInventory() {
-			return AetherFurnaceBlock.getFurnaceSlotsForType(this.type);
-		}
-		
-		private void initInventory() {
-			slots = new ItemStack[this.getSizeInventory()];
 		}
 		
 		@Override
@@ -305,8 +200,6 @@ public class AetherFurnaceBlock extends BlockContainer {
 			nbt = super.writeToNBT(nbt);
 			
 			nbt.setString(NBT_TYPE, type.name());
-			nbt.setTag(NBT_INVENTORY, Inventories.serializeInventory(this));
-			nbt.setFloat(NBT_PROGRESS, progress);
 			
 			return nbt;
 		}
@@ -320,133 +213,8 @@ public class AetherFurnaceBlock extends BlockContainer {
 			} catch (Exception e) {
 				this.type = Type.SMALL;
 			}
-			initInventory();
-			
-			Inventories.deserializeInventory(this, nbt.getTag(NBT_INVENTORY));
-			this.progress = nbt.getFloat(NBT_PROGRESS);
 		}
 		
-		@Override
-		public ItemStack getStackInSlot(int index) {
-			if (index < 0 || index >= getSizeInventory())
-				return null;
-			
-			return slots[index];
-		}
-		
-		@Override
-		public ItemStack decrStackSize(int index, int count) {
-			if (index < 0 || index >= getSizeInventory() || slots[index] == null)
-				return null;
-			
-			ItemStack stack;
-			if (slots[index].stackSize <= count) {
-				stack = slots[index];
-				slots[index] = null;
-			} else {
-				stack = slots[index].copy();
-				stack.stackSize = count;
-				slots[index].stackSize -= count;
-			}
-			
-			this.markDirty();
-			
-			return stack;
-		}
-
-		@Override
-		public ItemStack removeStackFromSlot(int index) {
-			if (index < 0 || index >= getSizeInventory())
-				return null;
-			
-			ItemStack stack = slots[index];
-			slots[index] = null;
-			
-			this.markDirty();
-			return stack;
-		}
-
-		@Override
-		public void setInventorySlotContents(int index, ItemStack stack) {
-			if (!isItemValidForSlot(index, stack))
-				return;
-			
-			slots[index] = stack;
-			this.markDirty();
-		}
-		
-		@Override
-		public int getInventoryStackLimit() {
-			return 64;
-		}
-
-		@Override
-		public boolean isUseableByPlayer(EntityPlayer player) {
-			return true;
-		}
-
-		@Override
-		public void openInventory(EntityPlayer player) {
-		}
-
-		@Override
-		public void closeInventory(EntityPlayer player) {
-		}
-
-		@Override
-		public boolean isItemValidForSlot(int index, ItemStack stack) {
-			if (index < 0 || index >= getSizeInventory())
-				return false;
-			
-			if (stack != null && !(stack.getItem() instanceof ReagentItem)) {
-				return false;
-			}
-			
-			ItemStack inSlot = this.getStackInSlot(index);
-			if (inSlot == null) {
-				if (!allReagentsValid(ReagentItem.findType(stack), true)) {
-					return false;
-				}
-			}
-			
-			return true;
-		}
-		
-		private static final int progressToInt(float progress) {
-			return Math.round(progress * 10000);
-		}
-		
-		private static final float intToProgress(int value) {
-			return (float) value / 10000f;
-		}
-
-		@Override
-		public int getField(int id) {
-			if (id == 0) {
-				return progressToInt(progress);
-			}
-			return 0;
-		}
-
-		@Override
-		public void setField(int id, int value) {
-			if (id == 0) {
-				progress = intToProgress(value);
-			}
-		}
-
-		@Override
-		public int getFieldCount() {
-			return 1;
-		}
-
-		@Override
-		public void clear() {
-			for (int i = 0; i < getSizeInventory(); i++) {
-				removeStackFromSlot(i);
-			}
-		}
-
 		@Override
 		public String getName() {
 			return "Aether Furnace Inventory";
@@ -460,6 +228,21 @@ public class AetherFurnaceBlock extends BlockContainer {
 		@Override
 		public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
 			return !(oldState.getBlock().equals(newState.getBlock()) && instance().getType(oldState) == instance().getType(newState));
+		}
+
+		@Override
+		protected float getAetherMultiplier() {
+			return this.type.getAetherMultiplier();
+		}
+
+		@Override
+		protected float getDurationMultiplier() {
+			return this.type.getDurationMultiplier();
+		}
+
+		@Override
+		protected void onBurningChange(boolean newBurning) {
+			worldObj.setBlockState(pos, instance().getDefaultState().withProperty(TYPE, this.type).withProperty(ON, newBurning));
 		}
 	}
 

@@ -259,13 +259,15 @@ public class AetherHandlerComponent implements IAetherHandler, IAetherFlowHandle
 
 	@Override
 	public int drawAether(EnumFacing side, int amount) {
+		final int start = amount;
 		// Check if have enough ourselves before using the iterative approach
 		amount -= drawAetherFromMyself(side, amount, true);
 		if (amount <= 0) {
-			return 0;
+			return start;
 		}
 		
-		return AetherFlowMechanics.drawFromHandler(this, side, amount, false);
+		amount -= AetherFlowMechanics.drawFromHandler(this, side, amount, false);
+		return start - amount;
 	}
 	
 	/**

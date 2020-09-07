@@ -7,8 +7,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -97,7 +97,7 @@ public class AetherBatteryBlock extends BlockContainer {
 		this.setUnlocalizedName(size.ID);
 		this.setHardness(3.0f);
 		this.setResistance(10.0f);
-		this.setCreativeTab(NostrumAetheria.creativeTab);
+		this.setCreativeTab(APIProxy.creativeTab);
 		this.setSoundType(SoundType.GLASS);
 		this.setHarvestLevel("axe", 0);
 	}

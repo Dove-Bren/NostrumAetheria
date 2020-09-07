@@ -4,11 +4,11 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
 import com.smanzana.nostrumaetheria.api.component.AetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.component.AetherRelayComponent;
 import com.smanzana.nostrumaetheria.api.component.AetherRelayComponent.AetherRelayListener;
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
@@ -81,7 +81,7 @@ public class AetherRelay extends BlockContainer {
 		this.setUnlocalizedName(ID);
 		this.setHardness(0.5f);
 		this.setResistance(2.0f);
-		this.setCreativeTab(NostrumAetheria.creativeTab);
+		this.setCreativeTab(APIProxy.creativeTab);
 		this.setSoundType(SoundType.GLASS);
 		this.setHarvestLevel("axe", 0);
 		this.setTickRandomly(true);
