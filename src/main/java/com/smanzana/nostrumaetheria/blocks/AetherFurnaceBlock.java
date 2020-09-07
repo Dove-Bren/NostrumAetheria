@@ -78,6 +78,9 @@ public class AetherFurnaceBlock extends BlockContainer {
 	public static final PropertyBool ON = PropertyBool.create("on");
 	public static final String ID = "aether_furnace_block";
 	
+	public static final String UnlocalizedForType(Type type) {
+		return ID + "_" + type.name().toLowerCase();
+	}
 	
 	private static AetherFurnaceBlock instance = null;
 	public static AetherFurnaceBlock instance() {

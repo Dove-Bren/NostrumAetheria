@@ -2,8 +2,6 @@ package com.smanzana.nostrumaetheria.blocks;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
-
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
@@ -74,7 +72,7 @@ public class InfineAetherBlock extends BlockContainer {
 		return false;
 	}
 	
-	public static class InfiniteAetherBlockEntity extends AetherTickingTileEntity {
+	public static class InfiniteAetherBlockEntity extends NativeAetherTickingTileEntity {
 
 		public InfiniteAetherBlockEntity() {
 			super(0, 10000);

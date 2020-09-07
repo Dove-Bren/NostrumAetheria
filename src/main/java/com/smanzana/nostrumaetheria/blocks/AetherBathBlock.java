@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
-import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
@@ -195,7 +194,7 @@ public class AetherBathBlock extends Block implements ITileEntityProvider {
 		super.updateTick(worldIn, pos, state, rand);
 	}
 	
-	public static class AetherBathTileEntity extends AetherTickingTileEntity implements ISidedInventory {
+	public static class AetherBathTileEntity extends NativeAetherTickingTileEntity implements ISidedInventory {
 		
 		private ItemStack stack;
 		
@@ -407,7 +406,7 @@ public class AetherBathBlock extends Block implements ITileEntityProvider {
 		}
 		
 		protected int maxAetherPerTick() {
-			return 2;
+			return 1;
 		}
 		
 		@Override

@@ -4,9 +4,8 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
+import com.smanzana.nostrumaetheria.api.component.OptionalAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
-import com.smanzana.nostrumaetheria.component.AetherHandlerComponent;
 import com.smanzana.nostrumaetheria.component.AetherRelayComponent;
 import com.smanzana.nostrumaetheria.component.AetherRelayComponent.AetherRelayListener;
 
@@ -196,7 +195,7 @@ public class AetherRelay extends BlockContainer {
 		return false;
 	}
 	
-	public static class AetherRelayEntity extends AetherTileEntity implements AetherRelayListener {
+	public static class AetherRelayEntity extends NativeAetherTickingTileEntity implements AetherRelayListener {
 
 		private static final String NBT_SIDE = "relay_side";
 		
@@ -204,26 +203,26 @@ public class AetherRelay extends BlockContainer {
 		private EnumFacing side;
 		
 		public AetherRelayEntity() {
-			super(0, 0);
-			side = EnumFacing.UP;
+			this(EnumFacing.UP);
 		}
 		
 		public AetherRelayEntity(EnumFacing facing) {
-			this();
+			super(0, 0);
 			
 			side = facing;
 			this.relayHandler = new AetherRelayComponent(this, facing);
 			this.handler = relayHandler;
+			this.compWrapper = new OptionalAetherHandlerComponent(relayHandler);
 		}
 		
-		@Override
-		protected AetherHandlerComponent createComponent(int defaultAether, int defaultMaxAether) {
-			// I wantd to override this and return a relay component but I can't think of a neasy way to get the side here.
-			// I could relax the component to not care about side at first, and have it attached later. instead
-			// I'll just throw the old one away?
-			relayHandler = new AetherRelayComponent(this, EnumFacing.UP); 
-			 return relayHandler;
-		}
+//		@Override
+//		protected AetherHandlerComponent createComponent(int defaultAether, int defaultMaxAether) {
+//			// I wantd to override this and return a relay component but I can't think of a neasy way to get the side here.
+//			// I could relax the component to not care about side at first, and have it attached later. instead
+//			// I'll just throw the old one away?
+//			relayHandler = new AetherRelayComponent(this, EnumFacing.UP); 
+//			return relayHandler;
+//		}
 		
 		@Override
 		public void validate() {
@@ -326,6 +325,7 @@ public class AetherRelay extends BlockContainer {
 			super.readFromNBT(compound);
 			
 			this.side = EnumFacing.values()[compound.getByte(NBT_SIDE)];
+			relayHandler.setSide(this.side);
 		}
 	}
 

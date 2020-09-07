@@ -6,7 +6,6 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
-import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
 
@@ -184,7 +183,7 @@ public class AetherRepairerBlock extends BlockContainer {
 		}
 	}
 	
-	public static class AetherRepairerBlockEntity extends AetherTickingTileEntity implements ISidedInventory {
+	public static class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory {
 		
 		private static int GetAetherCost(ItemStack stack) {
 			float base;

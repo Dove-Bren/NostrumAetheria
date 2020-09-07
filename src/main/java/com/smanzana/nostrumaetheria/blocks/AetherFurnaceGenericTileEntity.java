@@ -7,7 +7,6 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
 import com.smanzana.nostrummagica.utils.Inventories;
 
@@ -17,7 +16,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public abstract class AetherFurnaceGenericTileEntity extends AetherTickingTileEntity implements IInventory {
+public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTickingTileEntity implements IInventory {
 
 	private static final String NBT_INVENTORY_SLOTS = "slots";
 	private static final String NBT_INVENTORY = "inventory";

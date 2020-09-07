@@ -20,9 +20,19 @@ public class OptionalAetherHandlerComponent {
 		}
 	}
 	
+	public OptionalAetherHandlerComponent(IAetherHandlerComponent presetComponent) {
+		this.component = presetComponent;
+	}
+	
 	public void setAutoFill(boolean autoFill) {
 		if (component != null) {
 			component.setAutoFill(autoFill);
+		}
+	}
+	
+	public void configureInOut(boolean inputAllowed, boolean outputAllowed) {
+		if (component != null) {
+			component.configureInOut(inputAllowed, outputAllowed);
 		}
 	}
 	

@@ -73,9 +73,12 @@ public class AetherRelayRenderer extends TileEntitySpecialRenderer<AetherRelayEn
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x + .5, y + AetherRelay.height, z + .5);
 		GlStateManager.disableColorMaterial();
+		GlStateManager.enableTexture2D();
 		GlStateManager.disableTexture2D();
 		GlStateManager.disableLighting();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		GlStateManager.disableBlend();
+		GlStateManager.disableAlpha();
 		GlStateManager.enableBlend();
 		GlStateManager.enableAlpha();
 		GlStateManager.glLineWidth(3f);

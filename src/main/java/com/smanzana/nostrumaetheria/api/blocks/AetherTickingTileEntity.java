@@ -43,7 +43,7 @@ public abstract class AetherTickingTileEntity extends AetherTileEntity implement
 	public void update() {
 		ticksExisted++;
 		
-		handler.tick();
+		compWrapper.tick();
 		
 		if (!worldObj.isRemote && aetherDirtyFlag && autoSyncPeriod > 0 && (ticksExisted == 1 || ticksExisted % autoSyncPeriod == 0)) {
 			//worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 2);

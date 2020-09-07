@@ -39,7 +39,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	private static final String NBT_LINK = "relay_links";
 	
 	protected final int range;
-	protected final EnumFacing side;
+	protected EnumFacing side;
 	protected World worldObj;
 	protected BlockPos pos;
 	
@@ -59,18 +59,23 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 		this.links = new HashSet<>();
 		this.linkCache = new LinkedList<>();
 		this.missingLinks = new LinkedList<>();
-		this.side = side;
 		this.listener = listener;
 		
+		
+		setSide(side);
+	}
+	
+	public AetherRelayComponent(AetherRelayListener listener, EnumFacing side) {
+		this(listener, side, 8);
+	}
+	
+	public void setSide(EnumFacing side) {
 		// Configure connections to only allow the block we're actually attached to
 		for (EnumFacing s : EnumFacing.values()) { // Note: leaves out null, which we use for relay connections
 			this.enableSide(s, false, false);
 		}
 		this.enableSide(side.getOpposite(), true, false);
-	}
-	
-	public AetherRelayComponent(AetherRelayListener listener, EnumFacing side) {
-		this(listener, side, 8);
+		this.side = side;
 	}
 	
 	public void setPosition(World world, BlockPos pos) {

@@ -2,12 +2,14 @@ package com.smanzana.nostrumaetheria.api.blocks;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConnection;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
-import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.api.component.OptionalAetherHandlerComponent;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -22,46 +24,49 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 
 	private static final String NBT_HANDLER = "aether_handler";
 	
-	protected IAetherHandlerComponent handler;
+	protected OptionalAetherHandlerComponent compWrapper;
 	
 	public AetherTileEntity(int defaultAether, int defaultMaxAether) {
-		handler = createComponent(defaultAether, defaultMaxAether);
+		compWrapper = createComponent(defaultAether, defaultMaxAether);
 	}
 	
 	public AetherTileEntity() {
 		this(0, 0);
 	}
 	
-	protected IAetherHandlerComponent createComponent(int defaultAether, int defaultMaxAether) {
-		return APIProxy.createHandlerComponent(this, defaultAether, defaultMaxAether);
+	protected OptionalAetherHandlerComponent createComponent(int defaultAether, int defaultMaxAether) {
+		return new OptionalAetherHandlerComponent(this, defaultAether, defaultMaxAether);
 	}
 	
 	@Override
 	public void addConnections(List<AetherFlowConnection> connections) {
-		for (EnumFacing dir : EnumFacing.values()) {
-			if (!handler.getSideEnabled(dir)) {
-				continue;
-			}
-			
-			BlockPos neighbor = pos.offset(dir);
-			
-			// First check for a TileEntity
-			TileEntity te = worldObj.getTileEntity(neighbor);
-			if (te != null && te instanceof IAetherHandler) {
-				connections.add(new AetherFlowConnection((IAetherHandler) te, dir.getOpposite()));
-				continue;
-			}
-			if (te != null && te instanceof IAetherHandlerProvider) {
-				connections.add(new AetherFlowConnection(((IAetherHandlerProvider) te).getHandler(), dir.getOpposite()));
-				continue;
-			}
-			
-			// See if block boasts being able to get us a handler
-			IBlockState attachedState = worldObj.getBlockState(neighbor);
-			Block attachedBlock = attachedState.getBlock();
-			if (attachedBlock instanceof IAetherCapableBlock) {
-				connections.add(new AetherFlowConnection(((IAetherCapableBlock) attachedBlock).getAetherHandler(worldObj, attachedState, neighbor, dir), dir.getOpposite()));
-				continue;
+		IAetherHandlerComponent comp = compWrapper.getHandlerIfPresent();
+		if (comp != null) {
+			for (EnumFacing dir : EnumFacing.values()) {
+				if (!comp.getSideEnabled(dir)) {
+					continue;
+				}
+				
+				BlockPos neighbor = pos.offset(dir);
+				
+				// First check for a TileEntity
+				TileEntity te = worldObj.getTileEntity(neighbor);
+				if (te != null && te instanceof IAetherHandler) {
+					connections.add(new AetherFlowConnection((IAetherHandler) te, dir.getOpposite()));
+					continue;
+				}
+				if (te != null && te instanceof IAetherHandlerProvider) {
+					connections.add(new AetherFlowConnection(((IAetherHandlerProvider) te).getHandler(), dir.getOpposite()));
+					continue;
+				}
+				
+				// See if block boasts being able to get us a handler
+				IBlockState attachedState = worldObj.getBlockState(neighbor);
+				Block attachedBlock = attachedState.getBlock();
+				if (attachedBlock instanceof IAetherCapableBlock) {
+					connections.add(new AetherFlowConnection(((IAetherCapableBlock) attachedBlock).getAetherHandler(worldObj, attachedState, neighbor, dir), dir.getOpposite()));
+					continue;
+				}
 			}
 		}
 	}
@@ -86,19 +91,25 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 		super.invalidate();
 		
 		// Clean up connections
-		handler.clearConnections();
+		IAetherHandlerComponent comp = compWrapper.getHandlerIfPresent();
+		if (comp != null) {
+			comp.clearConnections();
+		}
 	}
 	
 	@Override
 	public void onChunkUnload() {
 		super.onChunkUnload();
-		handler.clearConnections();
+		IAetherHandlerComponent comp = compWrapper.getHandlerIfPresent();
+		if (comp != null) {
+			comp.clearConnections();
+		}
 	}
 	
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		super.writeToNBT(compound);
 		
-		compound.setTag(NBT_HANDLER, handler.writeToNBT(new NBTTagCompound()));
+		compound.setTag(NBT_HANDLER, compWrapper.toNBT());
 		
 		return compound;
 	}
@@ -106,16 +117,19 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	public void readFromNBT(NBTTagCompound compound) {
 		super.readFromNBT(compound);
 		
-		handler.readFromNBT(compound.getCompoundTag(NBT_HANDLER));
+		compWrapper.loadNBT(compound.getTag(NBT_HANDLER));
 	}
 
 	@SideOnly(Side.CLIENT)
 	public void syncAether(int aether) {
-		this.handler.setAether(aether);
+		IAetherHandlerComponent comp = compWrapper.getHandlerIfPresent();
+		if (comp != null) {
+			comp.setAether(aether);
+		}
 	}
 	
 	@Override
-	public IAetherHandler getHandler() {
-		return handler;
+	public @Nullable IAetherHandler getHandler() {
+		return compWrapper.getHandlerIfPresent();
 	}
 }

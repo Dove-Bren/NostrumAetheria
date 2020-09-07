@@ -7,7 +7,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.block.BlockContainer;
@@ -122,7 +121,7 @@ public class AetherBatteryBlock extends BlockContainer {
 		return false;
 	}
 	
-	public static class AetherBatteryEntity extends AetherTickingTileEntity {
+	public static class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 
 		private static final String NBT_SIZE = "battery_size";
 		
