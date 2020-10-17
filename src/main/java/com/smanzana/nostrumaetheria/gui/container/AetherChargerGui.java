@@ -174,7 +174,7 @@ public class AetherChargerGui {
 			if (chargerHandler != null) {
 				if (mouseX >= horizontalMargin + GUI_TOP_BAR_HOFFSET && mouseX <= horizontalMargin + GUI_TOP_BAR_HOFFSET + GUI_TOP_BAR_WIDTH
 						&& mouseY >= verticalMargin + GUI_TOP_BAR_VOFFSET && mouseY <= verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT) {
-					drawHoveringText(Lists.newArrayList(chargerHandler.getAether(null) + " / " + chargerHandler.getMaxAether(null)),
+					drawHoveringText(Lists.newArrayList(String.format("%.2f / %.2f", chargerHandler.getAether(null) * .01f, chargerHandler.getMaxAether(null) * .01f)),
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}
@@ -183,7 +183,7 @@ public class AetherChargerGui {
 			if (nestedHandler != null) {
 				if (mouseX >= horizontalMargin + GUI_BOTTOM_BAR_HOFFSET && mouseX <= horizontalMargin + GUI_BOTTOM_BAR_HOFFSET + GUI_BOTTOM_BAR_WIDTH
 						&& mouseY >= verticalMargin + GUI_BOTTOM_BAR_VOFFSET && mouseY <= verticalMargin + GUI_BOTTOM_BAR_VOFFSET + GUI_BOTTOM_BAR_HEIGHT) {
-					drawHoveringText(Lists.newArrayList(nestedHandler.getAether(null) + " / " + nestedHandler.getMaxAether(null)),
+					drawHoveringText(Lists.newArrayList(String.format("%.2f / %.2f", nestedHandler.getAether(null) * .01f, nestedHandler.getMaxAether(null) * .01f)),
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}

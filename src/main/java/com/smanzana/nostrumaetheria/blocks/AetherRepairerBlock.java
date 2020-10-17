@@ -8,6 +8,9 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -43,7 +46,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class AetherRepairerBlock extends BlockContainer {
+public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 	
 	public static final PropertyBool ON = PropertyBool.create("on");
 	public static final String ID = "aether_repairer";
@@ -181,6 +184,31 @@ public class AetherRepairerBlock extends BlockContainer {
 			worldIn.playSound((double)pos.getX() + 0.5D, (double)pos.getY(), (double)pos.getZ() + 0.5D, SoundEvents.BLOCK_WATER_AMBIENT, SoundCategory.BLOCKS, 1.0F, 0.25F, false);
 			worldIn.playSound((double)pos.getX() + 0.5D, (double)pos.getY(), (double)pos.getZ() + 0.5D, SoundEvents.BLOCK_LADDER_STEP, SoundCategory.BLOCKS, 0.1F, 0.25F, false);
 		}
+	}
+	
+	@Override
+	public String getLoreKey() {
+		return "aether_repairer";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Aether Repairing";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("These blocks user aether to repair items and equipment.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("These blocks user aether to repair items and equipment.", "The amount of aether it takes to repair each point of damage depends on the material, type of tool, or form of equipment.");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_BLOCKS;
 	}
 	
 	public static class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory {

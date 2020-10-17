@@ -20,7 +20,7 @@ item.info.lyon.desc=Charged up by slowly consuming reagents. Provides reagent-fr
 item.info.aen.desc=Charged up with Aether. Provides reagent-free casts.
 item.info.pendant.charges=%d Charges
 item.info.aether_gem.desc=Stores aether and provides it to other items in your inventory
-item.info.aether=%d / %d Aether
+item.info.aether=%s / %s
 
 itemGroup.nostrumaetheria=Nostrum Aetheria
 

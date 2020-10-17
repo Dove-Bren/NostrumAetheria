@@ -159,7 +159,7 @@ public class AetherRepairerGui {
 			if (repairerHandler != null) {
 				if (mouseX >= horizontalMargin + GUI_TOP_BAR_HOFFSET && mouseX <= horizontalMargin + GUI_TOP_BAR_HOFFSET + GUI_TOP_BAR_WIDTH
 						&& mouseY >= verticalMargin + GUI_TOP_BAR_VOFFSET && mouseY <= verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT) {
-					drawHoveringText(Lists.newArrayList(repairerHandler.getAether(null) + " / " + repairerHandler.getMaxAether(null)),
+					drawHoveringText(Lists.newArrayList(String.format("%.2f / %.2f", repairerHandler.getAether(null) * .01f, repairerHandler.getMaxAether(null) * .01f)),
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}

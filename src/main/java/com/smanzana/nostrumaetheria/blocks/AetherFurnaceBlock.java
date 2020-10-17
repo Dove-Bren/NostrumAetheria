@@ -8,6 +8,9 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -40,7 +43,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class AetherFurnaceBlock extends BlockContainer {
+public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 	
 	public static enum Type implements IStringSerializable {
 		SMALL(1, 1),
@@ -371,4 +374,29 @@ public class AetherFurnaceBlock extends BlockContainer {
 			return AetherFurnaceBlock.instance.onFromMeta(stack.getMetadata()) ? 1.0F : 0.0F;
 		}
 	};
+	
+	@Override
+	public String getLoreKey() {
+		return "aether_furnace";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Aether Furnace";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Aether furnaces burn reagents and produce aether.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Aether furnaces burn reagents and produce aether.", "Each different tier of furnace takes more reagents, but burn longer.", "All reagents placed in the furnace must be different.");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_BLOCKS;
+	}
 }

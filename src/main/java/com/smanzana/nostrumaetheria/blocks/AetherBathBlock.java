@@ -9,6 +9,9 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -35,7 +38,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class AetherBathBlock extends Block implements ITileEntityProvider {
+public class AetherBathBlock extends Block implements ITileEntityProvider, ILoreTagged {
 	
 	public static final String ID = "aether_bath";
 	protected static final AxisAlignedBB ALTAR_AABB = new AxisAlignedBB(0.2D, 0.0D, 0.2D, 0.8D, 0.9D, 0.8D);
@@ -441,5 +444,30 @@ public class AetherBathBlock extends Block implements ITileEntityProvider {
 				this.handler.setAutoFill(true);
 			}
 		}
+	}
+
+	@Override
+	public String getLoreKey() {
+		return "aether_bath";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Aether Bath";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Fashioned from an altar and a large stone bowl, the aether bath aesthetically displays all of your aether.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Fashioned from an altar and a large stone bowl, the aether bath aesthetically displays all of your aether.", "Aether baths fill up items with aether slowly.");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_BLOCKS;
 	}
 }

@@ -8,6 +8,9 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -29,7 +32,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class AetherBatteryBlock extends BlockContainer {
+public class AetherBatteryBlock extends BlockContainer implements ILoreTagged {
 	
 	private static enum Size {
 		SMALL("aether_battery_small", 1000),
@@ -331,5 +334,30 @@ public class AetherBatteryBlock extends BlockContainer {
 //			}
 //		}
 		
+	}
+
+	@Override
+	public String getLoreKey() {
+		return "AetherBattery";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Aether Batteries";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Aether batteries store aether, allowing you to build up a bunch for big costs.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Aether batteries store aether, allowing you to build up a bunch for big costs.", "There are four levels of battery. Batteries automatically flow into eachother, prefering to flow down when possible.");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_BLOCKS;
 	}
 }

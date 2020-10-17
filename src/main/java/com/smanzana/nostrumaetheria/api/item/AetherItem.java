@@ -48,7 +48,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 			IAetherHandlerComponent comp = getAetherHandler(stack);
 			int aether = comp.getAether(null);
 			int maxAether = comp.getMaxAether(null);
-			tooltip.add(ChatFormatting.GREEN + I18n.format("item.info.aether", new Object[] {aether, maxAether}));
+			tooltip.add(ChatFormatting.DARK_PURPLE + I18n.format("item.info.aether", new Object[] {String.format("%.2f", (float) aether * .01f), String.format("%.2f", (float) maxAether * .01f)}));
 		}
 	}
 	

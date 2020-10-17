@@ -75,6 +75,14 @@ public class OptionalAetherHandlerComponent {
 		return false;
 	}
 	
+	public boolean check(int amount) {
+		if (component == null) {
+			return true;
+		}
+		
+		return (component.getAether(null) >= amount);
+	}
+	
 	public NBTBase toNBT() {
 		if (component == null) {
 			return new NBTTagString("ABSENT");

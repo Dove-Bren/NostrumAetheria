@@ -9,6 +9,9 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherBathBlock.AetherBathTileEntity;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockHorizontal;
@@ -39,7 +42,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class AetherChargerBlock extends BlockContainer {
+public class AetherChargerBlock extends BlockContainer implements ILoreTagged {
 	
 	public static final PropertyBool ON = PropertyBool.create("on");
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
@@ -211,6 +214,31 @@ public class AetherChargerBlock extends BlockContainer {
 		if (rand.nextFloat() < .1f) {
 			worldIn.playSound((double)pos.getX() + 0.5D, (double)pos.getY(), (double)pos.getZ() + 0.5D, SoundEvents.BLOCK_WATER_AMBIENT, SoundCategory.BLOCKS, 0.7F, 0.25F, false);
 		}
+	}
+	
+	@Override
+	public String getLoreKey() {
+		return "aether_charger";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Aether Charger";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Aether chargers are an improved version of the aether bath.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Aether chargers allow you to add aether to items quickly and efficiently.");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_BLOCKS;
 	}
 	
 	public static class AetherChargerBlockEntity extends AetherBathTileEntity {

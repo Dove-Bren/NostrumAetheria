@@ -27,6 +27,7 @@ import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
@@ -63,12 +64,18 @@ public class CommonProxy {
     	registerItems();
     	registerBlocks();
     	this.registerRituals();
+    	
+    	NostrumMagica.instance.registerResearchReloadHook((i) -> {
+    		registerResearch();
+    		return 0;
+    	});
 	}
 	
 	public void init() {
 		NetworkRegistry.INSTANCE.registerGuiHandler(NostrumAetheria.instance, new NostrumAetheriaGui());
 		
 		this.registerResearch();
+		this.registerLore();
 	}
 	
 	public void postinit() {
@@ -455,6 +462,19 @@ public class CommonProxy {
 						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherRelay, 3))
 						)
 				);
+    }
+    
+    private void registerLore() {
+    	LoreRegistry.instance().register(AetherBathBlock.instance());
+    	LoreRegistry.instance().register(AetherBatteryBlock.small());
+    	LoreRegistry.instance().register(AetherBoilerBlock.instance());
+    	LoreRegistry.instance().register(AetherChargerBlock.instance());
+    	LoreRegistry.instance().register(AetherFurnaceBlock.instance());
+    	LoreRegistry.instance().register(AetherRelay.instance());
+    	LoreRegistry.instance().register(AetherRepairerBlock.instance());
+    	LoreRegistry.instance().register(ActivePendant.instance());
+    	LoreRegistry.instance().register(PassivePendant.instance());
+    	LoreRegistry.instance().register(AetherGem.instance());
     }
 
 	public EntityPlayer getPlayer() {

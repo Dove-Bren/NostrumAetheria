@@ -8,6 +8,9 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockFurnace;
@@ -44,7 +47,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class AetherBoilerBlock extends BlockContainer {
+public class AetherBoilerBlock extends BlockContainer implements ILoreTagged {
 	
 	public static final PropertyBool ON = PropertyBool.create("on");
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
@@ -331,5 +334,30 @@ public class AetherBoilerBlock extends BlockContainer {
 			worldIn.playSound((double)pos.getX() + 0.5D, (double)pos.getY(), (double)pos.getZ() + 0.5D, SoundEvents.BLOCK_FURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 1.0F, 0.25F, false);
 			worldIn.playSound((double)pos.getX() + 0.5D, (double)pos.getY(), (double)pos.getZ() + 0.5D, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.05F, 0.25F, false);
 		}
+	}
+	
+	@Override
+	public String getLoreKey() {
+		return "aether_boiler";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Aether Boiler";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Aether boilers allow you to generate aether while also doing regular smelting.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Aether boilers allow you to generate aether while also doing regular smelting.", "To use, put the boiler underneath a furnace. Add reagents, and then watch the furnace be powered!");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_BLOCKS;
 	}
 }

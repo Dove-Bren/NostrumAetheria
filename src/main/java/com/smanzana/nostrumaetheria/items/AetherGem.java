@@ -70,6 +70,7 @@ public class AetherGem extends AetherItem implements ILoreTagged {
 			return;
 		
 		tooltip.add(I18n.format("item.info.aether_gem.desc", (Object[]) null));
+		super.addInformation(stack, playerIn, tooltip, advanced);
 	}
 
 	@Override

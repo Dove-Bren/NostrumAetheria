@@ -8,6 +8,7 @@ import com.smanzana.nostrumaetheria.blocks.AetherRelay.AetherRelayEntity;
 import com.smanzana.nostrumaetheria.component.AetherRelayComponent;
 import com.smanzana.nostrummagica.utils.Curves;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
@@ -15,6 +16,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -42,7 +44,8 @@ public class AetherRelayRenderer extends TileEntitySpecialRenderer<AetherRelayEn
 			return;
 		}
 		
-		boolean debug = true;
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		boolean debug = player != null && (player.isCreative() || player.isSpectator());
 		
 		AetherRelayComponent relay = (AetherRelayComponent) handler;
 
@@ -53,13 +56,14 @@ public class AetherRelayRenderer extends TileEntitySpecialRenderer<AetherRelayEn
 		float[] dotColor = {1f, 0f, 0f, 1f};
 		float[] notColor = {0f, 0f, 0f, 0f};
 		
+		
 		if (debug) {
 			period = (20 * 3);
 			dotLength = 10;
 			dotColor = new float[]{1f, 0f, 0f, 1f};
 			notColor = new float[]{0f, 0f, 0f, 0f};
 		} else {
-			period = (20 * 5);
+			period = (20 * 10);
 			dotLength = 4;
 			dotColor = new float[]{1f, .3f, .3f, .2f};
 			notColor = new float[]{0f, 0f, 0f, 0f};

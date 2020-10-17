@@ -8,6 +8,9 @@ import com.smanzana.nostrumaetheria.api.component.OptionalAetherHandlerComponent
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.component.AetherRelayComponent;
 import com.smanzana.nostrumaetheria.component.AetherRelayComponent.AetherRelayListener;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
@@ -37,7 +40,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class AetherRelay extends BlockContainer {
+public class AetherRelay extends BlockContainer implements ILoreTagged {
 	
 	public static final PropertyDirection FACING = PropertyDirection.create("facing");
 	public static final String ID = "aether_relay";
@@ -386,5 +389,30 @@ public class AetherRelay extends BlockContainer {
 			this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);
 		}
+	}
+	
+	@Override
+	public String getLoreKey() {
+		return "aether_relay";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Aether Relays";
+	}
+
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Aether relays allow aether to be pulled from distant blocks.", "Relays automatically link to one another if placed close enough.");
+	}
+
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Aether relays allow aether to be pulled from distant blocks.", "Relays automatically link to one another if placed close enough.", "Relays can link to other relays up to 8 blocks away.");
+	}
+
+	@Override
+	public InfoScreenTabs getTab() {
+		return InfoScreenTabs.INFO_BLOCKS;
 	}
 }
