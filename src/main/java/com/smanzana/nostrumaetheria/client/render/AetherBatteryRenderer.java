@@ -58,6 +58,7 @@ public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherB
 		GlStateManager.enableBlend();
 		GlStateManager.disableAlpha();
 		GlStateManager.enableAlpha();
+		GlStateManager.enableColorMaterial();
 		GlStateManager.disableColorMaterial();
 		GlStateManager.enableTexture2D();
 		GlStateManager.disableTexture2D();
@@ -103,6 +104,8 @@ public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherB
 		tessellator.draw();
 		
 		GlStateManager.enableCull();
+		GlStateManager.disableBlend();
+		GlStateManager.enableTexture2D();
 		GlStateManager.popAttrib();
 		GlStateManager.popMatrix();
 		
