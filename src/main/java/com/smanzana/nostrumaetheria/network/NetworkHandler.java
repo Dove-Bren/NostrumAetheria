@@ -12,7 +12,7 @@ public class NetworkHandler {
 	
 	private static int discriminator = 0;
 	
-	private static final String CHANNEL_SYNC_NAME = "nostrum_aether_channel";
+	private static final String CHANNEL_SYNC_NAME = "nostrumaether_net"; // must be <20 chars
 	
 	
 	public static SimpleNetworkWrapper getSyncChannel() {

@@ -242,6 +242,12 @@ public class AetherBoilerBlock extends BlockContainer implements ILoreTagged {
 			IBlockState state = worldObj.getBlockState(pos);
 			worldObj.setBlockState(pos, instance().getDefaultState().withProperty(ON, newBurning).withProperty(FACING, state.getValue(FACING)));
 		}
+		
+		@Override
+		protected void generateAether() {
+			super.generateAether();
+			this.fuelNearbyFurnace();
+		}
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
+import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
 import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
 import com.smanzana.nostrumaetheria.items.ActivePendant;
@@ -21,11 +22,11 @@ import com.smanzana.nostrummagica.aetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
+import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.ThanoPendant;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.research.NostrumResearch;
@@ -197,6 +198,15 @@ public class CommonProxy {
     			);
     	AetherRepairerBlock.init();
     	APIProxy.AetherRepairerBlock = AetherRepairerBlock.instance();
+    	
+    	GameRegistry.register(AetherUnravelerBlock.instance(),
+    			new ResourceLocation(NostrumAetheria.MODID, AetherUnravelerBlock.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(AetherUnravelerBlock.instance()).setRegistryName(AetherUnravelerBlock.ID)
+    					.setCreativeTab(APIProxy.creativeTab).setUnlocalizedName(AetherUnravelerBlock.ID))
+    			);
+    	AetherUnravelerBlock.init();
+    	APIProxy.AetherUnravelerBlock = AetherUnravelerBlock.instance();
     }
     
     private void registerResearch() {
@@ -249,6 +259,13 @@ public class CommonProxy {
 			.hiddenParent("vani")
 			.reference("ritual::aether_repairer", "ritual.aether_repairer.name")
 		.build("aether_repairer", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, 2, true, new ItemStack(APIProxy.AetherRepairerBlock));
+		
+		NostrumResearch.startBuilding()
+			.parent("aether_repairer")
+			.reference("ritual::aether_unraveler", "ritual.aether_unraveler.name")
+		.build("aether_unraveler", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, 3, true, new ItemStack(APIProxy.AetherUnravelerBlock));
+		
+		//aether_unraveler
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_furnace")
@@ -392,6 +409,18 @@ public class CommonProxy {
 				);
 		
 		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("aether_unraveler",
+						new ItemStack(APIProxy.AetherUnravelerBlock),
+						EMagicElement.FIRE,
+						new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.GINSENG},
+						new ItemStack(APIProxy.AetherChargerBlock),
+						new ItemStack[] {new ItemStack(Blocks.OBSIDIAN), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), new ItemStack(Blocks.MAGMA), new ItemStack(Blocks.OBSIDIAN)},
+						new RRequirementResearch("aether_unraveler"),
+						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherUnravelerBlock))
+						)
+				);
+		
+		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_battery_small",
 						new ItemStack(APIProxy.AetherBatterySmallBlock),
 						null,
@@ -475,6 +504,7 @@ public class CommonProxy {
     	LoreRegistry.instance().register(ActivePendant.instance());
     	LoreRegistry.instance().register(PassivePendant.instance());
     	LoreRegistry.instance().register(AetherGem.instance());
+    	LoreRegistry.instance().register(AetherUnravelerBlock.instance());
     }
 
 	public EntityPlayer getPlayer() {

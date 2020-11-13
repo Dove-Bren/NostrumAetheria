@@ -10,7 +10,8 @@ tile.aether_furnace_block_large.name=Giant Aether Furnace
 tile.aether_boiler_block.name=Aether Boiler
 tile.aether_charger.name=Aether Charger
 tile.aether_repairer.name=Aether Repairer
-tile.aether_bath=Aether Bath
+tile.aether_bath.name=Aether Bath
+tile.aether_unraveler.name=Aether Unraveler
 
 item.pendant_active.name=Lyon Pendant
 item.pendant_passive.name=Aen Pendant
@@ -39,6 +40,7 @@ ritual.aether_battery_large.name=Craft Reinforced Aether Battery
 ritual.aether_battery_giant.name=Craft Heavy Aether Battery
 ritual.aether_gem.name=Form Aether Gem
 ritual.aether_relay.name=Form Aether Relay
+ritual.aether_unraveler.name=Craft Aether Unraveler
 
 research.tab.aether.name=Aetheria
 
@@ -78,3 +80,6 @@ research.aether_gem.info=  Aether batteries were a great exercise in aether stor
 research.aether_relay.name=Aether Relays
 research.aether_relay.desc=Aether distribution
 research.aether_relay.info=  You've quickly realized that you don't have a good way to transfer aether around, making it quite difficult to work with. To solve this, you have created crystal relays which allow aether to flow through them.|  Relays do not store aether themselves, but let blocks that need aether pull the aether from some other block connected by relay. In the same breath, blocks that produce and push aether can use aether relays to push the aether into distant blocks.|  Relays can be connected to many other relays, allowing you to create a aether network of sorts.
+research.aether_unraveler.name=Aether Unraveler
+research.aether_unraveler.desc=Undo, Please
+research.aether_unraveler.info=  Aether repairers are fantastic for repairing tools and equipment that has been damaged using the magical raw power of aether. But what if instead of repairing, you used the focused, purified energies to destroy?|  Aether Unravelers take spell scrolls and break them back down into their rune components. You will get all runes back that went into a spell. However, the aether cost is rather high!

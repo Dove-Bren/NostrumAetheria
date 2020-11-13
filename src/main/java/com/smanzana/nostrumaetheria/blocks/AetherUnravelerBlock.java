@@ -9,9 +9,16 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.spells.EAlteration;
+import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.Spell.SpellPart;
+import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -27,11 +34,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.Item.ToolMaterial;
-import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
-import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
@@ -42,30 +45,31 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
+public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged {
 	
 	public static final PropertyBool ON = PropertyBool.create("on");
-	public static final String ID = "aether_repairer";
+	public static final String ID = "aether_unraveler";
 	
 	
-	private static AetherRepairerBlock instance = null;
-	public static AetherRepairerBlock instance() {
+	private static AetherUnravelerBlock instance = null;
+	public static AetherUnravelerBlock instance() {
 		if (instance == null)
-			instance = new AetherRepairerBlock();
+			instance = new AetherUnravelerBlock();
 		
 		return instance;
 	}
 	
 	public static void init() {
-		GameRegistry.registerTileEntity(AetherRepairerBlockEntity.class, "aether_repairer_te");
+		GameRegistry.registerTileEntity(AetherUnravelerBlockEntity.class, "aether_unraveler_te");
 	}
 	
-	public AetherRepairerBlock() {
+	public AetherUnravelerBlock() {
 		super(Material.ROCK, MapColor.OBSIDIAN);
 		this.setUnlocalizedName(ID);
 		this.setHardness(3.0f);
@@ -111,7 +115,7 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (!worldIn.isRemote) {
-			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherRepairerID, worldIn, pos.getX(), pos.getY(), pos.getZ());
+			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherUnravelerID, worldIn, pos.getX(), pos.getY(), pos.getZ());
 			return true;
 		}
 		
@@ -120,7 +124,7 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 	
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new AetherRepairerBlockEntity();
+		return new AetherUnravelerBlockEntity();
 	}
 	
 	@Override
@@ -153,10 +157,10 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 	
 	private void destroy(World world, BlockPos pos, IBlockState state) {
 		TileEntity ent = world.getTileEntity(pos);
-		if (ent == null || !(ent instanceof AetherRepairerBlockEntity))
+		if (ent == null || !(ent instanceof AetherUnravelerBlockEntity))
 			return;
 		
-		AetherRepairerBlockEntity furnace = (AetherRepairerBlockEntity) ent;
+		AetherUnravelerBlockEntity furnace = (AetherUnravelerBlockEntity) ent;
 		for (int i = 0; i < furnace.getSizeInventory(); i++) {
 			if (furnace.getStackInSlot(i) != null) {
 				EntityItem item = new EntityItem(
@@ -189,22 +193,22 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 	
 	@Override
 	public String getLoreKey() {
-		return "aether_repairer";
+		return "aether_unraveler";
 	}
 
 	@Override
 	public String getLoreDisplayName() {
-		return "Aether Repairing";
+		return "Aether Unraveling";
 	}
 
 	@Override
 	public Lore getBasicLore() {
-		return new Lore().add("These blocks user aether to repair items and equipment.");
+		return new Lore().add("This block uses aether to break down magical items into their base components.");
 	}
 
 	@Override
 	public Lore getDeepLore() {
-		return new Lore().add("These blocks user aether to repair items and equipment.", "The amount of aether it takes to repair each point of damage depends on the material, type of tool, or form of equipment.");
+		return new Lore().add("This block uses aether to break down magical items into their base components.", "This allows it to take spell scrolls and return some of the runes that were used to craft it!");
 	}
 
 	@Override
@@ -212,129 +216,32 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 		return InfoScreenTabs.INFO_BLOCKS;
 	}
 	
-	public static class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory {
+	public static class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory {
 		
 		private static int GetAetherCost(ItemStack stack) {
-			float base;
-			float materialMod;
-			float enchantMod;
-			
-			if (stack.getItem() instanceof ItemArmor) {
-				ItemArmor armor = (ItemArmor) stack.getItem();
-				switch (armor.getEquipmentSlot()) {
-				case FEET:
-				case HEAD:
-					base = 20f;
-					break;
-				case LEGS:
-					base = 30f;
-					break;
-				case CHEST:
-				case MAINHAND:
-				case OFFHAND:
-				default:
-					base = 40f;
-					break;
-				}
-				
-				switch (armor.getArmorMaterial()) {
-				case LEATHER:
-					materialMod = .65f;
-					break;
-				case CHAIN:
-				case IRON:
-					materialMod = 1f;
-					break;
-				case GOLD:
-					materialMod = .8f;
-					break;
-				case DIAMOND:
-				default:
-					materialMod = 1.5f;
-					break;
-				}
-			} else if (stack.getItem() instanceof ItemSword) {
-				ItemSword sword = (ItemSword) stack.getItem();
-				
-				base = 25;
-				
-				ToolMaterial material;
-				try {
-					material = ToolMaterial.valueOf(sword.getToolMaterialName().toUpperCase());
-				} catch (Exception e) {
-					material = ToolMaterial.DIAMOND;
-				}
-				
-				switch (material) {
-				case WOOD:
-					materialMod = .25f;
-					break;
-				case STONE:
-					materialMod = .6f;
-					break;
-				case IRON:
-					materialMod = 1f;
-					break;
-				case GOLD:
-					materialMod = 1.4f;
-					break;
-				case DIAMOND:
-				default:
-					materialMod = 3f;
-					break;
-				}
-			} else if (stack.getItem() instanceof ItemTool) {
-				ItemTool tool = (ItemTool) stack.getItem();
-				base = 20f;
-				
-				switch (tool.getToolMaterial()) {
-				case WOOD:
-					materialMod = .25f;
-					break;
-				case STONE:
-					materialMod = .6f;
-					break;
-				case IRON:
-					materialMod = 1f;
-					break;
-				case GOLD:
-					materialMod = 1.4f;
-					break;
-				case DIAMOND:
-				default:
-					materialMod = 3f;
-					break;
-				}
-				
-			} else if (stack.getItem() instanceof SpellScroll) {
-				return 150;
-			} else {
-				materialMod = 999f;
-				base = 9999f;
-			}
-			
-			if (stack.isItemEnchanted()) {
-				enchantMod = Math.min(1f, 1.2f * stack.getEnchantmentTagList().tagCount());
-			} else {
-				enchantMod = 1f;
-			}
-			
-			return Math.round(base * enchantMod * materialMod);
+			return 2000; // If more items get added, adjust based on item
+		}
+		
+		private static int GetMaxTicks(ItemStack stack) {
+			return 20 * 100; // If more items get added, consider making them take different times
+			// Note ideally a whole divisor of aether cost, since I'm being lazy and not adding
+			// real support for fractions
 		}
 		
 		private boolean on;
 		private boolean aetherTick;
 		
 		private ItemStack stack;
+		private int workTicks;
 		
-		public AetherRepairerBlockEntity(int aether, int maxAether) {
+		public AetherUnravelerBlockEntity(int aether, int maxAether) {
 			super(aether, maxAether);
 			
 			this.setAutoSync(5);
 			this.handler.configureInOut(true, false);
 		}
 		
-		public AetherRepairerBlockEntity() {
+		public AetherUnravelerBlockEntity() {
 			this(0, 500);
 		}
 		
@@ -348,6 +255,7 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 		}
 		
 		private static final String NBT_ITEM = "item";
+		private static final String NBT_WORK_TICKS = "work_ticks";
 		
 		@Override
 		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
@@ -357,6 +265,10 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 				NBTTagCompound tag = new NBTTagCompound();
 				tag = stack.writeToNBT(tag);
 				nbt.setTag(NBT_ITEM, tag);
+			}
+			
+			if (workTicks > 0) {
+				nbt.setInteger(NBT_WORK_TICKS, workTicks);
 			}
 			
 			return nbt;
@@ -375,6 +287,8 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 				NBTTagCompound tag = nbt.getCompoundTag(NBT_ITEM);
 				stack = ItemStack.loadItemStackFromNBT(tag);
 			}
+			
+			workTicks = nbt.getInteger(NBT_WORK_TICKS); // defaults 0 :)
 		}
 		
 		private void forceUpdate() {
@@ -453,16 +367,20 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 				return true;
 			}
 			
-			if (!stack.isItemStackDamageable()) {
+			if (!(stack.getItem() instanceof SpellScroll)) {
 				return false;
 			}
 			
-			// We specifically want weapons, tools, or armor
-			return stack.getItem() instanceof ItemSword
-					|| stack.getItem() instanceof ItemArmor
-					|| stack.getItem() instanceof ItemTool
-					|| stack.getItem() instanceof SpellScroll;
+			if (stack.getItemDamage() > 0) {
+				return false;
+			}
 			
+			Spell spell = SpellScroll.getSpell(stack);
+			if (spell == null) {
+				return false;
+			}
+			
+			return true;
 		}
 
 		@Override
@@ -474,6 +392,12 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 		public int getField(int id) {
 			if (id == 0) {
 				return this.handler.getAether(null);
+			} else if (id == 1) {
+				if (stack == null) {
+					return 0;
+				}
+				
+				return (int) Math.round(((float) this.workTicks * 100f) / (float) GetMaxTicks(stack));
 			}
 			return 0;
 		}
@@ -482,18 +406,24 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 		public void setField(int id, int value) {
 			if (id == 0) {
 				this.handler.setAether(value);
+			} else if (id == 1) {
+				if (value == 0 || stack == null) {
+					workTicks = 0;
+				} else {
+					this.workTicks = (int) Math.round(((float) value * (float) GetMaxTicks(stack)) / 100);
+				}
 			}
 		}
 
 		@Override
 		public int getFieldCount() {
-			return 1;
+			return 2;
 		}
 		
 		@Override
 		public void onAetherFlowTick(int diff, boolean added, boolean taken) {
 			super.onAetherFlowTick(diff, added, taken);
-			aetherTick = !this.heldItemFull();
+			aetherTick = (stack != null);
 		}
 		
 		@Override
@@ -504,7 +434,7 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 
 		@Override
 		public String getName() {
-			return "Aether Repairer";
+			return "Aether Unraveler";
 		}
 
 		@Override
@@ -519,7 +449,7 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 
 		@Override
 		public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
-			if (index != 0 || direction == EnumFacing.DOWN || !this.isItemValidForSlot(0, itemStackIn))
+			if (index != 0 || !this.isItemValidForSlot(0, itemStackIn))
 				return false;
 			
 			return stack == null;
@@ -527,23 +457,110 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 
 		@Override
 		public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
-			return index == 0 && direction == EnumFacing.DOWN && stack != null && heldItemFull();
+			return false;
 		}
 		
-		public boolean heldItemFull() {
-			return stack == null || stack.getItemDamage() == 0;
+		protected void processItem(ItemStack stack) {
+			// If more items are added, add processing here!
+			
+			// Spell scroll
+			{
+				Spell spell = SpellScroll.getSpell(stack);
+				if (spell == null) {
+					NostrumAetheria.logger.error("Tried to process spell scroll in unraveler but found no spell");
+					return;
+				}
+				
+				for (SpellPart part : spell.getSpellParts()) {
+					final ItemStack[] runes;
+					if (part.isTrigger()) {
+						SpellTrigger trigger = part.getTrigger();
+						runes = new ItemStack[] {SpellRune.getRune(trigger)};
+					} else {
+						SpellShape shape = part.getShape();
+						EMagicElement elem = part.getElement();
+						int elemCount = part.getElementCount();
+						EAlteration alt = part.getAlteration();
+						runes = new ItemStack[1 + elemCount + (alt == null ? 0 : 1)];
+						runes[0] = SpellRune.getRune(shape);
+						if (alt != null) {
+							runes[1] = SpellRune.getRune(alt);
+						}
+						for (; elemCount > 0; elemCount--) {
+							runes[1 + (alt == null ? 0 : 1) + (elemCount - 1)]
+									= SpellRune.getRune(elem, 1);
+						}
+					}
+					
+					for (ItemStack rune : runes) {
+						EntityItem item = new EntityItem(worldObj, pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5, rune);
+						worldObj.spawnEntityInWorld(item);
+					}
+				}
+			}
+			
+			// Effects!
+			double x = pos.getX() + .5;
+			double y = pos.getY() + 1.2;
+			double z = pos.getZ() + .5;
+			((WorldServer) worldObj).spawnParticle(EnumParticleTypes.CRIT_MAGIC,
+					x,
+					y,
+					z,
+					15,
+					.25,
+					.6,
+					.25,
+					.1,
+					new int[0]);
+			//worldObj.playSound(null, pos, SoundEvents.BLOCK_ANVIL_USE, null
+			worldObj.playSound(null, pos, SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1f, 1f);
 		}
 		
 		@Override
 		public void update() {
-			// If we have an item, try to repair it
-			if (!worldObj.isRemote && this.ticksExisted % 20 == 0) {
-				if (stack != null && this.isItemValidForSlot(0, stack) && !this.heldItemFull()) {
-					final int aetherPer = GetAetherCost(stack);
-					if (handler.getAether(null) >= aetherPer) {
-						stack.setItemDamage(stack.getItemDamage() - 1);
-						handler.drawAether(null, aetherPer);
-						aetherTick = true;
+			// If we have an item, work and break it down
+			if (!worldObj.isRemote) {
+				if (stack != null) {
+					boolean worked = true;
+					final int aetherPerTick = GetAetherCost(stack) / GetMaxTicks(stack);
+					final int drawn = handler.drawAether(null, aetherPerTick);
+					if (drawn == 0) {
+						worked = false;
+					} else if (drawn < aetherPerTick) {
+						// Not enough for a full tick. Use probability instead!
+						final float chance = (float) drawn / (float) aetherPerTick;
+						worked = NostrumAetheria.random.nextFloat() < chance;
+					} else {
+						worked = true;
+					}
+					
+					if (worked) {
+						// Had and took aether. Advance
+						workTicks++;
+						if (workTicks > GetMaxTicks(stack)) {
+							workTicks = 0;
+							processItem(stack);
+							stack.stackSize--;
+							if (stack.stackSize <= 0) {
+								this.setItem(null); // dirties and updates
+							} else {
+								this.forceUpdate();
+							}
+						}
+					} else {
+						// Wanted aether but didn't get it. Lose progress
+						workTicks = Math.max(0, workTicks - 1);
+					}
+					
+					aetherTick = (drawn > 0); // worked; // Always appear lit up even if not enough aether to really go?
+				} else {
+					// Reset progress, if any
+					final boolean hadProgress = workTicks != 0;
+					workTicks = 0;
+					aetherTick = false;
+					if (hadProgress) {
+						this.markDirty();
 					}
 				}
 				

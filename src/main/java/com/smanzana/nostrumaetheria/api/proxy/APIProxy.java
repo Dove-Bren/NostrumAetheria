@@ -29,6 +29,7 @@ public abstract class APIProxy {
 	public static Block AetherBathBlock = null;
 	public static Block AetherChargerBlock = null;
 	public static Block AetherRepairerBlock = null;
+	public static Block AetherUnravelerBlock = null;
 	public static Item ActivePendantItem = null;
 	public static Item PassivePendantItem = null;
 	public static Item AetherGemItem = null;

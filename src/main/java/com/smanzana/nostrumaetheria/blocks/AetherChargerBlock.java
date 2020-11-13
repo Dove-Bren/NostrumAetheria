@@ -124,7 +124,7 @@ public class AetherChargerBlock extends BlockContainer implements ILoreTagged {
 			return true;
 		}
 		
-		return false;
+		return true;
 	}
 	
 	@Override
