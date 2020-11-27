@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
+import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -104,9 +105,24 @@ public abstract class APIProxy {
 		return null;
 	}
 	
+	/**
+	 * Register a recipe with the Aether Repairer.
+	 * This should be called in the init stage.
+	 * Default recipes are added in post-init. Note that recipes are given priority in the order they are
+	 * registered. This means default recipes can be overriden by registering another recipe that matches the
+	 * same items during init.
+	 * @param recipe
+	 */
+	public static void addRepairerRecipe(IAetherRepairerRecipe recipe) {
+		if (handler != null) {
+			handler.handleAddRepairerRecipe(recipe);
+		}
+	}
+	
 	protected abstract boolean handleIsEnabled();
 	protected abstract IAetherHandlerComponent handleCreateHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether);
 	protected abstract void handleSyncTEAether(AetherTileEntity te);
 	protected abstract boolean handleIsBlockLoaded(World world, BlockPos pos);
 	protected abstract int handleDrawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nullable ItemStack ignore);
+	protected abstract void handleAddRepairerRecipe(IAetherRepairerRecipe recipe);
 }

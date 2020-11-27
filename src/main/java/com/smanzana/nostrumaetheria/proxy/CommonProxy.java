@@ -80,7 +80,7 @@ public class CommonProxy {
 	}
 	
 	public void postinit() {
-		;
+		AetherRepairerBlock.initDefaultRecipes();
 	}
     
     private void registerItems() {

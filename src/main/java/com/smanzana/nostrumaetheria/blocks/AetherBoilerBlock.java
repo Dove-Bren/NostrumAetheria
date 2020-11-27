@@ -149,7 +149,7 @@ public class AetherBoilerBlock extends BlockContainer implements ILoreTagged {
 		protected void fuelNearbyFurnace() {
 			TileEntityFurnace furnace = getNearbyFurnace();
 			if (furnace != null) {
-				ReflectionHelper.setPrivateValue(TileEntityFurnace.class, furnace, 20, "furnaceBurnTime");
+				ReflectionHelper.setPrivateValue(TileEntityFurnace.class, furnace, 20, "furnaceBurnTime", "field_145956_a");
 				BlockFurnace.setState(true, worldObj, pos.up());
 			}
 		}

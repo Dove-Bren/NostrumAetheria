@@ -10,9 +10,11 @@ import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 import com.smanzana.nostrumaetheria.component.AetherHandlerComponent;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 import com.smanzana.nostrumaetheria.network.messages.AetherTileEntityMessage;
+import com.smanzana.nostrumaetheria.recipes.RepairerRecipeManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.Entity;
@@ -79,6 +81,11 @@ public class AetheriaAPIProxy extends APIProxy {
 	protected IAetherHandlerComponent handleCreateHandlerComponent(IAetherComponentListener listener, int defaultAether,
 			int defaultMaxAether) {
 		return new AetherHandlerComponent(listener, defaultAether, defaultMaxAether);
+	}
+
+	@Override
+	protected void handleAddRepairerRecipe(IAetherRepairerRecipe recipe) {
+		RepairerRecipeManager.instance().addRecipe(recipe);
 	}
 	
 }

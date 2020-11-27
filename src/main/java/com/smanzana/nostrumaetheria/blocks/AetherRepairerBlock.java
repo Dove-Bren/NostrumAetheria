@@ -7,7 +7,9 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrumaetheria.recipes.RepairerRecipeManager;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -63,6 +65,13 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 	
 	public static void init() {
 		GameRegistry.registerTileEntity(AetherRepairerBlockEntity.class, "aether_repairer_te");
+	}
+	
+	public static void initDefaultRecipes() {
+		RepairerRecipeManager.instance().addRecipe(new ArmorRepairRecipe());
+		RepairerRecipeManager.instance().addRecipe(new WeaponRepairRecipe());
+		RepairerRecipeManager.instance().addRecipe(new ToolRepairRecipe());
+		RepairerRecipeManager.instance().addRecipe(new ScrollRepairRecipe());
 	}
 	
 	public AetherRepairerBlock() {
@@ -214,114 +223,6 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 	
 	public static class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory {
 		
-		private static int GetAetherCost(ItemStack stack) {
-			float base;
-			float materialMod;
-			float enchantMod;
-			
-			if (stack.getItem() instanceof ItemArmor) {
-				ItemArmor armor = (ItemArmor) stack.getItem();
-				switch (armor.getEquipmentSlot()) {
-				case FEET:
-				case HEAD:
-					base = 20f;
-					break;
-				case LEGS:
-					base = 30f;
-					break;
-				case CHEST:
-				case MAINHAND:
-				case OFFHAND:
-				default:
-					base = 40f;
-					break;
-				}
-				
-				switch (armor.getArmorMaterial()) {
-				case LEATHER:
-					materialMod = .65f;
-					break;
-				case CHAIN:
-				case IRON:
-					materialMod = 1f;
-					break;
-				case GOLD:
-					materialMod = .8f;
-					break;
-				case DIAMOND:
-				default:
-					materialMod = 1.5f;
-					break;
-				}
-			} else if (stack.getItem() instanceof ItemSword) {
-				ItemSword sword = (ItemSword) stack.getItem();
-				
-				base = 25;
-				
-				ToolMaterial material;
-				try {
-					material = ToolMaterial.valueOf(sword.getToolMaterialName().toUpperCase());
-				} catch (Exception e) {
-					material = ToolMaterial.DIAMOND;
-				}
-				
-				switch (material) {
-				case WOOD:
-					materialMod = .25f;
-					break;
-				case STONE:
-					materialMod = .6f;
-					break;
-				case IRON:
-					materialMod = 1f;
-					break;
-				case GOLD:
-					materialMod = 1.4f;
-					break;
-				case DIAMOND:
-				default:
-					materialMod = 3f;
-					break;
-				}
-			} else if (stack.getItem() instanceof ItemTool) {
-				ItemTool tool = (ItemTool) stack.getItem();
-				base = 20f;
-				
-				switch (tool.getToolMaterial()) {
-				case WOOD:
-					materialMod = .25f;
-					break;
-				case STONE:
-					materialMod = .6f;
-					break;
-				case IRON:
-					materialMod = 1f;
-					break;
-				case GOLD:
-					materialMod = 1.4f;
-					break;
-				case DIAMOND:
-				default:
-					materialMod = 3f;
-					break;
-				}
-				
-			} else if (stack.getItem() instanceof SpellScroll) {
-				return 150;
-			} else {
-				materialMod = 999f;
-				base = 9999f;
-			}
-			
-			if (stack.isItemEnchanted()) {
-				enchantMod = Math.min(1f, 1.2f * stack.getEnchantmentTagList().tagCount());
-			} else {
-				enchantMod = 1f;
-			}
-			
-			return Math.round(base * enchantMod * materialMod);
-		}
-		
 		private boolean on;
 		private boolean aetherTick;
 		
@@ -453,16 +354,8 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 				return true;
 			}
 			
-			if (!stack.isItemStackDamageable()) {
-				return false;
-			}
-			
-			// We specifically want weapons, tools, or armor
-			return stack.getItem() instanceof ItemSword
-					|| stack.getItem() instanceof ItemArmor
-					|| stack.getItem() instanceof ItemTool
-					|| stack.getItem() instanceof SpellScroll;
-			
+			@Nullable IAetherRepairerRecipe recipe = RepairerRecipeManager.instance().findRecipe(stack);
+			return recipe != null;
 		}
 
 		@Override
@@ -493,7 +386,9 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 		@Override
 		public void onAetherFlowTick(int diff, boolean added, boolean taken) {
 			super.onAetherFlowTick(diff, added, taken);
-			aetherTick = !this.heldItemFull();
+			
+			@Nullable IAetherRepairerRecipe recipe = RepairerRecipeManager.instance().findRecipe(stack);
+			aetherTick = recipe != null;
 		}
 		
 		@Override
@@ -527,23 +422,25 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 
 		@Override
 		public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
-			return index == 0 && direction == EnumFacing.DOWN && stack != null && heldItemFull();
-		}
-		
-		public boolean heldItemFull() {
-			return stack == null || stack.getItemDamage() == 0;
+			return index == 0
+					&& direction == EnumFacing.DOWN
+					&& stack != null
+					&& null == RepairerRecipeManager.instance().findRecipe(stack);
 		}
 		
 		@Override
 		public void update() {
 			// If we have an item, try to repair it
 			if (!worldObj.isRemote && this.ticksExisted % 20 == 0) {
-				if (stack != null && this.isItemValidForSlot(0, stack) && !this.heldItemFull()) {
-					final int aetherPer = GetAetherCost(stack);
-					if (handler.getAether(null) >= aetherPer) {
-						stack.setItemDamage(stack.getItemDamage() - 1);
-						handler.drawAether(null, aetherPer);
-						aetherTick = true;
+				if (stack != null) {
+					@Nullable IAetherRepairerRecipe recipe = RepairerRecipeManager.instance().findRecipe(stack);
+					if (recipe != null) {
+						final int aetherCost = recipe.getAetherCost(stack);
+						if (handler.getAether(null) >= aetherCost) {
+							recipe.repair(stack);
+							handler.drawAether(null, aetherCost);
+							aetherTick = true;
+						}
 					}
 				}
 				
@@ -567,5 +464,202 @@ public class AetherRepairerBlock extends BlockContainer implements ILoreTagged {
 			}
 		}
 
+	}
+	
+	public static @Nullable ItemStack RepairTool(ItemStack tool, int amt) {
+		tool.setItemDamage(Math.max(0, tool.getItemDamage() - amt));
+		return tool;
+	}
+	
+	protected static class ArmorRepairRecipe implements IAetherRepairerRecipe {
+
+		@Override
+		public boolean matches(ItemStack stack) {
+			return stack.getItem() instanceof ItemArmor && stack.isItemDamaged();
+		}
+
+		@Override
+		public int getAetherCost(ItemStack stack) {
+			final float base;
+			final float materialMod;
+			final float enchantMod;
+			
+			ItemArmor armor = (ItemArmor) stack.getItem();
+			switch (armor.armorType) {
+			case FEET:
+			case HEAD:
+				base = 20f;
+				break;
+			case LEGS:
+				base = 30f;
+				break;
+			case CHEST:
+			case MAINHAND:
+			case OFFHAND:
+			default:
+				base = 40f;
+				break;
+			}
+			
+			switch (armor.getArmorMaterial()) {
+			case LEATHER:
+				materialMod = .65f;
+				break;
+			case CHAIN:
+			case IRON:
+				materialMod = 1f;
+				break;
+			case GOLD:
+				materialMod = .8f;
+				break;
+			case DIAMOND:
+			default:
+				materialMod = 1.5f;
+				break;
+			}
+			
+			if (stack.isItemEnchanted()) {
+				enchantMod = Math.min(1f, 1.2f * stack.getEnchantmentTagList().tagCount());
+			} else {
+				enchantMod = 1f;
+			}
+			
+			return Math.round(base * enchantMod * materialMod);
+		}
+
+		@Override
+		public ItemStack repair(ItemStack stack) {
+			return RepairTool(stack, 1);
+		}
+		
+	}
+	
+	protected static class WeaponRepairRecipe implements IAetherRepairerRecipe {
+
+		@Override
+		public boolean matches(ItemStack stack) {
+			return stack.getItem() instanceof ItemSword && stack.isItemDamaged();
+		}
+
+		@Override
+		public int getAetherCost(ItemStack stack) {
+			final float base;
+			final float materialMod;
+			final float enchantMod;
+			
+			ItemSword sword = (ItemSword) stack.getItem();
+			
+			base = 25;
+			
+			ToolMaterial material;
+			try {
+				material = ToolMaterial.valueOf(sword.getToolMaterialName().toUpperCase());
+			} catch (Exception e) {
+				material = ToolMaterial.DIAMOND;
+			}
+			
+			switch (material) {
+			case WOOD:
+				materialMod = .25f;
+				break;
+			case STONE:
+				materialMod = .6f;
+				break;
+			case IRON:
+				materialMod = 1f;
+				break;
+			case GOLD:
+				materialMod = 1.4f;
+				break;
+			case DIAMOND:
+			default:
+				materialMod = 3f;
+				break;
+			}
+			
+			if (stack.isItemEnchanted()) {
+				enchantMod = Math.min(1f, 1.2f * stack.getEnchantmentTagList().tagCount());
+			} else {
+				enchantMod = 1f;
+			}
+			
+			return Math.round(base * enchantMod * materialMod);
+		}
+
+		@Override
+		public ItemStack repair(ItemStack stack) {
+			return RepairTool(stack, 1);
+		}
+		
+	}
+	
+	protected static class ToolRepairRecipe implements IAetherRepairerRecipe {
+
+		@Override
+		public boolean matches(ItemStack stack) {
+			return stack.getItem() instanceof ItemTool && stack.isItemDamaged();
+		}
+
+		@Override
+		public int getAetherCost(ItemStack stack) {
+			final float base;
+			final float materialMod;
+			final float enchantMod;
+			
+			ItemTool tool = (ItemTool) stack.getItem();
+			base = 20f;
+			
+			switch (tool.getToolMaterial()) {
+			case WOOD:
+				materialMod = .25f;
+				break;
+			case STONE:
+				materialMod = .6f;
+				break;
+			case IRON:
+				materialMod = 1f;
+				break;
+			case GOLD:
+				materialMod = 1.4f;
+				break;
+			case DIAMOND:
+			default:
+				materialMod = 3f;
+				break;
+			}
+			
+			if (stack.isItemEnchanted()) {
+				enchantMod = Math.min(1f, 1.2f * stack.getEnchantmentTagList().tagCount());
+			} else {
+				enchantMod = 1f;
+			}
+			
+			return Math.round(base * enchantMod * materialMod);
+		}
+
+		@Override
+		public ItemStack repair(ItemStack stack) {
+			return RepairTool(stack, 1);
+		}
+		
+	}
+	
+	protected static class ScrollRepairRecipe implements IAetherRepairerRecipe {
+
+		@Override
+		public boolean matches(ItemStack stack) {
+			return stack.getItem() instanceof SpellScroll && stack.isItemDamaged();
+		}
+
+		@Override
+		public int getAetherCost(ItemStack stack) {
+			return 150;
+		}
+
+		@Override
+		public ItemStack repair(ItemStack stack) {
+			return RepairTool(stack, 1);
+		}
+		
 	}
 }
