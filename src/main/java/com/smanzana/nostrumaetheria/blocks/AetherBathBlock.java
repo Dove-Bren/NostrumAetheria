@@ -146,6 +146,10 @@ public class AetherBathBlock extends Block implements ITileEntityProvider, ILore
 	
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+		if (worldIn.isRemote) {
+			return true;
+		}
+		
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null)
 			return false;
@@ -422,13 +426,19 @@ public class AetherBathBlock extends Block implements ITileEntityProvider, ILore
 					AetherItem aetherItem = (AetherItem) stack.getItem();
 					int start = Math.min(maxAetherPerTick(), handler.getAether(null));
 					int leftover = aetherItem.addAether(stack, start);
-					handler.drawAether(null, start - leftover);
+					if (start != leftover) {
+						handler.drawAether(null, start - leftover);
+						AetherItem.SaveItem(stack); // Maybe should call every couple of ticks?
+					}
 				} else {
 					IAetherHandler handler = getHeldHandler();
 					if (handler != null) {
 						int start = Math.min(maxAetherPerTick(), this.handler.getAether(null));
 						int leftover = handler.addAether(null, start);
-						this.handler.drawAether(null, start - leftover);
+						if (start != leftover) {
+							this.handler.drawAether(null, start - leftover);
+							AetherItem.SaveItem(stack); // Maybe should call every couple of ticks?
+						}
 					}
 				}
 			}

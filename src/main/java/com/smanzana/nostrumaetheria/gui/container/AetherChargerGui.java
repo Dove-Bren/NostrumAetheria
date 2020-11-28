@@ -140,16 +140,12 @@ public class AetherChargerGui {
 			Gui.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
 			
 			IAetherHandler chargerHandler = container.chest.getHandler();
-			IAetherHandler nestedHandler = container.chest.getHeldHandler();
 			
 			float myAether = 0f;
-			float nestedAether = 0f;
+			final float nestedAether = (float) container.chest.getAetherDisplay() / (float) container.chest.getMaxAetherDisplay();
 			
 			if (chargerHandler != null) {
 				myAether = (float) chargerHandler.getAether(null) / (float) chargerHandler.getMaxAether(null);
-			}
-			if (nestedHandler != null) {
-				nestedAether = (float) nestedHandler.getAether(null) / (float) nestedHandler.getMaxAether(null);
 			}
 			
 			if (myAether > 0) {
@@ -179,11 +175,12 @@ public class AetherChargerGui {
 				}
 			}
 			
-			IAetherHandler nestedHandler = container.chest.getHeldHandler();
-			if (nestedHandler != null) {
+			final int maxAether = container.chest.getMaxAetherDisplay();
+			final int aether = container.chest.getAetherDisplay();
+			if (maxAether > 0) {
 				if (mouseX >= horizontalMargin + GUI_BOTTOM_BAR_HOFFSET && mouseX <= horizontalMargin + GUI_BOTTOM_BAR_HOFFSET + GUI_BOTTOM_BAR_WIDTH
 						&& mouseY >= verticalMargin + GUI_BOTTOM_BAR_VOFFSET && mouseY <= verticalMargin + GUI_BOTTOM_BAR_VOFFSET + GUI_BOTTOM_BAR_HEIGHT) {
-					drawHoveringText(Lists.newArrayList(String.format("%.2f / %.2f", nestedHandler.getAether(null) * .01f, nestedHandler.getMaxAether(null) * .01f)),
+					drawHoveringText(Lists.newArrayList(String.format("%.2f / %.2f", aether * .01f, maxAether * .01f)),
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}

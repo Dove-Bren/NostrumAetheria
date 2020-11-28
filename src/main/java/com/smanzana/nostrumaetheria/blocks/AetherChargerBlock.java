@@ -6,6 +6,7 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
+import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherBathBlock.AetherBathTileEntity;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
@@ -246,6 +247,9 @@ public class AetherChargerBlock extends BlockContainer implements ILoreTagged {
 		private boolean on;
 		private boolean aetherTick;
 		
+		private int clientAetherDisplay; // Client-only.
+		private int clientAetherMaxDisplay; // Client-only.
+		
 		public AetherChargerBlockEntity() {
 			super(0, 500);
 		}
@@ -269,6 +273,18 @@ public class AetherChargerBlock extends BlockContainer implements ILoreTagged {
 		public int getField(int id) {
 			if (id == 0) {
 				return this.handler.getAether(null);
+			} else if (id == 1) {
+				@Nullable IAetherHandler handler = this.getHeldHandler();
+				if (handler != null) {
+					return handler.getAether(null);
+				}
+				return 0;
+			} else if (id == 2) {
+				@Nullable IAetherHandler handler = this.getHeldHandler();
+				if (handler != null) {
+					return handler.getMaxAether(null);
+				}
+				return 0;
 			}
 			return 0;
 		}
@@ -277,12 +293,16 @@ public class AetherChargerBlock extends BlockContainer implements ILoreTagged {
 		public void setField(int id, int value) {
 			if (id == 0) {
 				this.handler.setAether(value);
+			} else if (id == 1) {
+				clientAetherDisplay = value;
+			} else if (id == 2) {
+				clientAetherMaxDisplay = value;
 			}
 		}
 
 		@Override
 		public int getFieldCount() {
-			return 1;
+			return 3;
 		}
 		
 		@Override
@@ -309,6 +329,16 @@ public class AetherChargerBlock extends BlockContainer implements ILoreTagged {
 				on = aetherTick;
 				aetherTick = false;
 			}
+		}
+		
+		@SideOnly(Side.CLIENT)
+		public int getAetherDisplay() {
+			return clientAetherDisplay;
+		}
+		
+		@SideOnly(Side.CLIENT)
+		public int getMaxAetherDisplay() {
+			return clientAetherMaxDisplay;
 		}
 
 	}

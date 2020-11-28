@@ -14,6 +14,7 @@ import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,6 +29,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public abstract class AetherItem extends Item implements IAetherHandlerItem {
 
 	private static final String NBT_AETHER_HANDLER = "aether_handler";
+	private static final String NBT_CLIENT_DIRTY = "aether_client_dirty"; // always true on server, set to false on client
 	private static final String NBT_PENDANT_ID = "id";
 	
 	public AetherItem() {
@@ -53,7 +55,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	}
 	
 	public IAetherHandlerComponent getAetherHandler(ItemStack stack) {
-		return getCachedHandlerItem(stack).component;
+		return GetOrCreateCachedHandlerItem(stack).component;
 	}
 
 	public int getAether(ItemStack stack) {
@@ -102,7 +104,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	// Note: clears dirty flag, so update won't automatically pick up the change and call callbacks.
 	// Anything that calls this should check and maybe call onAetherChange itself.
 	private void commitHandler(ItemStack stack) {
-		StackHandlerItem handlerItem = getCachedHandlerItem(stack);
+		StackHandlerItem handlerItem = GetOrCreateCachedHandlerItem(stack);
 		if (handlerItem.dirty) {
 			NBTTagCompound nbt = stack.getTagCompound();
 			if (nbt == null) {
@@ -111,13 +113,19 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 			}
 			
 			nbt.setTag(NBT_AETHER_HANDLER, handlerItem.component.writeToNBT(new NBTTagCompound()));
+			nbt.setBoolean(NBT_CLIENT_DIRTY, true);
 			handlerItem.dirty = false;
 		}
 	}
 	
-	private StackHandlerItem getCachedHandlerItem(ItemStack stack) {
-		UUID id = getItemID(stack);
-		StackHandlerItem adapter = StackHandlerCache.get(id);
+	private static @Nullable StackHandlerItem GetCachedHandlerItem(UUID id) {
+		return StackHandlerCache.get(id);
+	}
+	
+	private static StackHandlerItem GetOrCreateCachedHandlerItem(ItemStack stack) {
+		AetherItem type = (AetherItem) stack.getItem();
+		UUID id = type.getItemID(stack);
+		StackHandlerItem adapter = GetCachedHandlerItem(id);
 		if (adapter == null) {
 			adapter = new StackHandlerItem();
 			final StackHandlerItem ref = adapter;
@@ -138,7 +146,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 					ref.dirty = true;
 				}
 				
-			}, 0, getDefaultMaxAether(stack));
+			}, 0, type.getDefaultMaxAether(stack));
 			
 			if (stack.hasTagCompound() && stack.getTagCompound().hasKey(NBT_AETHER_HANDLER)) {
 				adapter.component.readFromNBT(stack.getTagCompound().getCompoundTag(NBT_AETHER_HANDLER));
@@ -146,8 +154,17 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 			
 			StackHandlerCache.put(id, adapter);
 		}
-		
 		return adapter;
+	}
+	
+	public static @Nullable IAetherHandlerComponent LookupAetherItemHandler(@Nullable UUID id) {
+		if (id != null) {
+			@Nullable StackHandlerItem wrapper = GetCachedHandlerItem(id);
+			if (wrapper != null) {
+				return wrapper.component;
+			}
+		}
+		return null;
 	}
 	
 	public UUID getItemID(ItemStack stack) {
@@ -239,18 +256,48 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 		}
 		
 		// Check for un-forwarded aether handler changes
-		StackHandlerItem handlerItem = getCachedHandlerItem(stack);
+		StackHandlerItem handlerItem = GetOrCreateCachedHandlerItem(stack);
 		if (!worldIn.isRemote && handlerItem.dirty) {
-			this.onAetherChange(stack, handlerItem.component.getAether(null));
-			commitHandler(stack);
+			SaveItem(stack);
+		}
+		
+		// On client side, check for dirty nbt
+		if (worldIn.isRemote && stack.hasTagCompound() && stack.getTagCompound().getBoolean(NBT_CLIENT_DIRTY)) {
+			// Clear dirty flag (on client side. Will be overwritten with next update)
+			NBTTagCompound tag = stack.getTagCompound();
+			tag.setBoolean(NBT_CLIENT_DIRTY, false);
+			stack.setTagCompound(tag);
+			
+			// Update local copy
+			if (!Minecraft.getMinecraft().isIntegratedServerRunning()) {
+				StackHandlerCache.remove(getItemID(stack));
+				GetOrCreateCachedHandlerItem(stack); // Creates it and loads from NBT :)
+			}
 		}
 		
 		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
 	}
 	
+	/**
+	 * Items' aether status is commited to the stacks' NBT automatically when in a player's inventory.
+	 * This is not true when on the ground or in a machine. To make that happen, the machine should call
+	 * this function on the item to commit any aether changes to NBT.
+	 * This function won't do any work if there are no changes.
+	 * However, if you're changing aether each tick, this will re-write NBT every time it's called.
+	 * @param stack
+	 */
+	public static void SaveItem(ItemStack stack) {
+		// Check for un-forwarded aether handler changes
+		StackHandlerItem handlerItem = GetOrCreateCachedHandlerItem(stack);
+		AetherItem type = (AetherItem) stack.getItem();
+		if (handlerItem.dirty) {
+			type.onAetherChange(stack, handlerItem.component.getAether(null));
+			type.commitHandler(stack);
+		}
+	}
 	
 	
-	private Map<UUID, StackHandlerItem> StackHandlerCache = new HashMap<>();
+	private static Map<UUID, StackHandlerItem> StackHandlerCache = new HashMap<>();
 	
 	private static final class StackHandlerItem {
 		private IAetherHandlerComponent component;
