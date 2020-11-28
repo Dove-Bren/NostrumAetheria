@@ -1,0 +1,16 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+      "model": "nostrumaetheria:aether_pump"
+    },
+    "variants": {
+        "facing": {
+            "north": {},
+            "east": { "y": 90 },
+            "south": { "y": 180 },
+            "west": { "y": 270},
+            "up": { "x": 270},
+            "down": { "x": 90}
+        }
+    }
+}

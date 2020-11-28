@@ -12,10 +12,12 @@ tile.aether_charger.name=Aether Charger
 tile.aether_repairer.name=Aether Repairer
 tile.aether_bath.name=Aether Bath
 tile.aether_unraveler.name=Aether Unraveler
+tile.aether_pump.name=Aether Pump
 
 item.pendant_active.name=Lyon Pendant
 item.pendant_passive.name=Aen Pendant
 item.aether_gem.name=Aether Gem
+item.aether_battery_cart_item.name=Aether Cart
 
 item.info.lyon.desc=Charged up by slowly consuming reagents. Provides reagent-free casts.
 item.info.aen.desc=Charged up with Aether. Provides reagent-free casts.
@@ -24,6 +26,8 @@ item.info.aether_gem.desc=Stores aether and provides it to other items in your i
 item.info.aether=%s / %s
 
 itemGroup.nostrumaetheria=Nostrum Aetheria
+
+entity.nostrumaetheria.aether_battery_cart.name=Aether Cart
 
 ritual.active_pendant.name=Lyon Infusion
 ritual.passive_pendant.name=Aen Infusion
@@ -41,6 +45,8 @@ ritual.aether_battery_giant.name=Craft Heavy Aether Battery
 ritual.aether_gem.name=Form Aether Gem
 ritual.aether_relay.name=Form Aether Relay
 ritual.aether_unraveler.name=Craft Aether Unraveler
+ritual.aether_battery_cart.name=Craft Aether Cart
+ritual.aether_pump.name=Craft Aether Pump
 
 research.tab.aether.name=Aetheria
 
@@ -83,3 +89,6 @@ research.aether_relay.info=  You've quickly realized that you don't have a good 
 research.aether_unraveler.name=Aether Unraveler
 research.aether_unraveler.desc=Undo, Please
 research.aether_unraveler.info=  Aether repairers are fantastic for repairing tools and equipment that has been damaged using the magical raw power of aether. But what if instead of repairing, you used the focused, purified energies to destroy?|  Aether Unravelers take spell scrolls and break them back down into their rune components. You will get all runes back that went into a spell. However, the aether cost is rather high!
+research.aether_carts.name=Aether Carts
+research.aether_carts.desc=Delivery!
+research.aether_carts.info=  It took a little bit of magic elbow-grease, but you've slotted an Aether Battery in a minecart and got things moving!|  Aether Carts operate like Aether Batteries in that they store mana. To add or draw mana from the cart, you'll need to use an Aether Pump.|  Note that breaking the cart will make it lose all of its aether.

@@ -6,6 +6,7 @@ import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
+import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
@@ -13,18 +14,25 @@ import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
 import com.smanzana.nostrumaetheria.client.render.AetherBathRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherBatteryRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherRelayRenderer;
+import com.smanzana.nostrumaetheria.client.render.RenderAetherBatteryMinecart;
 import com.smanzana.nostrumaetheria.client.render.TileEntityAetherDebugRenderer;
+import com.smanzana.nostrumaetheria.entities.EntityAetherBatteryMinecart;
 import com.smanzana.nostrumaetheria.items.ActivePendant;
+import com.smanzana.nostrumaetheria.items.AetherBatteryMinecartItem;
 import com.smanzana.nostrumaetheria.items.AetherGem;
 import com.smanzana.nostrumaetheria.items.PassivePendant;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ClientProxy extends CommonProxy {
@@ -45,12 +53,12 @@ public class ClientProxy extends CommonProxy {
 		AetherBatteryRenderer.init();
 		AetherBathRenderer.init();
 		
-//		RenderingRegistry.registerEntityRenderingHandler(EntityTestFairy.class, new IRenderFactory<EntityTestFairy>() {
-//			@Override
-//			public Render<? super EntityTestFairy> createRenderFor(RenderManager manager) {
-//				return new RenderTestFairy(manager, 1.0f);
-//			}
-//		});
+		RenderingRegistry.registerEntityRenderingHandler(EntityAetherBatteryMinecart.class, new IRenderFactory<EntityAetherBatteryMinecart>() {
+			@Override
+			public Render<? super EntityAetherBatteryMinecart> createRenderFor(RenderManager manager) {
+				return new RenderAetherBatteryMinecart(manager);
+			}
+		});
 		
 		OBJLoader.INSTANCE.addDomain(NostrumAetheria.MODID);
 	}
@@ -106,6 +114,12 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(AetherUnravelerBlock.instance()),
 				0,
 				AetherUnravelerBlock.ID);
+		registerModel(AetherBatteryMinecartItem.instance(),
+				0,
+				AetherBatteryMinecartItem.ID);
+		registerModel(Item.getItemFromBlock(AetherPumpBlock.instance()),
+				0,
+				AetherPumpBlock.ID);
 	}
 	
 	@Override

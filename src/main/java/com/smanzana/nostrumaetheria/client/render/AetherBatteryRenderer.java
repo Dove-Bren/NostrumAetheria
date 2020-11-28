@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherBatteryEntity> {
@@ -23,25 +24,14 @@ public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherB
 		super();
 	}
 	
-	@Override
-	public void renderTileEntityAt(AetherBatteryEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
-
-		super.renderTileEntityAt(te, x, y, z, partialTicks, destroyStage);
-		
-		final int aether = te.getHandler().getAether(null);
-		final int maxAether = te.getHandler().getMaxAether(null);
-		
-		if (aether <= 0 || maxAether <= 0) {
-			return;
-		}
-		
+	public void renderBatteryAt(World world, double x, double y, double z, float partialTicks, int destroyStage, int aether, int maxAether, boolean opaque) {
 		final double prog = ((double) aether / (double) maxAether);
 		final double min = 0.03;
 		final double max = (1.0 - .03);
 		final double maxy = min + (prog * (max - min));
 		final double glowPeriod = 20 * 5;
-		final float glow = (float) Math.sin(Math.PI * 2 * ((double) te.getWorld().getTotalWorldTime() % glowPeriod) / glowPeriod);
-		final float alpha = .4f + (.2f * glow);
+		final float glow = (float) Math.sin(Math.PI * 2 * ((double) world.getTotalWorldTime() % glowPeriod) / glowPeriod);
+		final float alpha = opaque ? 1f : (.6f + (.2f * glow));
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		VertexBuffer buffer = tessellator.getBuffer();
@@ -50,18 +40,20 @@ public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherB
 		GlStateManager.pushAttrib();
 		GlStateManager.translate(x, y, z);
 		GlStateManager.disableLighting();
-		//GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA,
-				SourceFactor.ONE, DestFactor.ZERO);
+		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+//		GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA,
+//				SourceFactor.ONE, DestFactor.ZERO);
 		//Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		GlStateManager.disableBlend();
 		GlStateManager.enableBlend();
-		GlStateManager.disableAlpha();
 		GlStateManager.enableAlpha();
+		GlStateManager.disableAlpha();
 		GlStateManager.enableColorMaterial();
 		GlStateManager.disableColorMaterial();
 		GlStateManager.enableTexture2D();
 		GlStateManager.disableTexture2D();
+		GlStateManager.depthMask(false);
+		GlStateManager.depthMask(true);
 		
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 		
@@ -108,7 +100,21 @@ public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherB
 		GlStateManager.enableTexture2D();
 		GlStateManager.popAttrib();
 		GlStateManager.popMatrix();
+	}
+	
+	@Override
+	public void renderTileEntityAt(AetherBatteryEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+
+		super.renderTileEntityAt(te, x, y, z, partialTicks, destroyStage);
 		
+		final int aether = te.getHandler().getAether(null);
+		final int maxAether = te.getHandler().getMaxAether(null);
+		
+		if (aether <= 0 || maxAether <= 0) {
+			return;
+		}
+		
+		renderBatteryAt(te.getWorld(), x, y, z, partialTicks, destroyStage, aether, maxAether, false);
 	}
 	
 }

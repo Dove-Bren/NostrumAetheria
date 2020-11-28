@@ -11,17 +11,12 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
-import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
-import com.smanzana.nostrumaetheria.api.blocks.IAetherCapableBlock;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLong;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -92,23 +87,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	}
 	
 	private static IAetherHandler getHandlerAt(World world, BlockPos pos, EnumFacing side) {
-		// First check for a TileEntity
-		TileEntity te = world.getTileEntity(pos);
-		if (te != null && te instanceof IAetherHandler) {
-			return (IAetherHandler) te;
-		}
-		if (te != null && te instanceof IAetherHandlerProvider) {
-			return ((IAetherHandlerProvider) te).getHandler();
-		}
-		
-		// See if block boasts being able to get us a handler
-		IBlockState attachedState = world.getBlockState(pos);
-		Block attachedBlock = attachedState.getBlock();
-		if (attachedBlock instanceof IAetherCapableBlock) {
-			return ((IAetherCapableBlock) attachedBlock).getAetherHandler(world, attachedState, pos, side);
-		}
-		
-		return null;
+		return IAetherHandler.GetHandlerAt(world, pos, side);
 	}
 	
 	protected void repairLinks() {

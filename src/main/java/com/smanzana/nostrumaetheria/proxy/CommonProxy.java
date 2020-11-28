@@ -7,12 +7,15 @@ import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
+import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
 import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
+import com.smanzana.nostrumaetheria.entities.EntityAetherBatteryMinecart;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
 import com.smanzana.nostrumaetheria.items.ActivePendant;
+import com.smanzana.nostrumaetheria.items.AetherBatteryMinecartItem;
 import com.smanzana.nostrumaetheria.items.AetherGem;
 import com.smanzana.nostrumaetheria.items.PassivePendant;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
@@ -45,6 +48,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -53,14 +57,15 @@ public class CommonProxy {
 	public void preinit() {
 		NetworkHandler.getInstance();
     	
-//    	int entityID = 0;
-//    	EntityRegistry.registerModEntity(EntityTestFairy.class, "test_fairy",
-//    			entityID++,
-//    			NostrumFairies.instance,
-//    			128,
-//    			1,
-//    			false
-//    			);
+    	int entityID = 0;
+    	EntityRegistry.registerModEntity(EntityAetherBatteryMinecart.class, "aether_battery_minecart",
+    			entityID++,
+    			NostrumAetheria.instance,
+    			128,
+    			1,
+    			false
+    			);
+    	APIProxy.AetherBatteryMinecart = EntityAetherBatteryMinecart.class;
 
     	registerItems();
     	registerBlocks();
@@ -95,6 +100,10 @@ public class CommonProxy {
     	GameRegistry.register(
     			AetherGem.instance().setRegistryName(AetherGem.ID));
     	APIProxy.AetherGemItem = AetherGem.instance();
+    	
+    	GameRegistry.register(
+    			AetherBatteryMinecartItem.instance().setRegistryName(AetherBatteryMinecartItem.ID));
+    	APIProxy.AetherBatteryMinecartItem = AetherBatteryMinecartItem.instance();
     }
     
     private void registerBlocks() {
@@ -207,6 +216,15 @@ public class CommonProxy {
     			);
     	AetherUnravelerBlock.init();
     	APIProxy.AetherUnravelerBlock = AetherUnravelerBlock.instance();
+    	
+    	GameRegistry.register(AetherPumpBlock.instance(),
+    			new ResourceLocation(NostrumAetheria.MODID, AetherPumpBlock.ID));
+    	GameRegistry.register(
+    			(new ItemBlock(AetherPumpBlock.instance()).setRegistryName(AetherPumpBlock.ID)
+    					.setCreativeTab(APIProxy.creativeTab).setUnlocalizedName(AetherPumpBlock.ID))
+    			);
+    	AetherPumpBlock.init();
+    	APIProxy.AetherPumpBlock = AetherPumpBlock.instance();
     }
     
     private void registerResearch() {
@@ -297,6 +315,15 @@ public class CommonProxy {
 			.hiddenParent("kani")
 			.reference("ritual::aether_relay", "ritual.aether_relay.name")
 		.build("aether_relay", (NostrumResearchTab) APIProxy.ResearchTab, Size.LARGE, 2, 3, true, new ItemStack(APIProxy.AetherRelay));
+		
+		// TODO if 'pipes' get added for short-range aether transport, consider making that a requirement for pumps & rails and stuff
+		// For example, pipes -> pumps -> rails with pumps as a separate thing?
+		NostrumResearch.startBuilding()
+			.parent("aether_battery")
+			.parent("aether_relay")
+			.reference("ritual::aether_battery_cart", "ritual.aether_battery_cart.name")
+			.reference("ritual::aether_pump", "ritual.aether_pump.name")
+		.build("aether_carts", (NostrumResearchTab) APIProxy.ResearchTab, Size.GIANT, 3, 3, true, new ItemStack(APIProxy.AetherBatteryMinecartItem));
     }
     
     private void registerRituals() {
@@ -488,7 +515,31 @@ public class CommonProxy {
 						new ItemStack(Blocks.REDSTONE_TORCH),
 						new ItemStack[] {new ItemStack(Items.ENDER_PEARL), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(PositionCrystal.instance()), new ItemStack(Items.REDSTONE)},
 						new RRequirementResearch("aether_relay"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherRelay, 3))
+						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherRelay, 8))
+						)
+				);
+		
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("aether_battery_cart",
+						new ItemStack(APIProxy.AetherBatteryMinecartItem),
+						null,
+						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.BLACK_PEARL},
+						new ItemStack(APIProxy.AetherBatteryMediumBlock),
+						new ItemStack[] {null, null, new ItemStack(Items.MINECART), null},
+						new RRequirementResearch("aether_carts"),
+						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherBatteryMinecartItem, 1))
+						)
+				);
+		
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("aether_pump",
+						new ItemStack(APIProxy.AetherPumpBlock),
+						null,
+						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.BLACK_PEARL},
+						new ItemStack(Blocks.HOPPER),
+						new ItemStack[] {new ItemStack(Items.IRON_INGOT), new ItemStack(Items.GOLD_INGOT), new ItemStack(Items.CAULDRON), new ItemStack(Items.IRON_INGOT)},
+						new RRequirementResearch("aether_carts"),
+						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherPumpBlock, 1))
 						)
 				);
     }
@@ -505,6 +556,7 @@ public class CommonProxy {
     	LoreRegistry.instance().register(PassivePendant.instance());
     	LoreRegistry.instance().register(AetherGem.instance());
     	LoreRegistry.instance().register(AetherUnravelerBlock.instance());
+    	LoreRegistry.instance().register(AetherPumpBlock.instance());
     }
 
 	public EntityPlayer getPlayer() {

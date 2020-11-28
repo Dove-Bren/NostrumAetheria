@@ -1,6 +1,15 @@
 package com.smanzana.nostrumaetheria.api.aether;
 
+import javax.annotation.Nullable;
+
+import com.smanzana.nostrumaetheria.api.blocks.IAetherCapableBlock;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 /**
  * Indicates that this class has the ability to store aether
@@ -54,5 +63,35 @@ public interface IAetherHandler {
 	 * @return
 	 */
 	public boolean canDraw(EnumFacing side, int amount);
+	
+
+	
+	/**
+	 * Look up a handler at the given position in the world.
+	 * Naturally, this only includes blocks and tile entities.
+	 * @param world
+	 * @param pos
+	 * @param side
+	 * @return
+	 */
+	public static @Nullable IAetherHandler GetHandlerAt(World world, BlockPos pos, @Nullable EnumFacing side) {
+		// First check for a TileEntity
+		TileEntity te = world.getTileEntity(pos);
+		if (te != null && te instanceof IAetherHandler) {
+			return (IAetherHandler) te;
+		}
+		if (te != null && te instanceof IAetherHandlerProvider) {
+			return ((IAetherHandlerProvider) te).getHandler();
+		}
+		
+		// See if block boasts being able to get us a handler
+		IBlockState attachedState = world.getBlockState(pos);
+		Block attachedBlock = attachedState.getBlock();
+		if (attachedBlock instanceof IAetherCapableBlock) {
+			return ((IAetherCapableBlock) attachedBlock).getAetherHandler(world, attachedState, pos, side);
+		}
+		
+		return null;
+	}
 	
 }

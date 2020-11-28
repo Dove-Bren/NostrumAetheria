@@ -360,4 +360,8 @@ public class AetherBatteryBlock extends BlockContainer implements ILoreTagged {
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_BLOCKS;
 	}
+	
+	public int getMaxAether() {
+		return size.capacity;
+	}
 }
