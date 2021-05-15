@@ -270,7 +270,7 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 	
 	@Override
 	public int damageDropped(IBlockState state) {
-		return getMetaFromState(state);
+		return metaFromType(state.getValue(TYPE));
 	}
 
 	@SideOnly(Side.CLIENT)
