@@ -20,8 +20,8 @@ import com.smanzana.nostrumaetheria.items.AetherGem;
 import com.smanzana.nostrumaetheria.items.PassivePendant;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.aetheria.items.AetherResourceType;
-import com.smanzana.nostrummagica.aetheria.items.NostrumAetherResourceItem;
+import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
+import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
@@ -86,6 +86,7 @@ public class CommonProxy {
 	
 	public void postinit() {
 		AetherRepairerBlock.initDefaultRecipes();
+		AetherUnravelerBlock.initDefaultRecipes();
 	}
     
     private void registerItems() {

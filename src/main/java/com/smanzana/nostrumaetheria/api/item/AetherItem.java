@@ -12,17 +12,21 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConn
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
+import com.smanzana.nostrumaetheria.api.event.LivingAetherDrawEvent;
+import com.smanzana.nostrumaetheria.api.event.LivingAetherDrawEvent.Phase;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -237,21 +241,36 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 			final int missing = Math.min(maxAether - aether, getMaxAutoFill(stack, worldIn, entityIn));
 			int toDraw = missing;
 			if (toDraw > 0) {
-				IInventory inv = null;
-				if (entityIn instanceof EntityPlayer) {
-					inv = ((EntityPlayer) entityIn).inventory;
-				}
-				// else....
 				
-				if (inv != null) {
-					toDraw -= APIProxy.drawFromInventory(worldIn, entityIn, inv, toDraw, stack);
+				LivingAetherDrawEvent event = new LivingAetherDrawEvent(Phase.BEFORE_EARLY, (EntityLivingBase) entityIn, stack, missing, toDraw);
+				MinecraftForge.EVENT_BUS.post(event);
+				toDraw = event.getAmtRemaining();
+				
+				if (toDraw > 0) {
+					IInventory inv = null;
+					if (entityIn instanceof EntityPlayer) {
+						inv = ((EntityPlayer) entityIn).inventory;
+					}
+					// else....
+					
+					if (inv != null) {
+						toDraw -= APIProxy.drawFromInventory(worldIn, entityIn, inv, toDraw, stack);
+					}
 				}
+				
+				event = new LivingAetherDrawEvent(Phase.BEFORE_LATE, (EntityLivingBase) entityIn, stack,  missing, toDraw);
+				MinecraftForge.EVENT_BUS.post(event);
+				toDraw = event.getAmtRemaining();
 				
 				// if missing has changed, we drew aether
 				int gained = missing - toDraw;
 				if (gained > 0) {
 					this.addAether(stack, gained);
 				}
+				
+				event = new LivingAetherDrawEvent(Phase.AFTER, (EntityLivingBase) entityIn, stack,  missing, toDraw);
+				MinecraftForge.EVENT_BUS.post(event);
+				event.getAmtRemaining();
 			}
 		}
 		

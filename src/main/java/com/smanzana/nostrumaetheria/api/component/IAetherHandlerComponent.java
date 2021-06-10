@@ -56,6 +56,8 @@ public interface IAetherHandlerComponent extends IAetherHandler, IAetherFlowHand
 	
 	@Override
 	public int getMaxAether(EnumFacing side);
+	
+	public void setMaxAether(int maxAether);
 
 	public int addAether(EnumFacing side, int amount, boolean force);
 	

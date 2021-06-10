@@ -1,5 +1,6 @@
 package com.smanzana.nostrumaetheria.blocks;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -7,7 +8,9 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrumaetheria.recipes.UnravelerRecipeManager;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -67,6 +70,10 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 	
 	public static void init() {
 		GameRegistry.registerTileEntity(AetherUnravelerBlockEntity.class, "aether_unraveler_te");
+	}
+	
+	public static void initDefaultRecipes() {
+		APIProxy.addUnravelerRecipe(new ScrollUnravelerRecipe());
 	}
 	
 	public AetherUnravelerBlock() {
@@ -218,20 +225,11 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 	
 	public static class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory {
 		
-		private static int GetAetherCost(ItemStack stack) {
-			return 2000; // If more items get added, adjust based on item
-		}
-		
-		private static int GetMaxTicks(ItemStack stack) {
-			return 20 * 100; // If more items get added, consider making them take different times
-			// Note ideally a whole divisor of aether cost, since I'm being lazy and not adding
-			// real support for fractions
-		}
-		
 		private boolean on;
 		private boolean aetherTick;
 		
-		private ItemStack stack;
+		private @Nullable ItemStack stack;
+		private @Nullable IAetherUnravelerRecipe recipe;
 		private int workTicks;
 		
 		public AetherUnravelerBlockEntity(int aether, int maxAether) {
@@ -245,13 +243,27 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 			this(0, 500);
 		}
 		
-		public ItemStack getItem() {
+		public @Nullable ItemStack getItem() {
 			return stack;
 		}
 		
-		public void setItem(ItemStack stack) {
+		public void setItem(@Nullable ItemStack stack) {
 			this.stack = stack;
+			refreshRecipe();
 			forceUpdate();
+		}
+		
+		public @Nullable IAetherUnravelerRecipe getCurrentRecipe() {
+			return recipe;
+		}
+		
+		protected void setRecipe(@Nullable IAetherUnravelerRecipe recipe) {
+			this.recipe = recipe;
+		}
+		
+		public void refreshRecipe() {
+			// Figure out recipe based on current item
+			setRecipe(UnravelerRecipeManager.instance().findRecipe(stack));
 		}
 		
 		private static final String NBT_ITEM = "item";
@@ -287,6 +299,7 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 				NBTTagCompound tag = nbt.getCompoundTag(NBT_ITEM);
 				stack = ItemStack.loadItemStackFromNBT(tag);
 			}
+			refreshRecipe();
 			
 			workTicks = nbt.getInteger(NBT_WORK_TICKS); // defaults 0 :)
 		}
@@ -325,6 +338,7 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 				return null;
 			ItemStack ret = this.stack;
 			this.stack = null;
+			refreshRecipe();
 			forceUpdate();
 			return ret;
 		}
@@ -334,6 +348,7 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 			if (index > 0)
 				return;
 			this.stack = stack;
+			refreshRecipe();
 			forceUpdate();
 		}
 
@@ -367,20 +382,7 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 				return true;
 			}
 			
-			if (!(stack.getItem() instanceof SpellScroll)) {
-				return false;
-			}
-			
-			if (stack.getItemDamage() > 0) {
-				return false;
-			}
-			
-			Spell spell = SpellScroll.getSpell(stack);
-			if (spell == null) {
-				return false;
-			}
-			
-			return true;
+			return UnravelerRecipeManager.instance().findRecipe(stack) != null;
 		}
 
 		@Override
@@ -388,16 +390,32 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 			return !(oldState.getBlock().equals(newState.getBlock()));
 		}
 		
+		public int getMaxTicks() {
+			if (this.recipe == null) {
+				return 0;
+			}
+			
+			return this.recipe.getDuration(stack);
+		}
+		
+		public int getTotalAetherCost() {
+			if (this.recipe == null) {
+				return 0;
+			}
+			
+			return this.recipe.getAetherCost(stack);
+		}
+		
 		@Override
 		public int getField(int id) {
 			if (id == 0) {
 				return this.handler.getAether(null);
 			} else if (id == 1) {
-				if (stack == null) {
+				if (stack == null || recipe == null) {
 					return 0;
 				}
 				
-				return (int) Math.round(((float) this.workTicks * 100f) / (float) GetMaxTicks(stack));
+				return (int) Math.round(((float) this.workTicks * 100f) / (float) getMaxTicks());
 			}
 			return 0;
 		}
@@ -407,10 +425,10 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 			if (id == 0) {
 				this.handler.setAether(value);
 			} else if (id == 1) {
-				if (value == 0 || stack == null) {
+				if (value == 0 || stack == null || recipe == null) {
 					workTicks = 0;
 				} else {
-					this.workTicks = (int) Math.round(((float) value * (float) GetMaxTicks(stack)) / 100);
+					this.workTicks = (int) Math.round(((float) value * (float) getMaxTicks()) / 100);
 				}
 			}
 		}
@@ -429,6 +447,7 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 		@Override
 		public void clear() {
 			this.stack = null;
+			refreshRecipe();
 			forceUpdate();
 		}
 
@@ -461,41 +480,15 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 		}
 		
 		protected void processItem(ItemStack stack) {
-			// If more items are added, add processing here!
+			if (recipe == null) {
+				return;
+			}
 			
-			// Spell scroll
-			{
-				Spell spell = SpellScroll.getSpell(stack);
-				if (spell == null) {
-					NostrumAetheria.logger.error("Tried to process spell scroll in unraveler but found no spell");
-					return;
-				}
-				
-				for (SpellPart part : spell.getSpellParts()) {
-					final ItemStack[] runes;
-					if (part.isTrigger()) {
-						SpellTrigger trigger = part.getTrigger();
-						runes = new ItemStack[] {SpellRune.getRune(trigger)};
-					} else {
-						SpellShape shape = part.getShape();
-						EMagicElement elem = part.getElement();
-						int elemCount = part.getElementCount();
-						EAlteration alt = part.getAlteration();
-						runes = new ItemStack[1 + elemCount + (alt == null ? 0 : 1)];
-						runes[0] = SpellRune.getRune(shape);
-						if (alt != null) {
-							runes[1] = SpellRune.getRune(alt);
-						}
-						for (; elemCount > 0; elemCount--) {
-							runes[1 + (alt == null ? 0 : 1) + (elemCount - 1)]
-									= SpellRune.getRune(elem, 1);
-						}
-					}
-					
-					for (ItemStack rune : runes) {
-						EntityItem item = new EntityItem(worldObj, pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5, rune);
-						worldObj.spawnEntityInWorld(item);
-					}
+			ItemStack[] items = recipe.unravel(stack);
+			if (items != null && items.length > 0) {
+				for (ItemStack item : items) {
+					EntityItem ent = new EntityItem(worldObj, pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5, item);
+					worldObj.spawnEntityInWorld(ent);
 				}
 			}
 			
@@ -521,9 +514,9 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 		public void update() {
 			// If we have an item, work and break it down
 			if (!worldObj.isRemote) {
-				if (stack != null) {
+				if (stack != null && recipe != null) {
 					boolean worked = true;
-					final int aetherPerTick = GetAetherCost(stack) / GetMaxTicks(stack);
+					final int aetherPerTick = getTotalAetherCost() / getMaxTicks();
 					final int drawn = handler.drawAether(null, aetherPerTick);
 					if (drawn == 0) {
 						worked = false;
@@ -538,7 +531,7 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 					if (worked) {
 						// Had and took aether. Advance
 						workTicks++;
-						if (workTicks > GetMaxTicks(stack)) {
+						if (workTicks > getMaxTicks()) {
 							workTicks = 0;
 							processItem(stack);
 							stack.stackSize--;
@@ -584,5 +577,72 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 			}
 		}
 
+	}
+	
+	protected static class ScrollUnravelerRecipe implements IAetherUnravelerRecipe {
+
+		private static final int AETHER_COST = 2000;
+		private static final int DURATION = 20 * 100;
+		
+		@Override
+		public boolean matches(ItemStack stack) {
+			return stack.getItem() instanceof SpellScroll;
+		}
+
+		@Override
+		public int getAetherCost(ItemStack stack) {
+			return AETHER_COST;
+		}
+		
+		@Override
+		public int getDuration(ItemStack stack) {
+			return DURATION;
+		}
+
+		@Override
+		public ItemStack[] unravel(ItemStack stack) {
+			ItemStack[] ret = new ItemStack[0];
+			
+			Spell spell = SpellScroll.getSpell(stack);
+			if (spell == null) {
+				NostrumAetheria.logger.error("Tried to process spell scroll in unraveler but found no spell");
+				return ret;
+			}
+			
+			List<SpellPart> parts = spell.getSpellParts();
+			List<ItemStack> pieces = new ArrayList<>();
+			for (SpellPart part : parts) {
+				final ItemStack[] runes;
+				if (part.isTrigger()) {
+					SpellTrigger trigger = part.getTrigger();
+					runes = new ItemStack[] {SpellRune.getRune(trigger)};
+				} else {
+					SpellShape shape = part.getShape();
+					EMagicElement elem = part.getElement();
+					int elemCount = part.getElementCount();
+					EAlteration alt = part.getAlteration();
+					runes = new ItemStack[1 + elemCount + (alt == null ? 0 : 1)];
+					runes[0] = SpellRune.getRune(shape);
+					if (alt != null) {
+						runes[1] = SpellRune.getRune(alt);
+					}
+					for (; elemCount > 0; elemCount--) {
+						runes[1 + (alt == null ? 0 : 1) + (elemCount - 1)]
+								= SpellRune.getRune(elem, 1);
+					}
+				}
+				
+				for (ItemStack rune : runes) {
+					pieces.add(rune);
+				}
+			}
+			
+			if (pieces.size() > 0) {
+				ret = pieces.toArray(new ItemStack[pieces.size()]);
+			}
+			
+			return ret;
+		}
+		
 	}
 }

@@ -6,6 +6,7 @@ import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
+import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
 
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -99,6 +100,21 @@ public abstract class APIProxy {
 		return 0;
 	}
 	
+	/**
+	 * Attempts to charge up any aether-holding items in an inventory.
+	 * Returns the amount that the inventory was charged.
+	 * @param inventory
+	 * @param amount
+	 * @return
+	 */
+	public static int pushToInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount) {
+		if (handler != null) {
+			return handler.handlePushToInventory(world, entity, inventory, amount);
+		}
+		
+		return 0;
+	}
+	
 	public static IAetherHandlerComponent createHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
 		if (handler != null) {
 			return handler.handleCreateHandlerComponent(listener, defaultAether, defaultMaxAether);
@@ -122,10 +138,26 @@ public abstract class APIProxy {
 		}
 	}
 	
+	/**
+	 * Register a recipe with the Aether Unraveler.
+	 * This should be called in the init stage.
+	 * Default recipes are added in post-init. Note that recipes are given priority in the order they are
+	 * registered. This means default recipes can be overriden by registering another recipe that matches the
+	 * same items during init.
+	 * @param recipe
+	 */
+	public static void addUnravelerRecipe(IAetherUnravelerRecipe recipe) {
+		if (handler != null) {
+			handler.handleAddUnravelerRecipe(recipe);
+		}
+	}
+	
 	protected abstract boolean handleIsEnabled();
 	protected abstract IAetherHandlerComponent handleCreateHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether);
 	protected abstract void handleSyncTEAether(AetherTileEntity te);
 	protected abstract boolean handleIsBlockLoaded(World world, BlockPos pos);
 	protected abstract int handleDrawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nullable ItemStack ignore);
+	protected abstract int handlePushToInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount);
 	protected abstract void handleAddRepairerRecipe(IAetherRepairerRecipe recipe);
+	protected abstract void handleAddUnravelerRecipe(IAetherUnravelerRecipe recipe);
 }

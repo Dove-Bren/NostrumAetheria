@@ -14,7 +14,7 @@ public interface IAetherBurnable {
 	
 	/**
 	 * How much aether to produce for each of the items in this stack when burned in a regular base small aether furnace.
-	 * Reagents, for example, produce 100 aether per reagent.
+	 * Reagents, for example, produce 150 aether per reagent.
 	 * @param stack
 	 * @return
 	 */

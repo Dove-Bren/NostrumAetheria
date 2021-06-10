@@ -30,6 +30,12 @@ public class OptionalAetherHandlerComponent {
 		}
 	}
 	
+	public void setAutoFill(boolean autoFill, int maxPerTick) {
+		if (component != null) {
+			component.setAutoFill(autoFill, maxPerTick);
+		}
+	}
+	
 	public void configureInOut(boolean inputAllowed, boolean outputAllowed) {
 		if (component != null) {
 			component.configureInOut(inputAllowed, outputAllowed);

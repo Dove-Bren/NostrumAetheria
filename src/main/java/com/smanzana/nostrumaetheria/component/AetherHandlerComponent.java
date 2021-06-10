@@ -192,6 +192,11 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	public int getMaxAether(EnumFacing side) {
 		return maxAether;
 	}
+	
+	@Override
+	public void setMaxAether(int maxAether) {
+		this.maxAether = maxAether;
+	}
 
 	public int addAether(EnumFacing side, int amount, boolean force) {
 		if (force || canAcceptOnSide(side)) {

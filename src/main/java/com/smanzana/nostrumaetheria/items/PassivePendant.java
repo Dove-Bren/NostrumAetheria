@@ -124,7 +124,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 		
 		int charges = getWholeCharges(stack);
 		if (charges > 0) {
-			if (!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) {
+			if ((!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) && !caster.worldObj.isRemote) {
 				spendCharge(stack);
 			}
 			summary.addReagentCost(-1f);

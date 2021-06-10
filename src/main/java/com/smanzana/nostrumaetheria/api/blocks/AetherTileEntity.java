@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConnection;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
+import com.smanzana.nostrumaetheria.api.aether.stats.IAetherStatTracker;
+import com.smanzana.nostrumaetheria.api.component.AetherStatTrackerComponent;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.component.OptionalAetherHandlerComponent;
@@ -25,9 +27,11 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	private static final String NBT_HANDLER = "aether_handler";
 	
 	protected OptionalAetherHandlerComponent compWrapper;
+	protected final IAetherStatTracker statTracker;
 	
 	public AetherTileEntity(int defaultAether, int defaultMaxAether) {
 		compWrapper = createComponent(defaultAether, defaultMaxAether);
+		statTracker = createTracker();
 	}
 	
 	public AetherTileEntity() {
@@ -36,6 +40,10 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	
 	protected OptionalAetherHandlerComponent createComponent(int defaultAether, int defaultMaxAether) {
 		return new OptionalAetherHandlerComponent(this, defaultAether, defaultMaxAether);
+	}
+	
+	protected IAetherStatTracker createTracker() {
+		return new AetherStatTrackerComponent();
 	}
 	
 	@Override
@@ -78,7 +86,16 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	
 	@Override
 	public void onAetherFlowTick(int diff, boolean added, boolean taken) {
-		;
+		if (this.worldObj != null) {
+			final int aether = (this.compWrapper.isPresent() ? this.compWrapper.getHandlerIfPresent().getAether(null) : 0);
+			statTracker.reportTotal(worldObj.getTotalWorldTime(), aether);
+			
+			if (added) {
+				statTracker.reportInput(worldObj.getTotalWorldTime(), diff);
+			} else {
+				statTracker.reportOutput(worldObj.getTotalWorldTime(), diff);
+			}
+		}
 	}
 	
 	@Override
@@ -131,5 +148,9 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	@Override
 	public @Nullable IAetherHandler getHandler() {
 		return compWrapper.getHandlerIfPresent();
+	}
+	
+	public IAetherStatTracker getStats() {
+		return this.statTracker;
 	}
 }

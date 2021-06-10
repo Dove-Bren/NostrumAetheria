@@ -245,7 +245,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 		
 		int charges = lyonGetWholeCharges(stack);
 		if (charges > 0) {
-			if (!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) {
+			if ((!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) && !caster.worldObj.isRemote) {
 				lyonSpendCharge(stack);
 			}
 			summary.addReagentCost(-1f);
