@@ -47,6 +47,10 @@ public class AetherRelayRenderer extends TileEntitySpecialRenderer<AetherRelayEn
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		boolean debug = player != null && (player.isCreative() || player.isSpectator());
 		
+		if (!debug) {
+			return; // Now we have particles
+		}
+		
 		AetherRelayComponent relay = (AetherRelayComponent) handler;
 
 		final Vec3d origin = Vec3d.ZERO;

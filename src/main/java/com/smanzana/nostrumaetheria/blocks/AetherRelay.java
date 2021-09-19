@@ -1,5 +1,6 @@
 package com.smanzana.nostrumaetheria.blocks;
 
+import java.util.Collection;
 import java.util.Random;
 
 import javax.annotation.Nullable;
@@ -8,7 +9,10 @@ import com.smanzana.nostrumaetheria.api.component.OptionalAetherHandlerComponent
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.component.AetherRelayComponent;
 import com.smanzana.nostrumaetheria.component.AetherRelayComponent.AetherRelayListener;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -34,6 +38,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -205,6 +210,8 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 		protected @Nullable AetherRelayComponent relayHandler;
 		private EnumFacing side;
 		
+		private int idleTicks;
+		
 		public AetherRelayEntity() {
 			this(EnumFacing.UP);
 		}
@@ -216,6 +223,7 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 			this.relayHandler = new AetherRelayComponent(this, facing);
 			this.handler = relayHandler;
 			this.compWrapper = new OptionalAetherHandlerComponent(relayHandler);
+			idleTicks = NostrumMagica.rand.nextInt(40) + 10;
 		}
 		
 //		@Override
@@ -329,6 +337,45 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 			
 			this.side = EnumFacing.values()[compound.getByte(NBT_SIDE)];
 			relayHandler.setSide(this.side);
+		}
+		
+		protected void idleVisualTick() {
+			AetherRelayComponent relay = (AetherRelayComponent) this.getHandler();
+			final Collection<BlockPos> links = relay.getLinkedPositions();
+			
+			if (links == null || links.isEmpty()) {
+				return;
+			}
+			
+			final int color;
+			//if (relay.isAetherActive()) {
+				color = 0x80D4CF80;
+			//} else {
+			//	color = 0x80D3D3CD;
+			//}
+			
+			for (BlockPos dest : links) {
+				if (NostrumMagica.rand.nextBoolean() && NostrumMagica.rand.nextBoolean()) {
+					NostrumParticles.GLOW_ORB.spawn(worldObj, new SpawnParams(
+							1, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 0, 20 * 1, 10, new Vec3d(dest.getX() + .5, dest.getY() + .5, dest.getZ() + .5)
+						).color(color));
+					
+					//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
+					//Vec3d targetPos
+				}
+			}
+		}
+		
+		@Override
+		public void update() {
+			super.update();
+			
+			if (this.worldObj != null && this.worldObj.isRemote) {
+				if (ticksExisted > idleTicks) {
+					idleTicks = ticksExisted + NostrumMagica.rand.nextInt(40) + 10;
+					idleVisualTick();
+				}
+			}
 		}
 	}
 

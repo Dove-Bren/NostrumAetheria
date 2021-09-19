@@ -41,8 +41,9 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	
 	// Transient tick variables
 	protected int ticksExisted;
-	protected boolean receivedAetherThisTick;
-	protected boolean gaveAetherThisTick;
+	protected boolean receivedAetherThisTick; // internal
+	protected boolean gaveAetherThisTick; // internal
+	protected boolean aetherActiveTick; // useful for checking if active after super.tick()
 	protected int aetherLastTick;
 	
 	public AetherHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
@@ -349,12 +350,23 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 		
 		int aetherDiff = this.getAether(null) - aetherLastTick;
 		if (aetherDiff != 0 || receivedAetherThisTick || gaveAetherThisTick) {
+			aetherActiveTick = true;
 			listener.onAetherFlowTick(aetherDiff, receivedAetherThisTick, gaveAetherThisTick);
+		} else {
+			aetherActiveTick = false;
 		}
 		
 		aetherLastTick = this.getAether(null);
 		receivedAetherThisTick = false;
 		gaveAetherThisTick = false;
+	}
+	
+	/**
+	 * Most accurate right after a tick (or super.tick()) call.
+	 * @return
+	 */
+	public boolean isAetherActive() {
+		return aetherActiveTick;
 	}
 	
 	private static final void configFromByte(boolean[] config, byte b) {
