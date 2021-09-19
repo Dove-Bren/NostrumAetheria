@@ -2,6 +2,8 @@ package com.smanzana.nostrumaetheria.items;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -9,6 +11,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -36,6 +39,7 @@ public class AetherGem extends AetherItem implements ILoreTagged {
 	
 	public AetherGem() {
 		super();
+		this.setUnlocalizedName(ID);
 		this.setUnlocalizedName(ID);
 		this.setMaxDamage(MAX_AETHER);
 		this.setMaxStackSize(1);
@@ -65,12 +69,9 @@ public class AetherGem extends AetherItem implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		if (stack == null)
-			return;
-		
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		tooltip.add(I18n.format("item.info.aether_gem.desc", (Object[]) null));
-		super.addInformation(stack, playerIn, tooltip, advanced);
+		super.addInformation(stack, worldIn, tooltip, flagIn);
 	}
 
 	@Override

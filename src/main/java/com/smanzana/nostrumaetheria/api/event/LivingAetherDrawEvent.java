@@ -1,6 +1,8 @@
 package com.smanzana.nostrumaetheria.api.event;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang3.Validate;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -27,7 +29,7 @@ public class LivingAetherDrawEvent extends LivingEvent {
 	/**
 	 * Item that's doing the drawing
 	 */
-	public final @Nullable ItemStack originalItem;
+	public final @Nonnull ItemStack originalItem;
 	
 	/**
 	 * Original amount requested to be drawn at event creation
@@ -48,13 +50,15 @@ public class LivingAetherDrawEvent extends LivingEvent {
 	
 	public final Phase phase;
 	
-	public LivingAetherDrawEvent(Phase phase, EntityLivingBase entity, @Nullable ItemStack originalItem, int origAmt, int drawAmt) {
+	public LivingAetherDrawEvent(Phase phase, EntityLivingBase entity, @Nonnull ItemStack originalItem, int origAmt, int drawAmt) {
 		super(entity);
 		this.phase = phase;
 		this.entity = entity;
 		this.originalItem = originalItem;
 		this.totalDrawAmt = origAmt;
 		this.desiredDrawAmt = this.amtRemaining = drawAmt;
+		
+		Validate.notNull(originalItem);
 	}
 	
 	public EntityLivingBase getEntity() {

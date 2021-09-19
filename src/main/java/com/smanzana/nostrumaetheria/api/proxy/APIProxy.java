@@ -1,5 +1,6 @@
 package com.smanzana.nostrumaetheria.api.proxy;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
@@ -11,6 +12,7 @@ import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -92,7 +94,7 @@ public abstract class APIProxy {
 	 * @param ignore
 	 * @return
 	 */
-	public static int drawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nullable ItemStack ignore) {
+	public static int drawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nonnull ItemStack ignore) {
 		if (handler != null) {
 			return handler.handleDrawFromInventory(world, entity, inventory, amount, ignore);
 		}
@@ -152,12 +154,20 @@ public abstract class APIProxy {
 		}
 	}
 	
+	public static EntityPlayer getClientPlayer() {
+		if (handler != null) {
+			return handler.handleGetClientPlayer();
+		}
+		return null;
+	}
+	
 	protected abstract boolean handleIsEnabled();
 	protected abstract IAetherHandlerComponent handleCreateHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether);
 	protected abstract void handleSyncTEAether(AetherTileEntity te);
 	protected abstract boolean handleIsBlockLoaded(World world, BlockPos pos);
-	protected abstract int handleDrawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nullable ItemStack ignore);
+	protected abstract int handleDrawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nonnull ItemStack ignore);
 	protected abstract int handlePushToInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount);
 	protected abstract void handleAddRepairerRecipe(IAetherRepairerRecipe recipe);
 	protected abstract void handleAddUnravelerRecipe(IAetherUnravelerRecipe recipe);
+	protected abstract EntityPlayer handleGetClientPlayer();
 }

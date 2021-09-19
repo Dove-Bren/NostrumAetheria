@@ -1,7 +1,9 @@
 package com.smanzana.nostrumaetheria.proxy;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
@@ -23,6 +25,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -49,7 +52,7 @@ public class AetheriaAPIProxy extends APIProxy {
 	}
 
 	@Override
-	protected int handleDrawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nullable ItemStack ignore) {
+	protected int handleDrawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nonnull ItemStack ignore) {
 		final int origAmt = amount;
 		
 		if (entity instanceof EntityLivingBase) {
@@ -62,7 +65,7 @@ public class AetheriaAPIProxy extends APIProxy {
 			final int start = amount;
 			for (int i = 0; i < inventory.getSizeInventory() && amount > 0; i++) {
 				ItemStack inSlot = inventory.getStackInSlot(i);
-				if (inSlot != null && inSlot != ignore) {
+				if (!inSlot.isEmpty() && inSlot != ignore) {
 					if (inSlot.getItem() instanceof AetherItem) {
 						AetherItem otherItem = (AetherItem) inSlot.getItem();
 						if (otherItem.canBeDrawnFrom(inSlot, world, entity)) {
@@ -109,7 +112,7 @@ public class AetheriaAPIProxy extends APIProxy {
 			final int start = amount;
 			for (int i = 0; i < inventory.getSizeInventory() && amount > 0; i++) {
 				ItemStack inSlot = inventory.getStackInSlot(i);
-				if (inSlot != null) {
+				if (!inSlot.isEmpty()) {
 					if (inSlot.getItem() instanceof AetherItem) {
 						AetherItem otherItem = (AetherItem) inSlot.getItem();
 						amount = otherItem.addAether(inSlot, amount);
@@ -150,6 +153,11 @@ public class AetheriaAPIProxy extends APIProxy {
 	@Override
 	protected void handleAddUnravelerRecipe(IAetherUnravelerRecipe recipe) {
 		UnravelerRecipeManager.instance().addRecipe(recipe);
+	}
+
+	@Override
+	protected EntityPlayer handleGetClientPlayer() {
+		return NostrumAetheria.proxy.getPlayer();
 	}
 	
 }

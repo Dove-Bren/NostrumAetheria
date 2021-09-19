@@ -3,7 +3,7 @@ package com.smanzana.nostrumaetheria.entities;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock.AetherPumpBlockEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherPumpBlockEntity;
 import com.smanzana.nostrumaetheria.items.AetherBatteryMinecartItem;
 
 import net.minecraft.block.state.IBlockState;
@@ -78,7 +78,7 @@ public class EntityAetherBatteryMinecart extends EntityMinecart {
 		//super.killMinecart(source);
 		
 		this.setDead();
-		if (this.worldObj.getGameRules().getBoolean("doEntityDrops")) {
+		if (this.world.getGameRules().getBoolean("doEntityDrops")) {
 			ItemStack itemstack = new ItemStack(APIProxy.AetherBatteryMinecartItem, 1);
 
 			if (this.hasCustomName()) {
@@ -103,16 +103,16 @@ public class EntityAetherBatteryMinecart extends EntityMinecart {
 	public void moveMinecartOnRail(BlockPos pos) {
 		super.moveMinecartOnRail(pos);
 		
-		if (worldObj.isRemote) {
+		if (world.isRemote) {
 			return;
 		}
 		
 		// Look for nearby pumps
 		for (EnumFacing dir : new EnumFacing[] {EnumFacing.EAST, EnumFacing.WEST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.UP}) {
 			final BlockPos at = pos.offset(dir);
-			IBlockState state = worldObj.getBlockState(at);
+			IBlockState state = world.getBlockState(at);
 			if (state.getBlock() instanceof AetherPumpBlock) {
-				TileEntity te = worldObj.getTileEntity(at);
+				TileEntity te = world.getTileEntity(at);
 				if (te != null && te instanceof AetherPumpBlockEntity) {
 					AetherPumpBlockEntity ent = (AetherPumpBlockEntity) te;
 					final EnumFacing pumpDir = AetherPumpBlock.instance().getFacing(state);

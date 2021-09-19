@@ -1,11 +1,11 @@
-package com.smanzana.nostrumaetheria.blocks;
+package com.smanzana.nostrumaetheria.blocks.tiles;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
 import com.smanzana.nostrummagica.utils.Inventories;
@@ -15,6 +15,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 
 public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTickingTileEntity implements IInventory {
 
@@ -29,7 +30,7 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	private int burnTicksRemaining;
 	private int burnTicksMax;
 	
-	private ItemStack[] slots;
+	private NonNullList<ItemStack> slots;
 	private boolean burning;
 	private float aetherCarry; // for handling floating point in an int world
 	
@@ -60,8 +61,8 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		
 		boolean success = true;
 		for (int i = 0; i < getSizeInventory(); i++) {
-			@Nullable ItemStack stack = slots[i];
-			if (stack == null) {
+			@Nonnull ItemStack stack = slots.get(i);
+			if (stack.isEmpty()) {
 				if (!allowEmpty) {
 					success = false;
 					break;
@@ -138,7 +139,7 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	
 	@Override
 	public void update() {
-		if (!worldObj.isRemote) {
+		if (!world.isRemote) {
 			this.handler.pushAether(500);
 			if (handler.getAether(null) < handler.getMaxAether(null) && consumeTick()) {
 				generateAether();
@@ -159,18 +160,18 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	
 	@Override
 	public int getSizeInventory() {
-		return slots.length;
+		return slots.size();
 	}
 	
 	private void initInventory(int count) {
-		slots = new ItemStack[count];
+		slots = NonNullList.withSize(count, ItemStack.EMPTY);
 	}
 	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		nbt.setInteger(NBT_INVENTORY_SLOTS, slots.length);
+		nbt.setInteger(NBT_INVENTORY_SLOTS, slots.size());
 		nbt.setTag(NBT_INVENTORY, Inventories.serializeInventory(this));
 		nbt.setFloat(NBT_AETHER_CARRY, this.aetherCarry);
 		nbt.setFloat(NBT_AETHER_PER, this.aetherPerTick);
@@ -200,24 +201,24 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	@Override
 	public ItemStack getStackInSlot(int index) {
 		if (index < 0 || index >= getSizeInventory())
-			return null;
+			return ItemStack.EMPTY;
 		
-		return slots[index];
+		return slots.get(index);
 	}
 	
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
-		if (index < 0 || index >= getSizeInventory() || slots[index] == null)
-			return null;
+		if (index < 0 || index >= getSizeInventory() || slots.get(index).isEmpty())
+			return ItemStack.EMPTY;
 		
 		ItemStack stack;
-		if (slots[index].stackSize <= count) {
-			stack = slots[index];
-			slots[index] = null;
+		if (slots.get(index).getCount() <= count) {
+			stack = slots.get(index);
+			slots.set(index, ItemStack.EMPTY);
 		} else {
-			stack = slots[index].copy();
-			stack.stackSize = count;
-			slots[index].stackSize -= count;
+			stack = slots.get(index).copy();
+			stack.setCount(count);
+			slots.get(index).shrink(count);
 		}
 		
 		this.markDirty();
@@ -228,10 +229,10 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
 		if (index < 0 || index >= getSizeInventory())
-			return null;
+			return ItemStack.EMPTY;
 		
-		ItemStack stack = slots[index];
-		slots[index] = null;
+		ItemStack stack = slots.get(index);
+		slots.set(index, ItemStack.EMPTY);
 		
 		this.markDirty();
 		return stack;
@@ -242,7 +243,7 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		if (!isItemValidForSlot(index, stack))
 			return;
 		
-		slots[index] = stack;
+		slots.set(index, stack);
 		this.markDirty();
 	}
 	
@@ -252,7 +253,7 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(EntityPlayer player) {
 		return true;
 	}
 
@@ -269,14 +270,14 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		if (index < 0 || index >= getSizeInventory())
 			return false;
 		
-		if (stack != null && (
+		if (!stack.isEmpty() && (
 				!(stack.getItem() instanceof IAetherBurnable) || ((IAetherBurnable) stack.getItem()).getBurnTicks(stack) <= 0
 				)) {
 			return false;
 		}
 		
 		ItemStack inSlot = this.getStackInSlot(index);
-		if (inSlot == null) {
+		if (inSlot.isEmpty()) {
 			if (!allReagentsValid(stack, true)) {
 				return false;
 			}
@@ -316,6 +317,17 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		for (int i = 0; i < getSizeInventory(); i++) {
 			removeStackFromSlot(i);
 		}
+	}
+	
+	@Override
+	public boolean isEmpty() {
+		for (ItemStack stack : slots) {
+			if (!stack.isEmpty()) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 
 	private static final class ReagentType {

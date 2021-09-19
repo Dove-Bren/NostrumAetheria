@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
@@ -18,6 +19,7 @@ import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,15 +44,12 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	
 	protected abstract int getDefaultMaxAether(ItemStack stack);
 	
-	protected abstract boolean shouldShowAether(ItemStack stack, EntityPlayer playerIn, boolean advanced);
+	protected abstract boolean shouldShowAether(@Nonnull ItemStack stack, EntityPlayer playerIn, boolean advanced);
     
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		if (stack == null)
-			return;
-		
-		if (shouldShowAether(stack, playerIn, advanced)) {
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+		if (shouldShowAether(stack, APIProxy.getClientPlayer(), flagIn.isAdvanced())) {
 			IAetherHandlerComponent comp = getAetherHandler(stack);
 			int aether = comp.getAether(null);
 			int maxAether = comp.getMaxAether(null);
@@ -58,12 +57,12 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 		}
 	}
 	
-	public IAetherHandlerComponent getAetherHandler(ItemStack stack) {
+	public IAetherHandlerComponent getAetherHandler(@Nonnull ItemStack stack) {
 		return GetOrCreateCachedHandlerItem(stack).component;
 	}
 
 	public int getAether(ItemStack stack) {
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return 0;
 		}
 		
@@ -74,7 +73,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	}
 	
 	public int deductAether(ItemStack stack, int amount) {
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return 0;
 		}
 		
@@ -90,7 +89,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	}
 	
 	public int addAether(ItemStack stack, int amount) {
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return amount;
 		}
 		
@@ -172,7 +171,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	}
 	
 	public UUID getItemID(ItemStack stack) {
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return null;
 		}
 		
@@ -213,7 +212,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	 * @param stack
 	 * @return
 	 */
-	public abstract boolean canBeDrawnFrom(@Nullable ItemStack stack, @Nullable World worldIn, Entity entityIn);
+	public abstract boolean canBeDrawnFrom(@Nonnull ItemStack stack, @Nullable World worldIn, Entity entityIn);
 	
 	protected void onFirstTick(ItemStack stack, World worldIn, Entity entityIn) {
 		getItemID(stack); // generates it if it's missing

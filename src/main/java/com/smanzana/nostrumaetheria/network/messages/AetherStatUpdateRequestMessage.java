@@ -30,8 +30,8 @@ public class AetherStatUpdateRequestMessage implements IMessage {
 			int aether = message.tag.getInteger(NBT_AETHER);
 			
 			Minecraft.getMinecraft().addScheduledTask(() -> {
-				if (Minecraft.getMinecraft().thePlayer.worldObj.provider.getDimension() == dim) {
-					World world = Minecraft.getMinecraft().thePlayer.worldObj;
+				if (Minecraft.getMinecraft().player.world.provider.getDimension() == dim) {
+					World world = Minecraft.getMinecraft().player.world;
 					if (!world.isBlockLoaded(pos)) {
 						return;
 					}

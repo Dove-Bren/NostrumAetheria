@@ -2,24 +2,18 @@ package com.smanzana.nostrumaetheria.client.render;
 
 import org.lwjgl.opengl.GL11;
 
-import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock.AetherBatteryEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherBatteryEntity;
 
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherBatteryEntity> {
 
-	public static void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(AetherBatteryEntity.class,
-				new AetherBatteryRenderer());
-	}
-	
 	public AetherBatteryRenderer() {
 		super();
 	}
@@ -34,7 +28,7 @@ public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherB
 		final float alpha = opaque ? 1f : (.6f + (.2f * glow));
 		
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer buffer = tessellator.getBuffer();
+		BufferBuilder buffer = tessellator.getBuffer();
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.pushAttrib();
@@ -103,9 +97,9 @@ public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherB
 	}
 	
 	@Override
-	public void renderTileEntityAt(AetherBatteryEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(AetherBatteryEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alphaIn) {
 
-		super.renderTileEntityAt(te, x, y, z, partialTicks, destroyStage);
+		super.render(te, x, y, z, partialTicks, destroyStage, alphaIn);
 		
 		final int aether = te.getHandler().getAether(null);
 		final int maxAether = te.getHandler().getMaxAether(null);

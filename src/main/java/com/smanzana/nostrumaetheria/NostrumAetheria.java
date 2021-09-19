@@ -16,7 +16,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -59,8 +58,8 @@ public class NostrumAetheria
     	APIProxy.creativeTab = new CreativeTabs(MODID){
 	    	@Override
 	        @SideOnly(Side.CLIENT)
-	        public Item getTabIconItem(){
-	    		return InfineAetherBlock.instance().itemBlock;
+	        public ItemStack getTabIconItem(){
+	    		return new ItemStack(InfineAetherBlock.instance().itemBlock);
 	        }
 	    };
 	    InfineAetherBlock.instance().setCreativeTab(APIProxy.creativeTab);

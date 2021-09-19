@@ -1,5 +1,7 @@
 package com.smanzana.nostrumaetheria.api.item;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.item.ItemStack;
 
 public interface IAetherBurnable {
@@ -10,7 +12,7 @@ public interface IAetherBurnable {
 	 * @param stack
 	 * @return
 	 */
-	public int getBurnTicks(ItemStack stack);
+	public int getBurnTicks(@Nonnull ItemStack stack);
 	
 	/**
 	 * How much aether to produce for each of the items in this stack when burned in a regular base small aether furnace.
@@ -18,6 +20,6 @@ public interface IAetherBurnable {
 	 * @param stack
 	 * @return
 	 */
-	public float getAetherYield(ItemStack stack);
+	public float getAetherYield(@Nonnull ItemStack stack);
 	
 }

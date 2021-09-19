@@ -1,18 +1,11 @@
 package com.smanzana.nostrumaetheria.blocks;
 
-import java.util.Collection;
 import java.util.Random;
 
-import javax.annotation.Nullable;
-
-import com.smanzana.nostrumaetheria.api.component.OptionalAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherRelayEntity;
 import com.smanzana.nostrumaetheria.component.AetherRelayComponent;
-import com.smanzana.nostrumaetheria.component.AetherRelayComponent.AetherRelayListener;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -28,9 +21,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
@@ -38,10 +28,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -72,15 +60,6 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 			instance = new AetherRelay();
 		
 		return instance;
-	}
-	
-	public static void init() {
-		GameRegistry.registerTileEntity(AetherRelayEntity.class, "aether_relay_te");
-//		GameRegistry.addShapedRecipe(new ItemStack(instance()),
-//				"WPW", "WCW", "WWW",
-//				'W', new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
-//				'P', new ItemStack(Items.PAPER, 1, OreDictionary.WILDCARD_VALUE),
-//				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
 	}
 	
 	private AetherRelay() {
@@ -122,20 +101,19 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
-		IBlockState state = worldIn.getBlockState(pos);
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
 		return state.getValue(FACING) == side;
 	}
 	
-	@Override
-	public boolean isVisuallyOpaque() {
-		return false;
-	}
-	
-	@Override
-	public boolean isFullyOpaque(IBlockState state) {
-		return false;
-	}
+//	@Override
+//	public boolean isVisuallyOpaque() {
+//		return false;
+//	}
+//	
+//	@Override
+//	public boolean isFullyOpaque(IBlockState state) {
+//		return false;
+//	}
 	
 	@Override
 	public boolean isFullBlock(IBlockState state) {
@@ -153,7 +131,7 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		return RELAY_AABBs[blockState.getValue(FACING).ordinal()];
 	}
 	
@@ -186,7 +164,7 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		if (!worldIn.isRemote) {
 			// r equest an update
@@ -195,7 +173,7 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 			TileEntity ent = worldIn.getTileEntity(pos);
 			if (ent != null && ent instanceof AetherRelayEntity) {
 				AetherRelayEntity relay = (AetherRelayEntity) ent;
-				System.out.println(relay.relayHandler == null ? "Missing relay handler" : "has relay handler with " + relay.relayHandler.getLinkedPositions().size());
+				System.out.println(relay.getHandler() == null ? "Missing relay handler" : "has relay handler with " + ((AetherRelayComponent)relay.getHandler()).getLinkedPositions().size());
 			}
 			return true;
 		}
@@ -203,182 +181,6 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 		return false;
 	}
 	
-	public static class AetherRelayEntity extends NativeAetherTickingTileEntity implements AetherRelayListener {
-
-		private static final String NBT_SIDE = "relay_side";
-		
-		protected @Nullable AetherRelayComponent relayHandler;
-		private EnumFacing side;
-		
-		private int idleTicks;
-		
-		public AetherRelayEntity() {
-			this(EnumFacing.UP);
-		}
-		
-		public AetherRelayEntity(EnumFacing facing) {
-			super(0, 0);
-			
-			side = facing;
-			this.relayHandler = new AetherRelayComponent(this, facing);
-			this.handler = relayHandler;
-			this.compWrapper = new OptionalAetherHandlerComponent(relayHandler);
-			idleTicks = NostrumMagica.rand.nextInt(40) + 10;
-		}
-		
-//		@Override
-//		protected AetherHandlerComponent createComponent(int defaultAether, int defaultMaxAether) {
-//			// I wantd to override this and return a relay component but I can't think of a neasy way to get the side here.
-//			// I could relax the component to not care about side at first, and have it attached later. instead
-//			// I'll just throw the old one away?
-//			relayHandler = new AetherRelayComponent(this, EnumFacing.UP); 
-//			return relayHandler;
-//		}
-		
-		@Override
-		public void validate() {
-			super.validate();
-			
-			if (this.worldObj != null) {
-				relayHandler.setPosition(worldObj, pos.toImmutable());
-			}
-		}
-		
-		@Override
-		public void setWorldObj(World world) {
-			super.setWorldObj(world);
-			
-			if (this.pos != null && !this.pos.equals(BlockPos.ORIGIN)) {
-				relayHandler.setPosition(worldObj, pos.toImmutable());
-			}
-			// if this is too early for side, let's save it :(
-			
-//			if (!isInvalid()) {
-//				if (link == null) {
-//					autoLink();
-//				} else {
-//					// link up with the tile entity
-//					repairLink();
-//				}
-//			}
-		}
-		
-		@Override
-		public void onLoad() {
-			super.onLoad();
-//			if (!worldObj.isRemote) {
-//				worldObj.getMinecraftServer().addScheduledTask(() -> {
-//					if (worldObj != null && getPairedRelay() == null) {
-//						if (link == null) {
-//							autoLink();
-//						} else {
-//							// link up with the tile entity
-//							repairLink();
-//						}
-//					}
-//				});
-//			}
-		}
-		
-		@Override
-		public void updateContainingBlockInfo() {
-			super.updateContainingBlockInfo();
-			
-			if (relayHandler != null && !relayHandler.hasLinks()) {
-				relayHandler.autoLink();
-			}
-		}
-		
-		@Override
-		public void onLinkChange() {
-			this.markDirty();
-			IBlockState state = worldObj.getBlockState(pos);
-			worldObj.notifyBlockUpdate(pos, state, state, 2);
-		}
-		
-		@Override
-		public void onChunkUnload() {
-			super.onChunkUnload();
-			
-			// For any linked relays, let them know we're going away (but weren't destroyed)
-			relayHandler.unloadRelay();
-		}
-		
-		public EnumFacing getSide() {
-			return side;
-		}
-		
-		@Override
-		public SPacketUpdateTileEntity getUpdatePacket() {
-			return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
-		}
-
-		@Override
-		public NBTTagCompound getUpdateTag() {
-			return this.writeToNBT(new NBTTagCompound());
-		}
-		
-		@Override
-		public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-			super.onDataPacket(net, pkt);
-			handleUpdateTag(pkt.getNbtCompound());
-		}
-		
-		public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-			super.writeToNBT(compound);
-			
-			compound.setByte(NBT_SIDE, (byte) this.side.ordinal());
-			
-			return compound;
-		}
-		
-		public void readFromNBT(NBTTagCompound compound) {
-			super.readFromNBT(compound);
-			
-			this.side = EnumFacing.values()[compound.getByte(NBT_SIDE)];
-			relayHandler.setSide(this.side);
-		}
-		
-		protected void idleVisualTick() {
-			AetherRelayComponent relay = (AetherRelayComponent) this.getHandler();
-			final Collection<BlockPos> links = relay.getLinkedPositions();
-			
-			if (links == null || links.isEmpty()) {
-				return;
-			}
-			
-			final int color;
-			//if (relay.isAetherActive()) {
-				color = 0x80D4CF80;
-			//} else {
-			//	color = 0x80D3D3CD;
-			//}
-			
-			for (BlockPos dest : links) {
-				if (NostrumMagica.rand.nextBoolean() && NostrumMagica.rand.nextBoolean()) {
-					NostrumParticles.GLOW_ORB.spawn(worldObj, new SpawnParams(
-							1, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 0, 20 * 1, 10, new Vec3d(dest.getX() + .5, dest.getY() + .5, dest.getZ() + .5)
-						).color(color));
-					
-					//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
-					//Vec3d targetPos
-				}
-			}
-		}
-		
-		@Override
-		public void update() {
-			super.update();
-			
-			if (this.worldObj != null && this.worldObj.isRemote) {
-				if (ticksExisted > idleTicks) {
-					idleTicks = ticksExisted + NostrumMagica.rand.nextInt(40) + 10;
-					idleVisualTick();
-				}
-			}
-		}
-	}
-
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new AetherRelayEntity(getFacingFromMeta(meta));
@@ -401,7 +203,7 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 			return;
 		
 		AetherRelayEntity relay = (AetherRelayEntity) ent;
-		relay.relayHandler.unlinkAll();
+		((AetherRelayComponent)relay.getHandler()).unlinkAll();
 	}
 	
 	@Override
@@ -424,8 +226,8 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn) {
-		super.neighborChanged(state, worldIn, pos, blockIn);
+	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos from) {
+		super.neighborChanged(state, worldIn, pos, blockIn, from);
 		
 		if (worldIn.isRemote) {
 			return;

@@ -17,7 +17,7 @@ public class TileEntityAetherDebugRenderer<T extends AetherTileEntity> extends T
 	}
 	
 	@Override
-	public void renderTileEntityAt(AetherTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(AetherTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alphaIn) {
 
 //		final int aether = te.getHandler().getAether(null);
 //		final int maxAether = te.getHandler().getMaxAether(null);

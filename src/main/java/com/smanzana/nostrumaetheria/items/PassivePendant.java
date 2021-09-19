@@ -2,6 +2,8 @@ package com.smanzana.nostrumaetheria.items;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
@@ -12,6 +14,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,6 +45,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 	public PassivePendant() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setUnlocalizedName(ID);
 		this.setMaxDamage(MAX_CHARGES);
 		this.setMaxStackSize(1);
 		this.setCreativeTab(APIProxy.creativeTab);
@@ -70,10 +74,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		if (stack == null)
-			return;
-		
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		tooltip.add(I18n.format("item.info.aen.desc", (Object[]) null));
 		int charges = getWholeCharges(stack);
 		tooltip.add(ChatFormatting.GREEN + I18n.format("item.info.pendant.charges", new Object[] {charges}));
@@ -115,7 +116,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 	
 	@Override
 	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
-		if (stack == null)
+		if (stack.isEmpty())
 			return;
 		
 		if (summary.getReagentCost() <= 0) {
@@ -124,7 +125,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 		
 		int charges = getWholeCharges(stack);
 		if (charges > 0) {
-			if ((!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) && !caster.worldObj.isRemote) {
+			if ((!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) && !caster.world.isRemote) {
 				spendCharge(stack);
 			}
 			summary.addReagentCost(-1f);

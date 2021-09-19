@@ -2,7 +2,7 @@ package com.smanzana.nostrumaetheria.gui.container;
 
 import java.util.Objects;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.items.ActivePendant;
@@ -47,7 +47,7 @@ public class ActivePendantGui {
 			pendantInvWrapper = new Inventories.ItemStackArrayWrapper(inv) {
 				@Override
 				public boolean isItemValidForSlot(int index, ItemStack stack) {
-					return index == 0 && (stack == null || stack.getItem() instanceof ReagentItem);
+					return index == 0 && (stack.isEmpty() || stack.getItem() instanceof ReagentItem);
 				}
 				
 				@Override
@@ -62,13 +62,14 @@ public class ActivePendantGui {
 				for (int x = 0; x < 9; x++) {
 					this.addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, GUI_PLAYER_INV_HOFFSET + (x * 18), GUI_PLAYER_INV_VOFFSET + (y * 18)) {
 						@Override
-						public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
-							if (stack != null && stack.getItem() instanceof ActivePendant) {
+						public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
+							if (!stack.isEmpty() && stack.getItem() instanceof ActivePendant) {
 								if (Objects.equals(ActivePendant.lyonGetID(stack), ActivePendant.lyonGetID(pendant))) {
 									//playerIn.closeScreen(); // Assumes just one player is looking
 									valid = false;
 								}
 							}
+							return stack;
 						}
 					});
 				}
@@ -78,20 +79,21 @@ public class ActivePendantGui {
 			for (int x = 0; x < 9; x++) {
 				this.addSlotToContainer(new Slot(playerInv, x, GUI_HOTBAR_INV_HOFFSET + x * 18, GUI_HOTBAR_INV_VOFFSET) {
 					@Override
-					public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
-						if (stack != null && stack.getItem() instanceof ActivePendant) {
+					public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
+						if (!stack.isEmpty() && stack.getItem() instanceof ActivePendant) {
 							if (Objects.equals(ActivePendant.lyonGetID(stack), ActivePendant.lyonGetID(pendant))) {
 								//playerIn.closeScreen(); // Assumes just one player is looking
 								valid = false;
 							}
 						}
+						return stack;
 					}
 				});
 			}
 			
 			this.addSlotToContainer(new Slot(pendantInvWrapper, 0, GUI_PENDANT_INV_HOFFSET, GUI_PENDANT_INV_VOFFSET) {
 				@Override
-				public boolean isItemValid(@Nullable ItemStack stack) {
+				public boolean isItemValid(@Nonnull ItemStack stack) {
 					return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
 				}
 			});
@@ -99,7 +101,7 @@ public class ActivePendantGui {
 		
 		@Override
 		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-			ItemStack prev = null;	
+			ItemStack prev = ItemStack.EMPTY;	
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			
 			if (slot != null && slot.getHasStack()) {
@@ -109,18 +111,18 @@ public class ActivePendantGui {
 				if (slot.inventory == this.pendantInvWrapper) {
 					// Trying to take out the reagent
 					if (playerIn.inventory.addItemStackToInventory(cur)) {
-						slot.putStack(null);
-						slot.onPickupFromSlot(playerIn, cur);
+						slot.putStack(ItemStack.EMPTY);
+						cur = slot.onTake(playerIn, cur);
 					} else {
-						prev = null;
+						prev = ItemStack.EMPTY;
 					}
 				} else {
 					// shift-click in player inventory
 					if (slot.isItemValid(cur)) {
 						ItemStack leftover = Inventories.addItem(pendantInvWrapper, cur);
-						slot.putStack(leftover != null && leftover.stackSize <= 0 ? null : leftover);
-						if (leftover != null && leftover.stackSize == prev.stackSize) {
-							prev = null;
+						slot.putStack(leftover.isEmpty() ? ItemStack.EMPTY : leftover);
+						if (!leftover.isEmpty() && leftover.getCount() == prev.getCount()) {
+							prev = ItemStack.EMPTY;
 						}
 					}
 				}

@@ -58,7 +58,7 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 				BlockPos neighbor = pos.offset(dir);
 				
 				// First check for a TileEntity
-				TileEntity te = worldObj.getTileEntity(neighbor);
+				TileEntity te = world.getTileEntity(neighbor);
 				if (te != null && te instanceof IAetherHandler) {
 					connections.add(new AetherFlowConnection((IAetherHandler) te, dir.getOpposite()));
 					continue;
@@ -69,10 +69,10 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 				}
 				
 				// See if block boasts being able to get us a handler
-				IBlockState attachedState = worldObj.getBlockState(neighbor);
+				IBlockState attachedState = world.getBlockState(neighbor);
 				Block attachedBlock = attachedState.getBlock();
 				if (attachedBlock instanceof IAetherCapableBlock) {
-					connections.add(new AetherFlowConnection(((IAetherCapableBlock) attachedBlock).getAetherHandler(worldObj, attachedState, neighbor, dir), dir.getOpposite()));
+					connections.add(new AetherFlowConnection(((IAetherCapableBlock) attachedBlock).getAetherHandler(world, attachedState, neighbor, dir), dir.getOpposite()));
 					continue;
 				}
 			}
@@ -86,14 +86,14 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	
 	@Override
 	public void onAetherFlowTick(int diff, boolean added, boolean taken) {
-		if (this.worldObj != null) {
+		if (this.world != null) {
 			final int aether = (this.compWrapper.isPresent() ? this.compWrapper.getHandlerIfPresent().getAether(null) : 0);
-			statTracker.reportTotal(worldObj.getTotalWorldTime(), aether);
+			statTracker.reportTotal(world.getTotalWorldTime(), aether);
 			
 			if (added) {
-				statTracker.reportInput(worldObj.getTotalWorldTime(), diff);
+				statTracker.reportInput(world.getTotalWorldTime(), diff);
 			} else {
-				statTracker.reportOutput(worldObj.getTotalWorldTime(), diff);
+				statTracker.reportOutput(world.getTotalWorldTime(), diff);
 			}
 		}
 	}

@@ -1,12 +1,13 @@
 package com.smanzana.nostrumaetheria.blocks;
 
-import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherFurnaceBlockEntity;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -26,20 +27,18 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.IItemPropertyGetter;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -93,15 +92,6 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 		return instance;
 	}
 	
-	public static void init() {
-		GameRegistry.registerTileEntity(AetherFurnaceBlockEntity.class, "aether_furnace_block_te");
-//		GameRegistry.addShapedRecipe(new ItemStack(instance()),
-//				"WPW", "WCW", "WWW",
-//				'W', new ItemStack(Blocks.PLANKS, 1, OreDictionary.WILDCARD_VALUE),
-//				'P', new ItemStack(Items.PAPER, 1, OreDictionary.WILDCARD_VALUE),
-//				'C', NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1));
-	}
-	
 	public AetherFurnaceBlock() {
 		super(Material.ROCK, MapColor.OBSIDIAN);
 		this.setUnlocalizedName(ID);
@@ -137,7 +127,7 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 		return metaFromType(type) | metaFromOn(on);
 	}
 	
-	protected static int getFurnaceSlotsForType(Type type) {
+	public static int getFurnaceSlotsForType(Type type) {
 		switch (type) {
 		case LARGE:
 			return 7;
@@ -171,12 +161,12 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
 		return true;
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (!worldIn.isRemote) {
 			//worldIn.notifyBlockUpdate(pos, worldIn.getBlockState(pos), worldIn.getBlockState(pos), 2);
 			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherFurnaceID, worldIn, pos.getX(), pos.getY(), pos.getZ());
@@ -185,84 +175,14 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 		return true;
 	}
 	
-	public static class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
-
-		private static final String NBT_TYPE = "type";
-		
-		private Type type;
-		
-		public AetherFurnaceBlockEntity() {
-			this(Type.SMALL);
-		}
-		
-		public AetherFurnaceBlockEntity(Type type) {
-			super(getFurnaceSlotsForType(type), 0, 500);
-			this.type = type;
-			
-		}
-		
-		public Type getType() {
-			return this.type;
-		}
-		
-		@Override
-		public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-			nbt = super.writeToNBT(nbt);
-			
-			nbt.setString(NBT_TYPE, type.name());
-			
-			return nbt;
-		}
-		
-		@Override
-		public void readFromNBT(NBTTagCompound nbt) {
-			super.readFromNBT(nbt);
-			
-			try {
-				this.type = Type.valueOf(nbt.getString(NBT_TYPE));
-			} catch (Exception e) {
-				this.type = Type.SMALL;
-			}
-		}
-		
-		@Override
-		public String getName() {
-			return "Aether Furnace Inventory";
-		}
-
-		@Override
-		public boolean hasCustomName() {
-			return false;
-		}
-		
-		@Override
-		public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
-			return !(oldState.getBlock().equals(newState.getBlock()) && instance().getType(oldState) == instance().getType(newState));
-		}
-
-		@Override
-		protected float getAetherMultiplier() {
-			return this.type.getAetherMultiplier();
-		}
-
-		@Override
-		protected float getDurationMultiplier() {
-			return this.type.getDurationMultiplier();
-		}
-
-		@Override
-		protected void onBurningChange(boolean newBurning) {
-			worldObj.setBlockState(pos, instance().getDefaultState().withProperty(TYPE, this.type).withProperty(ON, newBurning));
-		}
-	}
-
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new AetherFurnaceBlockEntity(typeFromMeta(meta));
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, ItemStack stack) {
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+		final @Nonnull ItemStack stack = placer.getHeldItem(hand);
 		return this.getDefaultState()
 				.withProperty(TYPE, typeFromMeta(stack.getMetadata()))
 				.withProperty(ON, false);
@@ -275,7 +195,7 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) {
+	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
 		for (Type type : Type.values()) {
 			list.add(new ItemStack(this, 1, metaFromType(type)));
 		}
@@ -299,11 +219,11 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 		
 		AetherFurnaceBlockEntity furnace = (AetherFurnaceBlockEntity) ent;
 		for (int i = 0; i < furnace.getSizeInventory(); i++) {
-			if (furnace.getStackInSlot(i) != null) {
+			if (!furnace.getStackInSlot(i).isEmpty()) {
 				EntityItem item = new EntityItem(
 						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
 						furnace.removeStackFromSlot(i));
-				world.spawnEntityInWorld(item);
+				world.spawnEntity(item);
 			}
 		}
 		

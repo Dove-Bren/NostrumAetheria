@@ -2,28 +2,22 @@ package com.smanzana.nostrumaetheria.client.render;
 
 import org.lwjgl.opengl.GL11;
 
-import com.smanzana.nostrumaetheria.blocks.AetherBathBlock.AetherBathTileEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherBathTileEntity;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class AetherBathRenderer extends TileEntitySpecialRenderer<AetherBathTileEntity> {
 
-	public static void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(AetherBathTileEntity.class,
-				new AetherBathRenderer());
-	}
-	
 	public AetherBathRenderer() {
 		
 	}
@@ -42,7 +36,7 @@ public class AetherBathRenderer extends TileEntitySpecialRenderer<AetherBathTile
 		GlStateManager.enableColorMaterial();
 		
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer buffer = tessellator.getBuffer();
+		BufferBuilder buffer = tessellator.getBuffer();
 		buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_NORMAL);
 		buffer.pos(0, 0, 0).normal(0, 1, 0).endVertex();
 		for (int i = points; i >= 0; i--) {
@@ -56,7 +50,7 @@ public class AetherBathRenderer extends TileEntitySpecialRenderer<AetherBathTile
 	}
 	
 	@Override
-	public void renderTileEntityAt(AetherBathTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(AetherBathTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alphaIn) {
 
 		int aether = te.getHandler().getAether(null);
 		if (aether > 0) {
@@ -92,7 +86,7 @@ public class AetherBathRenderer extends TileEntitySpecialRenderer<AetherBathTile
 		}
 		
 		ItemStack item = te.getItem();
-		if (item == null)
+		if (item.isEmpty())
 			return;
 		
 		float rot = 2.0f * (Minecraft.getSystemTime() / 50);

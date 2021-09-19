@@ -3,6 +3,7 @@ package com.smanzana.nostrumaetheria.api.recipes;
 import javax.annotation.Nonnull;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 
 /**
  * A "Recipe" for something that can be put in the unraveler and taken apart.
@@ -44,6 +45,6 @@ public interface IAetherUnravelerRecipe {
 	 * The origin idea is discarded and all items returned from this method are thrown out as results.
 	 * @param stack
 	 */
-	public @Nonnull ItemStack[] unravel(ItemStack stack);
+	public @Nonnull NonNullList<ItemStack> unravel(ItemStack stack);
 	
 }

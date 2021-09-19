@@ -1,6 +1,6 @@
 package com.smanzana.nostrumaetheria.api.recipes;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import net.minecraft.item.ItemStack;
 
@@ -39,6 +39,6 @@ public interface IAetherRepairerRecipe {
 	 * Note: Recipes can use
 	 * @param stack
 	 */
-	public @Nullable ItemStack repair(ItemStack stack);
+	public @Nonnull ItemStack repair(ItemStack stack);
 	
 }

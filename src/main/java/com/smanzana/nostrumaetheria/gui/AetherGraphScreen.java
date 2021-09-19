@@ -1,7 +1,6 @@
 package com.smanzana.nostrumaetheria.gui;
 
 import com.smanzana.nostrumaetheria.api.aether.stats.AetherStatInstance;
-import com.smanzana.nostrumaetheria.network.NetworkHandler;
 
 import net.minecraft.client.gui.GuiScreen;
 

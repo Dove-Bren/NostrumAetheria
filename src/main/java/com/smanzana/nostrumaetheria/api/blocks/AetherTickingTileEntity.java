@@ -45,7 +45,7 @@ public abstract class AetherTickingTileEntity extends AetherTileEntity implement
 		
 		compWrapper.tick();
 		
-		if (!worldObj.isRemote && aetherDirtyFlag && autoSyncPeriod > 0 && (ticksExisted == 1 || ticksExisted % autoSyncPeriod == 0)) {
+		if (!world.isRemote && aetherDirtyFlag && autoSyncPeriod > 0 && (ticksExisted == 1 || ticksExisted % autoSyncPeriod == 0)) {
 			//worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 2);
 			syncServerAether();
 			aetherDirtyFlag = false;

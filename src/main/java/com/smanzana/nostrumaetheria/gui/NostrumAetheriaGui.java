@@ -1,11 +1,11 @@
 package com.smanzana.nostrumaetheria.gui;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
-import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock.AetherBoilerBlockEntity;
-import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock.AetherChargerBlockEntity;
-import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock.AetherFurnaceBlockEntity;
-import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock.AetherRepairerBlockEntity;
-import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock.AetherUnravelerBlockEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherBoilerBlockEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherChargerBlockEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherFurnaceBlockEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherRepairerBlockEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherUnravelerBlockEntity;
 import com.smanzana.nostrumaetheria.gui.container.ActivePendantGui;
 import com.smanzana.nostrumaetheria.gui.container.AetherBoilerGui;
 import com.smanzana.nostrumaetheria.gui.container.AetherBoilerGui.AetherBoilerGuiContainer;
@@ -57,9 +57,9 @@ public class NostrumAetheriaGui implements IGuiHandler {
 		
 		if (ID == activePendantID) {
 			ItemStack held = player.getHeldItemMainhand();
-			if (held == null || !(held.getItem() instanceof ActivePendant)) {
+			if (held.isEmpty() || !(held.getItem() instanceof ActivePendant)) {
 				held = player.getHeldItemOffhand();
-				if (held == null || !(held.getItem() instanceof ActivePendant)) {
+				if (held.isEmpty() || !(held.getItem() instanceof ActivePendant)) {
 					NostrumAetheria.logger.error("Was told to open pendant inventory, but no pendant found!");
 					return null; // Error!
 				}
@@ -124,9 +124,9 @@ public class NostrumAetheriaGui implements IGuiHandler {
 		
 		if (ID == activePendantID) {
 			ItemStack held = player.getHeldItemMainhand();
-			if (held == null || !(held.getItem() instanceof ActivePendant)) {
+			if (held.isEmpty() || !(held.getItem() instanceof ActivePendant)) {
 				held = player.getHeldItemOffhand();
-				if (held == null || !(held.getItem() instanceof ActivePendant)) {
+				if (held.isEmpty() || !(held.getItem() instanceof ActivePendant)) {
 					NostrumAetheria.logger.error("Was told to open pendant inventory, but no pendant found!");
 					return null; // Error!
 				}

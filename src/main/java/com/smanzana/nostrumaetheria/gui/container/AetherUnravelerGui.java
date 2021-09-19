@@ -1,11 +1,11 @@
 package com.smanzana.nostrumaetheria.gui.container;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
-import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock.AetherUnravelerBlockEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherUnravelerBlockEntity;
 import com.smanzana.nostrummagica.client.gui.container.AutoContainer;
 import com.smanzana.nostrummagica.utils.Inventories;
 
@@ -63,7 +63,7 @@ public class AetherUnravelerGui {
 			}
 			
 			this.addSlotToContainer(new Slot(chest, 0, GUI_TOP_INV_HOFFSET, GUI_TOP_INV_VOFFSET) {
-				public boolean isItemValid(@Nullable ItemStack stack) {
+				public boolean isItemValid(@Nonnull ItemStack stack) {
 			        return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
 			    }
 			});
@@ -71,7 +71,7 @@ public class AetherUnravelerGui {
 		
 		@Override
 		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-			ItemStack prev = null;	
+			ItemStack prev = ItemStack.EMPTY;	
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			
 			if (slot != null && slot.getHasStack()) {
@@ -81,17 +81,17 @@ public class AetherUnravelerGui {
 				if (slot.inventory == this.chest) {
 					// Trying to take one of our items
 					if (playerIn.inventory.addItemStackToInventory(cur)) {
-						slot.putStack(null);
-						slot.onPickupFromSlot(playerIn, cur);
+						slot.putStack(ItemStack.EMPTY);
+						cur = slot.onTake(playerIn, cur);
 					} else {
-						prev = null;
+						prev = ItemStack.EMPTY;
 					}
 				} else {
 					// shift-click in player inventory
 					ItemStack leftover = Inventories.addItem(chest, cur);
-					slot.putStack(leftover != null && leftover.stackSize <= 0 ? null : leftover);
-					if (leftover != null && leftover.stackSize == prev.stackSize) {
-						prev = null;
+					slot.putStack(leftover.isEmpty() ? ItemStack.EMPTY : leftover);
+					if (!leftover.isEmpty() && leftover.getCount() == prev.getCount()) {
+						prev = ItemStack.EMPTY;
 					}
 				}
 				

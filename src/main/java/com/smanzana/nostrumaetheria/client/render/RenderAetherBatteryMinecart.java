@@ -1,6 +1,6 @@
 package com.smanzana.nostrumaetheria.client.render;
 
-import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock.AetherBatteryEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherBatteryEntity;
 import com.smanzana.nostrumaetheria.entities.EntityAetherBatteryMinecart;
 
 import net.minecraft.block.state.IBlockState;
@@ -19,8 +19,8 @@ public class RenderAetherBatteryMinecart extends RenderMinecart<EntityAetherBatt
 	protected void renderCartContents(EntityAetherBatteryMinecart cart, float partialTicks, IBlockState state) {
 		super.renderCartContents(cart, partialTicks, state);
 		if (cart.getAether() > 0) {
-			TileEntitySpecialRenderer<?> render = TileEntityRendererDispatcher.instance.getSpecialRendererByClass(AetherBatteryEntity.class); 
-			((AetherBatteryRenderer) render).renderBatteryAt(cart.worldObj, 0, 0, -1, partialTicks, 0, cart.getAether(), cart.getMaxAether(), true);
+			TileEntitySpecialRenderer<?> render = TileEntityRendererDispatcher.instance.getRenderer(AetherBatteryEntity.class); 
+			((AetherBatteryRenderer) render).renderBatteryAt(cart.world, 0, 0, -1, partialTicks, 0, cart.getAether(), cart.getMaxAether(), true);
 		}
 	}
 }

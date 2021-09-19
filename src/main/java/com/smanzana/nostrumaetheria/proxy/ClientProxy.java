@@ -11,6 +11,10 @@ import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
 import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherBathTileEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherBatteryEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.AetherRelayEntity;
+import com.smanzana.nostrumaetheria.blocks.tiles.InfiniteAetherBlockEntity;
 import com.smanzana.nostrumaetheria.client.render.AetherBathRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherBatteryRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherRelayRenderer;
@@ -28,9 +32,11 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -47,26 +53,23 @@ public class ClientProxy extends CommonProxy {
 	public void preinit() {
 		super.preinit();
 		
-		TileEntityAetherDebugRenderer.registerFor(InfineAetherBlock.InfiniteAetherBlockEntity.class);
-		TileEntityAetherDebugRenderer.registerFor(AetherBatteryBlock.AetherBatteryEntity.class);
-		AetherRelayRenderer.init();
-		AetherBatteryRenderer.init();
-		AetherBathRenderer.init();
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityAetherBatteryMinecart.class, new IRenderFactory<EntityAetherBatteryMinecart>() {
-			@Override
-			public Render<? super EntityAetherBatteryMinecart> createRenderFor(RenderManager manager) {
-				return new RenderAetherBatteryMinecart(manager);
-			}
-		});
-		
 		OBJLoader.INSTANCE.addDomain(NostrumAetheria.MODID);
 	}
 	
 	@Override
 	public void init() {
 		super.init();
+	}
+	
+	@Override
+	public void postinit() {
+		super.postinit();
 		
+		//this.overlayRenderer = new OverlayRenderer();
+	}
+	
+	@SubscribeEvent
+	private void registerAllModels(ModelRegistryEvent event) {
 		registerModel(Item.getItemFromBlock(InfineAetherBlock.instance()),
 				0,
 				InfineAetherBlock.ID);
@@ -120,13 +123,9 @@ public class ClientProxy extends CommonProxy {
 		registerModel(Item.getItemFromBlock(AetherPumpBlock.instance()),
 				0,
 				AetherPumpBlock.ID);
-	}
-	
-	@Override
-	public void postinit() {
-		super.postinit();
 		
-		//this.overlayRenderer = new OverlayRenderer();
+		registerEntityRenderers();
+		registerTileEntityRenderers();
 	}
 	
 	public static void registerModel(Item item, int meta, String modelName) {
@@ -135,6 +134,25 @@ public class ClientProxy extends CommonProxy {
     			new ModelResourceLocation(NostrumAetheria.MODID + ":" + modelName, "inventory"));
 	}
 	
+	private void registerEntityRenderers() {
+		RenderingRegistry.registerEntityRenderingHandler(EntityAetherBatteryMinecart.class, new IRenderFactory<EntityAetherBatteryMinecart>() {
+			@Override
+			public Render<? super EntityAetherBatteryMinecart> createRenderFor(RenderManager manager) {
+				return new RenderAetherBatteryMinecart(manager);
+			}
+		});
+	}
+	
+	private void registerTileEntityRenderers() {
+		TileEntityAetherDebugRenderer.registerFor(InfiniteAetherBlockEntity.class);
+		TileEntityAetherDebugRenderer.registerFor(AetherBatteryEntity.class);
+		ClientRegistry.bindTileEntitySpecialRenderer(AetherRelayEntity.class,
+				new AetherRelayRenderer());
+		ClientRegistry.bindTileEntitySpecialRenderer(AetherBatteryEntity.class,
+				new AetherBatteryRenderer());
+		ClientRegistry.bindTileEntitySpecialRenderer(AetherBathTileEntity.class,
+				new AetherBathRenderer());
+	}
 
 	@Override
 	public boolean isServer() {
@@ -143,7 +161,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public EntityPlayer getPlayer() {
-		return Minecraft.getMinecraft().thePlayer;
+		return Minecraft.getMinecraft().player;
 	}
 	
 	@SubscribeEvent

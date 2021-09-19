@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
@@ -18,6 +19,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -58,6 +60,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 	public ActivePendant() {
 		super();
 		this.setUnlocalizedName(ID);
+		this.setUnlocalizedName(ID);
 		this.setMaxDamage(MAX_CHARGES);
 		this.setMaxStackSize(1);
 		this.setCreativeTab(APIProxy.creativeTab);
@@ -86,10 +89,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		if (stack == null)
-			return;
-		
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		tooltip.add(I18n.format("item.info.lyon.desc", (Object[]) null));
 		int charges = lyonGetWholeCharges(stack);
 		tooltip.add(ChatFormatting.GREEN + I18n.format("item.info.pendant.charges", new Object[] {charges}));
@@ -139,7 +139,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 //	}
 	
 	private static void lyonSetPoints(ItemStack stack, float points) {
-		if (stack == null)
+		if (stack.isEmpty())
 			return;
 		
 		if (points > (float) MAX_POINTS) {
@@ -157,7 +157,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 	}
 	
 	public static float lyonGetPoints(ItemStack stack) {
-		if (stack == null || !stack.hasTagCompound())
+		if (stack.isEmpty() || !stack.hasTagCompound())
 			return 0;
 		
 		NBTTagCompound nbt = stack.getTagCompound();
@@ -167,16 +167,16 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 		return nbt.getFloat(NBT_PENDANT_POINTS);
 	}
 	
-	public static @Nullable ItemStack lyonGetReagents(ItemStack stack) {
-		if (stack == null || !stack.hasTagCompound()) {
-			return null;
+	public static @Nonnull ItemStack lyonGetReagents(ItemStack stack) {
+		if (stack.isEmpty() || !stack.hasTagCompound()) {
+			return ItemStack.EMPTY;
 		}
 		
-		return ItemStack.loadItemStackFromNBT(stack.getTagCompound().getCompoundTag(NBT_PENDANT_REAGENTS));
+		return new ItemStack(stack.getTagCompound().getCompoundTag(NBT_PENDANT_REAGENTS));
 	}
 	
-	public static void lyonSetReagents(ItemStack stack, @Nullable ItemStack reagent) {
-		if (stack == null) {
+	public static void lyonSetReagents(ItemStack stack, @Nonnull ItemStack reagent) {
+		if (stack.isEmpty()) {
 			return;
 		}
 		
@@ -193,17 +193,17 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 	}
 	
 	public static boolean lyonDecrementReagents(ItemStack stack) {
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return false;
 		}
 		
-		@Nullable ItemStack reagent = lyonGetReagents(stack);
-		if (reagent == null) {
+		@Nonnull ItemStack reagent = lyonGetReagents(stack);
+		if (reagent.isEmpty()) {
 			return false;
 		} else {
-			reagent.stackSize--;
-			if (reagent.stackSize <= 0) {
-				reagent = null;
+			reagent.shrink(1);
+			if (reagent.isEmpty()) {
+				reagent = ItemStack.EMPTY;
 			}
 			lyonSetReagents(stack, reagent);
 			return true;
@@ -211,7 +211,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 	}
 	
 	public static UUID lyonGetID(ItemStack stack) {
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return null;
 		}
 		
@@ -236,7 +236,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 
 	@Override
 	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
-		if (stack == null)
+		if (stack.isEmpty())
 			return;
 		
 		if (summary.getReagentCost() <= 0) {
@@ -245,7 +245,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 		
 		int charges = lyonGetWholeCharges(stack);
 		if (charges > 0) {
-			if ((!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) && !caster.worldObj.isRemote) {
+			if ((!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) && !caster.world.isRemote) {
 				lyonSpendCharge(stack);
 			}
 			summary.addReagentCost(-1f);
@@ -312,11 +312,11 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.activePendantID, worldIn,
 				(int) playerIn.posX, (int) playerIn.posY, (int) playerIn.posZ);
 		
-		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, playerIn.getHeldItem(hand));
 	}
 	
 }
