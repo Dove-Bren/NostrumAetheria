@@ -60,7 +60,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 	public ActivePendant() {
 		super();
 		this.setUnlocalizedName(ID);
-		this.setUnlocalizedName(ID);
+		this.setRegistryName(ID);
 		this.setMaxDamage(MAX_CHARGES);
 		this.setMaxStackSize(1);
 		this.setCreativeTab(APIProxy.creativeTab);

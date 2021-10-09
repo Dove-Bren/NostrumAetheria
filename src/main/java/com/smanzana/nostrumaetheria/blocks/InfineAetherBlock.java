@@ -8,7 +8,6 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
@@ -29,9 +28,6 @@ public class InfineAetherBlock extends BlockContainer {
 		return instance;
 	}
 	
-	// Doing things weird here to allow this to be the creative tab icon
-	public final ItemBlock itemBlock;
-	
 	public InfineAetherBlock() {
 		super(Material.ROCK, MapColor.OBSIDIAN);
 		this.setUnlocalizedName(ID);
@@ -40,8 +36,6 @@ public class InfineAetherBlock extends BlockContainer {
 		//this.setCreativeTab(NostrumAetheria.creativeTab);
 		this.setSoundType(SoundType.STONE);
 		this.setHarvestLevel("axe", 0);
-		
-		itemBlock = new ItemBlock(this);
 	}
 	
 	@Override

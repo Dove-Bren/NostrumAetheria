@@ -284,7 +284,7 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 		@SideOnly(Side.CLIENT)
 		public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
 			Type type = AetherFurnaceBlock.instance.typeFromMeta(stack.getMetadata());
-			return (float) type.ordinal() / (float) Type.values().length;
+			return (float) type.ordinal();
 		}
 	};
 	

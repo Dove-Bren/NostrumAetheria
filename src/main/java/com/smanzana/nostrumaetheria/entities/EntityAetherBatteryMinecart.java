@@ -136,11 +136,15 @@ public class EntityAetherBatteryMinecart extends EntityMinecart {
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound nbt) {
 		super.writeEntityToNBT(nbt);
+		
+		nbt.setInteger("cart_aether", this.getAether());
 	}
 	
 	@Override
 	public void readEntityFromNBT(NBTTagCompound nbt) {
 		super.readEntityFromNBT(nbt);
+		
+		this.setAether(nbt.getInteger("cart_aether"));
 	}
 	
 	public int getAether() {

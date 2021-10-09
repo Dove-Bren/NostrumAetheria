@@ -6,11 +6,11 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.items.ActivePendant;
+import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -148,7 +148,7 @@ public class ActivePendantGui {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static class ActivePendantGuiContainer extends GuiContainer {
+	public static class ActivePendantGuiContainer extends AutoGuiContainer {
 
 		//private ActivePendantContainer container;
 		
@@ -167,7 +167,6 @@ public class ActivePendantGui {
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			

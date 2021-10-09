@@ -45,7 +45,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 	public PassivePendant() {
 		super();
 		this.setUnlocalizedName(ID);
-		this.setUnlocalizedName(ID);
+		this.setRegistryName(ID);
 		this.setMaxDamage(MAX_CHARGES);
 		this.setMaxStackSize(1);
 		this.setCreativeTab(APIProxy.creativeTab);

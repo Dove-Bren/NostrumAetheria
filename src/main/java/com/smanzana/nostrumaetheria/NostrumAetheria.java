@@ -51,15 +51,11 @@ public class NostrumAetheria
     	instance = this;
     	APIProxy.handler = new AetheriaAPIProxy();
     	
-//	    if (Loader.isModLoaded("Baubles")) {
-//	    	baubles.enable();
-//	    }
-    	
     	APIProxy.creativeTab = new CreativeTabs(MODID){
 	    	@Override
 	        @SideOnly(Side.CLIENT)
 	        public ItemStack getTabIconItem(){
-	    		return new ItemStack(InfineAetherBlock.instance().itemBlock);
+	    		return new ItemStack(InfineAetherBlock.instance());
 	        }
 	    };
 	    InfineAetherBlock.instance().setCreativeTab(APIProxy.creativeTab);

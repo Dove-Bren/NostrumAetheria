@@ -40,7 +40,7 @@ public class AetherGem extends AetherItem implements ILoreTagged {
 	public AetherGem() {
 		super();
 		this.setUnlocalizedName(ID);
-		this.setUnlocalizedName(ID);
+		this.setRegistryName(ID);
 		this.setMaxDamage(MAX_AETHER);
 		this.setMaxStackSize(1);
 		this.setCreativeTab(APIProxy.creativeTab);

@@ -33,6 +33,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -69,7 +70,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@SubscribeEvent
-	private void registerAllModels(ModelRegistryEvent event) {
+	public void registerAllModels(ModelRegistryEvent event) {
 		registerModel(Item.getItemFromBlock(InfineAetherBlock.instance()),
 				0,
 				InfineAetherBlock.ID);
@@ -129,8 +130,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	public static void registerModel(Item item, int meta, String modelName) {
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher()
-    	.register(item, meta,
+		ModelLoader.setCustomModelResourceLocation(item, meta,
     			new ModelResourceLocation(NostrumAetheria.MODID + ":" + modelName, "inventory"));
 	}
 	

@@ -8,14 +8,14 @@
         }
     },
     "overrides": [{
-        "predicate": { "size": 0.66 },
-        "model": "nostrumaetheria:block/aether_furnace_off_large" 
-    }, {
-        "predicate": { "size": 0.33 },
-        "model": "nostrumaetheria:block/aether_furnace_off_medium"  
-    }, {
         "predicate": { "size": 0 },
         "model": "nostrumaetheria:block/aether_furnace_off_small"
-    } 
+    }, {
+        "predicate": { "size":1 },
+        "model": "nostrumaetheria:block/aether_furnace_off_medium"  
+    }, {
+        "predicate": { "size": 2 },
+        "model": "nostrumaetheria:block/aether_furnace_off_large" 
+    }
     ]
 }

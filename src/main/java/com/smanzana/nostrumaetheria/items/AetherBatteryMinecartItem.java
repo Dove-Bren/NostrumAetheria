@@ -36,7 +36,7 @@ public class AetherBatteryMinecartItem extends Item {
 	public AetherBatteryMinecartItem() {
 		super();
 		this.setUnlocalizedName(ID);
-		this.setUnlocalizedName(ID);
+		this.setRegistryName(ID);
 		this.setMaxStackSize(16);
 		this.setCreativeTab(APIProxy.creativeTab);
 	}

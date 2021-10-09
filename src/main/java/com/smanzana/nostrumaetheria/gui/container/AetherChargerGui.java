@@ -7,10 +7,10 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.blocks.tiles.AetherChargerBlockEntity;
 import com.smanzana.nostrummagica.client.gui.container.AutoContainer;
+import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -111,7 +111,7 @@ public class AetherChargerGui {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static class AetherChargerGuiContainer extends GuiContainer {
+	public static class AetherChargerGuiContainer extends AutoGuiContainer {
 
 		private AetherChargerContainer container;
 		
@@ -130,7 +130,6 @@ public class AetherChargerGui {
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			

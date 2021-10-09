@@ -7,10 +7,10 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.blocks.tiles.AetherRepairerBlockEntity;
 import com.smanzana.nostrummagica.client.gui.container.AutoContainer;
+import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -107,7 +107,7 @@ public class AetherRepairerGui {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static class AetherRepairerGuiContainer extends GuiContainer {
+	public static class AetherRepairerGuiContainer extends AutoGuiContainer {
 
 		private AetherRepairerContainer container;
 		
@@ -126,7 +126,6 @@ public class AetherRepairerGui {
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			

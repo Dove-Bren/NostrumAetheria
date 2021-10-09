@@ -1,8 +1,5 @@
 package com.smanzana.nostrumaetheria.proxy;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
@@ -35,8 +32,8 @@ import com.smanzana.nostrumaetheria.items.AetherGem;
 import com.smanzana.nostrumaetheria.items.PassivePendant;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.aetheria.items.AetherResourceType;
-import com.smanzana.nostrummagica.aetheria.items.NostrumAetherResourceItem;
+import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
+import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
@@ -102,10 +99,20 @@ public class CommonProxy {
 		AetherUnravelerBlock.initDefaultRecipes();
 	}
 	
-	private List<Item> blockItems = new ArrayList<>(16);
-    
+	private void registerBlockItem(Block block, String registryName, @Nullable CreativeTabs tab, IForgeRegistry<Item> registry) {
+    	ItemBlock item = new ItemBlock(block);
+    	item.setRegistryName(registryName);
+    	item.setUnlocalizedName(registryName);
+    	item.setCreativeTab(tab == null ? APIProxy.creativeTab : tab);
+    	registry.register(item);
+    }
+	
+	private void registerBlockItem(Block block, String registryName, IForgeRegistry<Item> registry) {
+		registerBlockItem(block, registryName, null, registry);
+    }
+	
 	@SubscribeEvent
-    private void registerItems(RegistryEvent.Register<Item> event) {
+    public void registerItems(RegistryEvent.Register<Item> event) {
 		final IForgeRegistry<Item> registry = event.getRegistry();
 		
 		registry.register(ActivePendant.instance());
@@ -120,54 +127,17 @@ public class CommonProxy {
     	registry.register(AetherBatteryMinecartItem.instance());
     	APIProxy.AetherBatteryMinecartItem = AetherBatteryMinecartItem.instance();
     	
-    	for (Item blockItem : blockItems) {
-    		registry.register(blockItem);
-    	}
-    }
-	
-	 private void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
-    	block.setRegistryName(registryName);
-    	registry.register(block);
-    }
-    
-    private void registerBlockAndItemBlock(Block block, String registryName, @Nullable CreativeTabs tab, IForgeRegistry<Block> registry) {
-    	registerBlock(block, registryName, registry);
-    	
-    	ItemBlock item = new ItemBlock(block);
-    	item.setRegistryName(registryName);
-    	item.setUnlocalizedName(registryName);
-    	item.setCreativeTab(tab == null ? APIProxy.creativeTab : tab);
-    	blockItems.add(item);
-    }
-    
-    private void registerBlockAndItemBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
-    	registerBlockAndItemBlock(block, registryName, null, registry);
-    }
-    
-    @SubscribeEvent
-    private void registerBlocks(RegistryEvent.Register<Block> event) {
-		final IForgeRegistry<Block> registry = event.getRegistry();
-		
-    	registerBlockAndItemBlock(InfineAetherBlock.instance(), InfineAetherBlock.ID, registry);
-    	APIProxy.InfiniteAetherBlock = InfineAetherBlock.instance();
-    	
+    	// Blocks
+    	registerBlockItem(InfineAetherBlock.instance(), InfineAetherBlock.ID, registry);
     	for (AetherBatteryBlock block : new AetherBatteryBlock[]{
     			AetherBatteryBlock.small(),
     			AetherBatteryBlock.medium(),
     			AetherBatteryBlock.large(),
     			AetherBatteryBlock.giant()
     	}) {
-    		registerBlockAndItemBlock(block, block.getID(), registry);
+    		registerBlockItem(block, block.getID(), registry);
     	}
-    	APIProxy.AetherBatterySmallBlock = AetherBatteryBlock.small();
-    	APIProxy.AetherBatteryMediumBlock = AetherBatteryBlock.medium();
-    	APIProxy.AetherBatteryLargeBlock = AetherBatteryBlock.large();
-    	APIProxy.AetherBatteryGiantBlock = AetherBatteryBlock.giant();
-    	
-    	registerBlockAndItemBlock(AetherRelay.instance(), AetherRelay.ID, registry);
-    	APIProxy.AetherRelay = AetherRelay.instance();
-    	
-    	registerBlock(AetherFurnaceBlock.instance(), AetherFurnaceBlock.ID, registry);
+    	registerBlockItem(AetherRelay.instance(), AetherRelay.ID, registry);
     	ItemBlock furnaceItem = new ItemBlock(AetherFurnaceBlock.instance()){
 			@Override
 			public String getUnlocalizedName(ItemStack stack) {
@@ -186,28 +156,82 @@ public class CommonProxy {
 				.setHasSubtypes(true);
     	furnaceItem.addPropertyOverride(new ResourceLocation("on"), AetherFurnaceBlock.ON_GETTER);
     	furnaceItem.addPropertyOverride(new ResourceLocation("size"), AetherFurnaceBlock.SIZE_GETTER);
-    	blockItems.add(furnaceItem);
+    	registry.register(furnaceItem);
+    	registerBlockItem(AetherBoilerBlock.instance(), AetherBoilerBlock.ID, registry);
+    	registerBlockItem(AetherBathBlock.instance(), AetherBathBlock.ID, registry);
+    	registerBlockItem(AetherChargerBlock.instance(), AetherChargerBlock.ID, registry);
+    	registerBlockItem(AetherRepairerBlock.instance(), AetherRepairerBlock.ID, registry);
+    	registerBlockItem(AetherUnravelerBlock.instance(), AetherUnravelerBlock.ID, registry);
+    	registerBlockItem(AetherPumpBlock.instance(), AetherPumpBlock.ID, registry);
     	
+    	/*
+    	 * String[] subnames = new String[AetherFurnaceBlock.Type.values().length];
+    	int i = 0;
+    	for (AetherFurnaceBlock.Type type : AetherFurnaceBlock.Type.values()) {
+    		subnames[i++] = type.name().toLowerCase();
+    	}
+    	registry.register((new ItemMultiTexture(AetherFurnaceBlock.instance(), AetherFurnaceBlock.instance(), subnames))
+    			.setRegistryName(AetherFurnaceBlock.ID).setCreativeTab(APIProxy.creativeTab));
+    	
+    	registerBlockItem(AetherBoilerBlock.instance(), AetherBoilerBlock.ID, registry);
+    	registerBlockItem(AetherBathBlock.instance(), AetherBathBlock.ID, registry);
+    	registerBlockItem(AetherChargerBlock.instance(), AetherChargerBlock.ID, registry);
+    	registerBlockItem(AetherRepairerBlock.instance(), AetherRepairerBlock.ID, registry);
+    	registerBlockItem(AetherUnravelerBlock.instance(), AetherUnravelerBlock.ID, registry);
+    	registerBlockItem(AetherPumpBlock.instance(), AetherPumpBlock.ID, registry);
+    	 * 
+    	 */
+    }
+	
+	 private void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
+    	block.setRegistryName(registryName);
+    	registry.register(block);
+    }
+    
+    @SubscribeEvent
+    public void registerBlocks(RegistryEvent.Register<Block> event) {
+		final IForgeRegistry<Block> registry = event.getRegistry();
+		
+    	registerBlock(InfineAetherBlock.instance(), InfineAetherBlock.ID, registry);
+    	APIProxy.InfiniteAetherBlock = InfineAetherBlock.instance();
+    	
+    	for (AetherBatteryBlock block : new AetherBatteryBlock[]{
+    			AetherBatteryBlock.small(),
+    			AetherBatteryBlock.medium(),
+    			AetherBatteryBlock.large(),
+    			AetherBatteryBlock.giant()
+    	}) {
+    		registerBlock(block, block.getID(), registry);
+    	}
+    	APIProxy.AetherBatterySmallBlock = AetherBatteryBlock.small();
+    	APIProxy.AetherBatteryMediumBlock = AetherBatteryBlock.medium();
+    	APIProxy.AetherBatteryLargeBlock = AetherBatteryBlock.large();
+    	APIProxy.AetherBatteryGiantBlock = AetherBatteryBlock.giant();
+    	
+    	registerBlock(AetherRelay.instance(), AetherRelay.ID, registry);
+    	APIProxy.AetherRelay = AetherRelay.instance();
+    	
+    	registerBlock(AetherFurnaceBlock.instance(), AetherFurnaceBlock.ID, registry);
     	APIProxy.AetherFurnaceBlock = AetherFurnaceBlock.instance();
     	
-    	registerBlockAndItemBlock(AetherBoilerBlock.instance(), AetherBoilerBlock.ID, registry);
+    	registerBlock(AetherBoilerBlock.instance(), AetherBoilerBlock.ID, registry);
     	APIProxy.AetherBoilerBlock = AetherBoilerBlock.instance();
     	
-    	registerBlockAndItemBlock(AetherBathBlock.instance(), AetherBathBlock.ID, registry);
+    	registerBlock(AetherBathBlock.instance(), AetherBathBlock.ID, registry);
     	APIProxy.AetherBathBlock = AetherBathBlock.instance();
     	
     	
-    	registerBlockAndItemBlock(AetherChargerBlock.instance(), AetherChargerBlock.ID, registry);
+    	registerBlock(AetherChargerBlock.instance(), AetherChargerBlock.ID, registry);
     	APIProxy.AetherChargerBlock = AetherChargerBlock.instance();
     	
     	
-    	registerBlockAndItemBlock(AetherRepairerBlock.instance(), AetherRepairerBlock.ID, registry);
+    	registerBlock(AetherRepairerBlock.instance(), AetherRepairerBlock.ID, registry);
     	APIProxy.AetherRepairerBlock = AetherRepairerBlock.instance();
     	
-    	registerBlockAndItemBlock(AetherUnravelerBlock.instance(), AetherUnravelerBlock.ID, registry);
+    	registerBlock(AetherUnravelerBlock.instance(), AetherUnravelerBlock.ID, registry);
     	APIProxy.AetherUnravelerBlock = AetherUnravelerBlock.instance();
     	
-    	registerBlockAndItemBlock(AetherPumpBlock.instance(), AetherPumpBlock.ID, registry);
+    	registerBlock(AetherPumpBlock.instance(), AetherPumpBlock.ID, registry);
     	APIProxy.AetherPumpBlock = AetherPumpBlock.instance();
     	
     	registerTileEntities();
@@ -227,14 +251,14 @@ public class CommonProxy {
     }
     
     @SubscribeEvent
-    private void registerEntities(RegistryEvent.Register<EntityEntry> event) {
+    public void registerEntities(RegistryEvent.Register<EntityEntry> event) {
     	final IForgeRegistry<EntityEntry> registry = event.getRegistry();
     	
     	int entityID = 0;
     	registry.register(EntityEntryBuilder.create()
     			.entity(EntityAetherBatteryMinecart.class)
     			.id("aether_battery_minecart", entityID++)
-    			.name("aether_battery_minecart")
+    			.name(NostrumMagica.MODID + ".aether_battery_minecart")
     			.tracker(128, 1, false)
     			.build());
     	APIProxy.AetherBatteryMinecart = EntityAetherBatteryMinecart.class;
