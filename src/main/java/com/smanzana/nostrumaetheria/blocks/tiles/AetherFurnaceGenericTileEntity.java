@@ -137,13 +137,17 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		this.aetherCarry -= whole;
 	}
 	
+	protected boolean shouldTryBurn() {
+		return handler.getAether(null) < handler.getMaxAether(null);
+	}
+	
 	protected abstract void onBurningChange(boolean newBurning);
 	
 	@Override
 	public void update() {
 		if (!world.isRemote) {
 			this.handler.pushAether(500);
-			if (handler.getAether(null) < handler.getMaxAether(null) && consumeTick()) {
+			if (shouldTryBurn() && consumeTick()) {
 				generateAether();
 				
 				if (!burning) {

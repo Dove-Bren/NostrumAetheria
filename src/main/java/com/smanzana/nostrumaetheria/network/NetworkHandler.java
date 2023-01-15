@@ -1,5 +1,6 @@
 package com.smanzana.nostrumaetheria.network;
 
+import com.smanzana.nostrumaetheria.network.messages.AetherBoilerModeChangeMessage;
 import com.smanzana.nostrumaetheria.network.messages.AetherTileEntityMessage;
 
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -34,6 +35,7 @@ public class NetworkHandler {
 		syncChannel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL_SYNC_NAME);
 		
 		syncChannel.registerMessage(AetherTileEntityMessage.Handler.class, AetherTileEntityMessage.class, discriminator++, Side.CLIENT);
+		syncChannel.registerMessage(AetherBoilerModeChangeMessage.Handler.class, AetherBoilerModeChangeMessage.class, discriminator++, Side.SERVER);
 //		syncChannel.registerMessage(ClientCastMessage.Handler.class, ClientCastMessage.class, discriminator++, Side.SERVER);
 	}
 	

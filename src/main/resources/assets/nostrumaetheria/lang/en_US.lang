@@ -29,6 +29,11 @@ itemGroup.nostrumaetheria=Nostrum Aetheria
 
 entity.nostrumaetheria.aether_battery_cart.name=Aether Cart
 
+gui.aether_boiler.mode.focus_aether=Active until aether full
+gui.aether_boiler.mode.focus_furnace=Active while furnace is cooking
+gui.aether_boiler.mode.focus_both=Active until aether full and furnace is done
+gui.aether_boiler.mode.always_on=Always active
+
 ritual.active_pendant.name=Lyon Infusion
 ritual.passive_pendant.name=Aen Infusion
 ritual.aether_furnace_small.name=Craft Small Aether Furnace
