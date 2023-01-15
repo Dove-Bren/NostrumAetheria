@@ -13,12 +13,8 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.spells.EAlteration;
-import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -242,26 +238,35 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 			}
 			
 			List<SpellPart> parts = spell.getSpellParts();
+			NonNullList<ItemStack> runes = NonNullList.create();
 			for (SpellPart part : parts) {
-				final ItemStack[] runes;
-				if (part.isTrigger()) {
-					SpellTrigger trigger = part.getTrigger();
-					runes = new ItemStack[] {SpellRune.getRune(trigger)};
-				} else {
-					SpellShape shape = part.getShape();
-					EMagicElement elem = part.getElement();
-					int elemCount = part.getElementCount();
-					EAlteration alt = part.getAlteration();
-					runes = new ItemStack[1 + elemCount + (alt == null ? 0 : 1)];
-					runes[0] = SpellRune.getRune(shape);
-					if (alt != null) {
-						runes[1] = SpellRune.getRune(alt);
-					}
-					for (; elemCount > 0; elemCount--) {
-						runes[1 + (alt == null ? 0 : 1) + (elemCount - 1)]
-								= SpellRune.getRune(elem, 1);
-					}
-				}
+				runes.clear();
+				runes = SpellRune.decomposeRune(SpellRune.getRune(part, 1), runes);
+				
+//				if (part.isTrigger()) {
+//					SpellTrigger trigger = part.getTrigger();
+//					runes = new ItemStack[] {SpellRune.getRune(trigger)};
+//				} else {
+//					SpellShape shape = part.getShape();
+//					EMagicElement elem = part.getElement();
+//					int elemCount = part.getElementCount();
+//					EAlteration alt = part.getAlteration();
+//					
+//					// TIER 3 element is 4 runes
+//					elemCount = (int) Math.pow(2, elemCount-1);
+//					
+//					runes = new ItemStack[1 + elemCount + (alt == null ? 0 : 1)];
+//					runes[0] = SpellRune.getRune(shape);
+//					if (alt != null) {
+//						runes[1] = SpellRune.getRune(alt);
+//					}
+//					
+//					
+//					for (; elemCount > 0; elemCount--) {
+//						runes[1 + (alt == null ? 0 : 1) + (elemCount - 1)]
+//								= SpellRune.getRune(elem, 1);
+//					}
+//				}
 				
 				for (ItemStack rune : runes) {
 					ret.add(rune);

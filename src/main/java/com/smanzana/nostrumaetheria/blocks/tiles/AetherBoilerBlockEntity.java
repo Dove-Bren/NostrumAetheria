@@ -34,7 +34,7 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	protected void fuelNearbyFurnace() {
 		TileEntityFurnace furnace = getNearbyFurnace();
 		if (furnace != null) {
-			ObfuscationReflectionHelper.setPrivateValue(TileEntityFurnace.class, furnace, 20, "furnaceBurnTime");
+			ObfuscationReflectionHelper.setPrivateValue(TileEntityFurnace.class, furnace, 20, "field_145956_a");// "furnaceBurnTime");
 			BlockFurnace.setState(true, world, pos.up());
 		}
 	}
