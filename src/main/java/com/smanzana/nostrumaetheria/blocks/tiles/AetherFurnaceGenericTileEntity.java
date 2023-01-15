@@ -36,6 +36,8 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	
 	public AetherFurnaceGenericTileEntity(int slotCount, int defaultAether, int defaultMaxAether) {
 		super(defaultAether, defaultMaxAether);
+		
+		this.setAutoSync(5);
 		this.handler.configureInOut(false, true);
 		
 		this.initInventory(slotCount);

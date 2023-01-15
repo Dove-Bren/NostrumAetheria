@@ -2,7 +2,9 @@ package com.smanzana.nostrumaetheria.gui.container;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
+import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.blocks.tiles.AetherFurnaceBlockEntity;
 import com.smanzana.nostrummagica.client.gui.container.AutoContainer;
 import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
@@ -32,6 +34,10 @@ public class AetherFurnaceGui {
 	private static final int GUI_HOTBAR_INV_HOFFSET = 8;
 	private static final int GUI_HOTBAR_INV_VOFFSET = 108;
 	private static final int GUI_INV_CELL_LENGTH = 18;
+	private static final int GUI_TOP_BAR_HOFFSET = 76;
+	private static final int GUI_TOP_BAR_VOFFSET = 12;
+	private static final int GUI_TOP_BAR_WIDTH = 24;
+	private static final int GUI_TOP_BAR_HEIGHT = 3;
 	
 	private static final int GUI_FIRE_FIRE_WIDTH = 13;
 	private static final int GUI_FIRE_FIRE_HEIGHT = 14;
@@ -167,11 +173,34 @@ public class AetherFurnaceGui {
 			}
 			
 			GlStateManager.color(1f, 1f, 1f, 1f);
+			
+			IAetherHandler furnaceHandler = container.chest.getHandler();
+			float myAether = 0f;
+			
+			if (furnaceHandler != null) {
+				myAether = (float) furnaceHandler.getAether(null) / (float) furnaceHandler.getMaxAether(null);
+			}
+			
+			if (myAether > 0) {
+				Gui.drawRect(horizontalMargin + GUI_TOP_BAR_HOFFSET, verticalMargin + GUI_TOP_BAR_VOFFSET,
+						horizontalMargin + GUI_TOP_BAR_HOFFSET + (int) (GUI_TOP_BAR_WIDTH * myAether), verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT,
+						0xA0909000);
+			}
 		}
 		
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-			;
+			int horizontalMargin = (width - xSize) / 2;
+			int verticalMargin = (height - ySize) / 2;
+			
+			IAetherHandler furnaceHandler = container.chest.getHandler();
+			if (furnaceHandler != null) {
+				if (mouseX >= horizontalMargin + GUI_TOP_BAR_HOFFSET && mouseX <= horizontalMargin + GUI_TOP_BAR_HOFFSET + GUI_TOP_BAR_WIDTH
+						&& mouseY >= verticalMargin + GUI_TOP_BAR_VOFFSET && mouseY <= verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT) {
+					drawHoveringText(Lists.newArrayList(String.format("%.2f / %.2f", furnaceHandler.getAether(null) * .01f, furnaceHandler.getMaxAether(null) * .01f)),
+							mouseX - horizontalMargin, mouseY - verticalMargin);
+				}
+			}
 		}
 		
 	}
