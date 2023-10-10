@@ -4,9 +4,9 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.StringNBT;
 
 public class OptionalAetherHandlerComponent {
 
@@ -89,22 +89,22 @@ public class OptionalAetherHandlerComponent {
 		return (component.getAether(null) >= amount);
 	}
 	
-	public NBTBase toNBT() {
+	public INBT toNBT() {
 		if (component == null) {
-			return new NBTTagString("ABSENT");
+			return new StringNBT("ABSENT");
 		} else {
-			return component.writeToNBT(new NBTTagCompound());
+			return component.writeToNBT(new CompoundNBT());
 		}
 	}
 	
-	public void loadNBT(NBTBase nbt) {
+	public void loadNBT(INBT nbt) {
 		if (component == null) {
-			if (!(nbt instanceof NBTTagString) || !((NBTTagString) nbt).getString().equals("ABSENT")) {
+			if (!(nbt instanceof StringNBT) || !((StringNBT) nbt).getString().equals("ABSENT")) {
 				System.out.println("Attempted to load an optional aether handler but currently disabled. Did the aether mod get removed??");
 			}
 		} else {
-			if (nbt instanceof NBTTagCompound) {
-				component.readFromNBT((NBTTagCompound) nbt);
+			if (nbt instanceof CompoundNBT) {
+				component.readFromNBT((CompoundNBT) nbt);
 			}
 		}
 	}

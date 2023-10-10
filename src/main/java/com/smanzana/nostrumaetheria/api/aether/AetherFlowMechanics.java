@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConnection;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 public final class AetherFlowMechanics {
 	
@@ -106,7 +106,7 @@ public final class AetherFlowMechanics {
 	
 	private static boolean IsRunning = false;
 	public static final int drawFromHandler(@Nullable IAetherHandler originHandler,
-			IAetherHandler handler, EnumFacing face, int amount, boolean depthFirst) {
+			IAetherHandler handler, Direction face, int amount, boolean depthFirst) {
 		if (IsRunning) {
 			// This indicates that trying to draw from an aether handler ended up invoking a NEW handler walk.
 			// This is usuaully avoided by overriding the IAetherFlowHandler interface and providing a selfish that-handler-only
@@ -122,7 +122,7 @@ public final class AetherFlowMechanics {
 		
 		if (originHandler != null) {
 			context.visit(new AetherFlowConnection(originHandler, null));
-			for (EnumFacing originOtherFace : EnumFacing.values()) {
+			for (Direction originOtherFace : Direction.values()) {
 				context.visit(new AetherFlowConnection(originHandler, originOtherFace));
 			}
 		}
@@ -142,11 +142,11 @@ public final class AetherFlowMechanics {
 		return amount - left; 
 	}
 	
-	public static final int drawFromHandler(IAetherHandler handler, EnumFacing face, int amount, boolean depthFirst) {
+	public static final int drawFromHandler(IAetherHandler handler, Direction face, int amount, boolean depthFirst) {
 		return drawFromHandler(null, handler, face, amount, depthFirst);
 	}
 	
-	public static final int drawFromHandler(IAetherHandler handler, EnumFacing face, int amount) {
+	public static final int drawFromHandler(IAetherHandler handler, Direction face, int amount) {
 		return drawFromHandler(handler, face, amount, false);
 	}
 	
@@ -159,7 +159,7 @@ public final class AetherFlowMechanics {
 		}
 	}
 	
-	public static final int getTotalAether(IAetherHandler handler, EnumFacing face) {
+	public static final int getTotalAether(IAetherHandler handler, Direction face) {
 		if (IsRunning) {
 			// This indicates that trying to draw from an aether handler ended up invoking a NEW handler walk.
 			// This is usuaully avoided by overriding the IAetherFlowHandler interface and providing a selfish that-handler-only

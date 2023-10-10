@@ -1,8 +1,8 @@
 package com.smanzana.nostrumaetheria.api.aether.stats;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagInt;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.IntNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.Constants.NBT;
 
 /**
@@ -56,44 +56,44 @@ public class AetherStatInstance {
 	private static final String NBT_INPUT_LIST = "input_list";
 	private static final String NBT_OUTPUT_LIST = "output_list";
 	
-	public NBTTagCompound toNBT() {
-		NBTTagCompound tag = new NBTTagCompound();
+	public CompoundNBT toNBT() {
+		CompoundNBT tag = new CompoundNBT();
 		
-		tag.setInteger(NBT_INTERVALS, TOTAL_INTERVALS);
-		NBTTagList list = new NBTTagList();
+		tag.putInt(NBT_INTERVALS, TOTAL_INTERVALS);
+		ListNBT list = new ListNBT();
 		for (int i = 0; i < TOTAL_INTERVALS; i++) {
-			list.appendTag(new NBTTagInt(aetherTotalHistory[i]));
+			list.add(new IntNBT(aetherTotalHistory[i]));
 		}
-		tag.setTag(NBT_TOTAL_LIST, list);
+		tag.put(NBT_TOTAL_LIST, list);
 		
-		list = new NBTTagList();
+		list = new ListNBT();
 		for (int i = 0; i < TOTAL_INTERVALS; i++) {
-			list.appendTag(new NBTTagInt(aetherInHistory[i]));
+			list.add(new IntNBT(aetherInHistory[i]));
 		}
-		tag.setTag(NBT_INPUT_LIST, list);
+		tag.put(NBT_INPUT_LIST, list);
 		
-		list = new NBTTagList();
+		list = new ListNBT();
 		for (int i = 0; i < TOTAL_INTERVALS; i++) {
-			list.appendTag(new NBTTagInt(aetherOutHistory[i]));
+			list.add(new IntNBT(aetherOutHistory[i]));
 		}
-		tag.setTag(NBT_OUTPUT_LIST, list);
+		tag.put(NBT_OUTPUT_LIST, list);
 		
 		return tag;
 	}
 	
-	public void readFromNBT(NBTTagCompound tag) {
-		final int count = tag.getInteger(NBT_INTERVALS);
-		final NBTTagList totalList = tag.getTagList(NBT_TOTAL_LIST, NBT.TAG_INT);
-		final NBTTagList inputList = tag.getTagList(NBT_INPUT_LIST, NBT.TAG_INT);
-		final NBTTagList outputList = tag.getTagList(NBT_OUTPUT_LIST, NBT.TAG_INT);
+	public void readFromNBT(CompoundNBT tag) {
+		final int count = tag.getInt(NBT_INTERVALS);
+		final ListNBT totalList = tag.getList(NBT_TOTAL_LIST, NBT.TAG_INT);
+		final ListNBT inputList = tag.getList(NBT_INPUT_LIST, NBT.TAG_INT);
+		final ListNBT outputList = tag.getList(NBT_OUTPUT_LIST, NBT.TAG_INT);
 		for (int i = 0; i < TOTAL_INTERVALS; i++) {
 			final int total;
 			final int input;
 			final int output;
 			if (i < count) {
-				total = totalList.getIntAt(i);
-				input = inputList.getIntAt(i);
-				output = outputList.getIntAt(i);
+				total = totalList.getInt(i);
+				input = inputList.getInt(i);
+				output = outputList.getInt(i);
 			} else {
 				total = input = output = 0;
 			}

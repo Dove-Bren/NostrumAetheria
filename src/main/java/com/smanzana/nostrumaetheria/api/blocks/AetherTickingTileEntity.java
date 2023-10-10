@@ -2,12 +2,13 @@ package com.smanzana.nostrumaetheria.api.blocks;
 
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.util.ITickable;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.tileentity.ITickableTileEntity;
+import net.minecraft.tileentity.TileEntityType;
 
-public abstract class AetherTickingTileEntity extends AetherTileEntity implements ITickable {
+public abstract class AetherTickingTileEntity extends AetherTileEntity implements ITickableTileEntity {
 
 	// Automatically send block updates down to the client every n ticks (if there were changes)
 	protected int autoSyncPeriod;
@@ -16,12 +17,12 @@ public abstract class AetherTickingTileEntity extends AetherTileEntity implement
 	protected int ticksExisted;
 	protected boolean aetherDirtyFlag; // for use with auto-sync
 	
-	public AetherTickingTileEntity(int defaultAether, int defaultMaxAether) {
-		super(defaultAether, defaultMaxAether);
+	public AetherTickingTileEntity(TileEntityType<?> type, int defaultAether, int defaultMaxAether) {
+		super(type, defaultAether, defaultMaxAether);
 	}
 	
-	public AetherTickingTileEntity() {
-		super();
+	public AetherTickingTileEntity(TileEntityType<?> type) {
+		super(type);
 	}
 	
 	public void setAutoSync(int period) {
@@ -40,7 +41,7 @@ public abstract class AetherTickingTileEntity extends AetherTileEntity implement
 	}
 	
 	@Override
-	public void update() {
+	public void tick() {
 		ticksExisted++;
 		
 		compWrapper.tick();
@@ -53,17 +54,17 @@ public abstract class AetherTickingTileEntity extends AetherTileEntity implement
 	}
 	
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
+	public CompoundNBT getUpdateTag() {
+		return this.write(new CompoundNBT());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(pkt.getNbtCompound());
 	}

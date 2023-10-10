@@ -10,18 +10,18 @@ import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
 
 import net.minecraft.block.Block;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public abstract class APIProxy {
 	
-    public static CreativeTabs creativeTab;
+    public static ItemGroup creativeTab;
 	public static Block InfiniteAetherBlock = null;
 	public static Block AetherBatterySmallBlock = null;
 	public static Block AetherBatteryMediumBlock = null;
@@ -154,7 +154,7 @@ public abstract class APIProxy {
 		}
 	}
 	
-	public static EntityPlayer getClientPlayer() {
+	public static PlayerEntity getClientPlayer() {
 		if (handler != null) {
 			return handler.handleGetClientPlayer();
 		}
@@ -169,5 +169,5 @@ public abstract class APIProxy {
 	protected abstract int handlePushToInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount);
 	protected abstract void handleAddRepairerRecipe(IAetherRepairerRecipe recipe);
 	protected abstract void handleAddUnravelerRecipe(IAetherUnravelerRecipe recipe);
-	protected abstract EntityPlayer handleGetClientPlayer();
+	protected abstract PlayerEntity handleGetClientPlayer();
 }

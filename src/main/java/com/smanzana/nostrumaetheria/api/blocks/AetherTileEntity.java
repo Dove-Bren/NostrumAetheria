@@ -14,13 +14,14 @@ import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.component.OptionalAetherHandlerComponent;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class AetherTileEntity extends TileEntity implements IAetherHandlerProvider, IAetherComponentListener {
 
@@ -29,13 +30,14 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	protected OptionalAetherHandlerComponent compWrapper;
 	protected final IAetherStatTracker statTracker;
 	
-	public AetherTileEntity(int defaultAether, int defaultMaxAether) {
+	public AetherTileEntity(TileEntityType<?> type, int defaultAether, int defaultMaxAether) {
+		super(type);
 		compWrapper = createComponent(defaultAether, defaultMaxAether);
 		statTracker = createTracker();
 	}
 	
-	public AetherTileEntity() {
-		this(0, 0);
+	public AetherTileEntity(TileEntityType<?> type) {
+		this(type, 0, 0);
 	}
 	
 	protected OptionalAetherHandlerComponent createComponent(int defaultAether, int defaultMaxAether) {
@@ -50,7 +52,7 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	public void addConnections(List<AetherFlowConnection> connections) {
 		IAetherHandlerComponent comp = compWrapper.getHandlerIfPresent();
 		if (comp != null) {
-			for (EnumFacing dir : EnumFacing.values()) {
+			for (Direction dir : Direction.values()) {
 				if (!comp.getSideEnabled(dir)) {
 					continue;
 				}
@@ -69,7 +71,7 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 				}
 				
 				// See if block boasts being able to get us a handler
-				IBlockState attachedState = world.getBlockState(neighbor);
+				BlockState attachedState = world.getBlockState(neighbor);
 				Block attachedBlock = attachedState.getBlock();
 				if (attachedBlock instanceof IAetherCapableBlock) {
 					connections.add(new AetherFlowConnection(((IAetherCapableBlock) attachedBlock).getAetherHandler(world, attachedState, neighbor, dir), dir.getOpposite()));
@@ -88,12 +90,12 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	public void onAetherFlowTick(int diff, boolean added, boolean taken) {
 		if (this.world != null) {
 			final int aether = (this.compWrapper.isPresent() ? this.compWrapper.getHandlerIfPresent().getAether(null) : 0);
-			statTracker.reportTotal(world.getTotalWorldTime(), aether);
+			statTracker.reportTotal(world.getGameTime(), aether);
 			
 			if (added) {
-				statTracker.reportInput(world.getTotalWorldTime(), diff);
+				statTracker.reportInput(world.getGameTime(), diff);
 			} else {
-				statTracker.reportOutput(world.getTotalWorldTime(), diff);
+				statTracker.reportOutput(world.getGameTime(), diff);
 			}
 		}
 	}
@@ -104,8 +106,8 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	}
 	
 	@Override
-	public void invalidate() {
-		super.invalidate();
+	public void remove() {
+		super.remove();
 		
 		// Clean up connections
 		IAetherHandlerComponent comp = compWrapper.getHandlerIfPresent();
@@ -114,30 +116,32 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 		}
 	}
 	
-	@Override
-	public void onChunkUnload() {
-		super.onChunkUnload();
-		IAetherHandlerComponent comp = compWrapper.getHandlerIfPresent();
-		if (comp != null) {
-			comp.clearConnections();
-		}
-	}
+//	@Override
+//	public void onChunkUnload() {
+//		super.onChunkUnload();
+//		IAetherHandlerComponent comp = compWrapper.getHandlerIfPresent();
+//		if (comp != null) {
+//			comp.clearConnections();
+//		}
+//	}
 	
-	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-		super.writeToNBT(compound);
+	@Override
+	public CompoundNBT write(CompoundNBT compound) {
+		super.write(compound);
 		
-		compound.setTag(NBT_HANDLER, compWrapper.toNBT());
+		compound.put(NBT_HANDLER, compWrapper.toNBT());
 		
 		return compound;
 	}
 	
-	public void readFromNBT(NBTTagCompound compound) {
-		super.readFromNBT(compound);
+	@Override
+	public void read(CompoundNBT compound) {
+		super.read(compound);
 		
-		compWrapper.loadNBT(compound.getTag(NBT_HANDLER));
+		compWrapper.loadNBT(compound.get(NBT_HANDLER));
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void syncAether(int aether) {
 		IAetherHandlerComponent comp = compWrapper.getHandlerIfPresent();
 		if (comp != null) {

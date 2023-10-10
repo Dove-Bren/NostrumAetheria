@@ -4,8 +4,8 @@ import com.smanzana.nostrumaetheria.api.aether.AetherFlowMechanics.AetherIterate
 import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 
 public interface IAetherHandlerComponent extends IAetherHandler, IAetherFlowHandler {
 	
@@ -24,9 +24,9 @@ public interface IAetherHandlerComponent extends IAetherHandler, IAetherFlowHand
 	 * @param side The side. Note: NULL is allowed.
 	 * @param enabled
 	 */
-	public void enableSide(EnumFacing side, boolean enabled, boolean dirty);
+	public void enableSide(Direction side, boolean enabled, boolean dirty);
 	
-	public void enableSide(EnumFacing side, boolean enabled);
+	public void enableSide(Direction side, boolean enabled);
 	
 	/**
 	 * Check whether the given side is enabled for aether transfer.
@@ -35,7 +35,7 @@ public interface IAetherHandlerComponent extends IAetherHandler, IAetherFlowHand
 	 * @param side
 	 * @return
 	 */
-	public boolean getSideEnabled(EnumFacing side);
+	public boolean getSideEnabled(Direction side);
 	
 	/**
 	 * Adds a (usually distant) aether connection that may be used to draw aether from.
@@ -45,33 +45,33 @@ public interface IAetherHandlerComponent extends IAetherHandler, IAetherFlowHand
 	 * @param handler
 	 * @param dir
 	 */
-	public void addAetherConnection(IAetherHandler handler, EnumFacing dir);
+	public void addAetherConnection(IAetherHandler handler, Direction dir);
 	
-	public void removeAetherConnection(IAetherHandler handler, EnumFacing dir);
+	public void removeAetherConnection(IAetherHandler handler, Direction dir);
 	
 	public void clearConnections();
 	
 	@Override
-	public int getAether(EnumFacing side);
+	public int getAether(Direction side);
 	
 	@Override
-	public int getMaxAether(EnumFacing side);
+	public int getMaxAether(Direction side);
 	
 	public void setMaxAether(int maxAether);
 
-	public int addAether(EnumFacing side, int amount, boolean force);
+	public int addAether(Direction side, int amount, boolean force);
 	
 	@Override
-	public int addAether(EnumFacing side, int amount);
+	public int addAether(Direction side, int amount);
 	
 	@Override
-	public boolean canAdd(EnumFacing side, int amount);
+	public boolean canAdd(Direction side, int amount);
 	
 	@Override
-	public int drawAether(EnumFacing side, int amount, AetherIterateContext context);
+	public int drawAether(Direction side, int amount, AetherIterateContext context);
 
 	@Override
-	public int drawAether(EnumFacing side, int amount);
+	public int drawAether(Direction side, int amount);
 	
 	/**
 	 * Attempts to recuperate any lost aether from configured connections.
@@ -87,16 +87,16 @@ public interface IAetherHandlerComponent extends IAetherHandler, IAetherFlowHand
 	public void pushAether(int maxDiff);
 	
 	@Override
-	public int getAetherTotal(EnumFacing side, AetherIterateContext context);
+	public int getAetherTotal(Direction side, AetherIterateContext context);
 	
 	@Override
-	public boolean canDraw(EnumFacing side, int amount);
+	public boolean canDraw(Direction side, int amount);
 	
 	public void tick();
 	
-	public NBTTagCompound writeToNBT(NBTTagCompound compound);
+	public CompoundNBT writeToNBT(CompoundNBT compound);
 	
-	public void readFromNBT(NBTTagCompound compound);
+	public void readFromNBT(CompoundNBT compound);
 	
 	public void setAether(int aether);
 }

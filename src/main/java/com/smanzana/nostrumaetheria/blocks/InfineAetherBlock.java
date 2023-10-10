@@ -2,7 +2,7 @@ package com.smanzana.nostrumaetheria.blocks;
 
 import com.smanzana.nostrumaetheria.blocks.tiles.InfiniteAetherBlockEntity;
 
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -16,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class InfineAetherBlock extends BlockContainer {
+public class InfineAetherBlock extends Block {
 	
 	public static final String ID = "infinite_aether_block";
 	

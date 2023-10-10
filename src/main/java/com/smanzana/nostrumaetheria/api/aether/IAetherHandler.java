@@ -5,9 +5,9 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.api.blocks.IAetherCapableBlock;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -23,14 +23,14 @@ public interface IAetherHandler {
 	 * @param side
 	 * @return
 	 */
-	public int getAether(EnumFacing side);
+	public int getAether(Direction side);
 	
 	/**
 	 * Return the maximum amount of aether than can be stored
 	 * @param side
 	 * @return
 	 */
-	public int getMaxAether(EnumFacing side);
+	public int getMaxAether(Direction side);
 	
 	/**
 	 * Add the specified amount of aether. If not all of it fits, return the leftover.
@@ -38,7 +38,7 @@ public interface IAetherHandler {
 	 * @param amount
 	 * @return
 	 */
-	public int addAether(EnumFacing side, int amount);
+	public int addAether(Direction side, int amount);
 	
 	/**
 	 * Check whether this handler could accept all of amount on this side.
@@ -46,7 +46,7 @@ public interface IAetherHandler {
 	 * @param amount
 	 * @return
 	 */
-	public boolean canAdd(EnumFacing side, int amount);
+	public boolean canAdd(Direction side, int amount);
 	
 	/**
 	 * Attempt to draw aether. If not all is present, draw as much as possible.
@@ -54,7 +54,7 @@ public interface IAetherHandler {
 	 * @param amount
 	 * @return The amount actually drawn
 	 */
-	public int drawAether(EnumFacing side, int amount);
+	public int drawAether(Direction side, int amount);
 	
 	/**
 	 * Check whether all of the aether requested is available to be drawn from this side
@@ -62,7 +62,7 @@ public interface IAetherHandler {
 	 * @param amount
 	 * @return
 	 */
-	public boolean canDraw(EnumFacing side, int amount);
+	public boolean canDraw(Direction side, int amount);
 	
 
 	
@@ -74,7 +74,7 @@ public interface IAetherHandler {
 	 * @param side
 	 * @return
 	 */
-	public static @Nullable IAetherHandler GetHandlerAt(World world, BlockPos pos, @Nullable EnumFacing side) {
+	public static @Nullable IAetherHandler GetHandlerAt(World world, BlockPos pos, @Nullable Direction side) {
 		// First check for a TileEntity
 		TileEntity te = world.getTileEntity(pos);
 		if (te != null && te instanceof IAetherHandler) {
@@ -85,7 +85,7 @@ public interface IAetherHandler {
 		}
 		
 		// See if block boasts being able to get us a handler
-		IBlockState attachedState = world.getBlockState(pos);
+		BlockState attachedState = world.getBlockState(pos);
 		Block attachedBlock = attachedState.getBlock();
 		if (attachedBlock instanceof IAetherCapableBlock) {
 			return ((IAetherCapableBlock) attachedBlock).getAetherHandler(world, attachedState, pos, side);

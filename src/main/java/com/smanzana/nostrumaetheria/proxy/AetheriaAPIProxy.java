@@ -24,14 +24,14 @@ import com.smanzana.nostrumaetheria.recipes.UnravelerRecipeManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
+import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
 
 public class AetheriaAPIProxy extends APIProxy {
 
@@ -43,7 +43,7 @@ public class AetheriaAPIProxy extends APIProxy {
 	@Override
 	protected void handleSyncTEAether(AetherTileEntity te) {
 		NetworkHandler.getSyncChannel().sendToAllAround(new AetherTileEntityMessage(te),
-				new TargetPoint(te.getWorld().provider.getDimension(), te.getPos().getX(), te.getPos().getY(), te.getPos().getZ(), 64));
+				new TargetPoint(te.getWorld().getDimension().getType(), te.getPos().getX(), te.getPos().getY(), te.getPos().getZ(), 64));
 	}
 
 	@Override
@@ -55,8 +55,8 @@ public class AetheriaAPIProxy extends APIProxy {
 	protected int handleDrawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nonnull ItemStack ignore) {
 		final int origAmt = amount;
 		
-		if (entity instanceof EntityLivingBase) {
-			LivingAetherDrawEvent event = new LivingAetherDrawEvent(Phase.BEFORE_EARLY, (EntityLivingBase) entity, ignore, origAmt, amount);
+		if (entity instanceof LivingEntity) {
+			LivingAetherDrawEvent event = new LivingAetherDrawEvent(Phase.BEFORE_EARLY, (LivingEntity) entity, ignore, origAmt, amount);
 			MinecraftForge.EVENT_BUS.post(event);
 			amount = event.getAmtRemaining();
 		}
@@ -88,14 +88,14 @@ public class AetheriaAPIProxy extends APIProxy {
 				}
 			}
 			
-			if (entity instanceof EntityLivingBase) {
-				LivingAetherDrawEvent event = new LivingAetherDrawEvent(Phase.BEFORE_LATE, (EntityLivingBase) entity, ignore, origAmt, amount);
+			if (entity instanceof LivingEntity) {
+				LivingAetherDrawEvent event = new LivingAetherDrawEvent(Phase.BEFORE_LATE, (LivingEntity) entity, ignore, origAmt, amount);
 				MinecraftForge.EVENT_BUS.post(event);
 				amount = event.getAmtRemaining();
 			}
 			
-			if (entity instanceof EntityLivingBase) {
-				LivingAetherDrawEvent event = new LivingAetherDrawEvent(Phase.AFTER, (EntityLivingBase) entity, ignore, origAmt, amount);
+			if (entity instanceof LivingEntity) {
+				LivingAetherDrawEvent event = new LivingAetherDrawEvent(Phase.AFTER, (LivingEntity) entity, ignore, origAmt, amount);
 				MinecraftForge.EVENT_BUS.post(event);
 			}
 			
@@ -156,7 +156,7 @@ public class AetheriaAPIProxy extends APIProxy {
 	}
 
 	@Override
-	protected EntityPlayer handleGetClientPlayer() {
+	protected PlayerEntity handleGetClientPlayer() {
 		return NostrumAetheria.proxy.getPlayer();
 	}
 	

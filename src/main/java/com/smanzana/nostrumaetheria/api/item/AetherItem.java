@@ -8,7 +8,6 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConnection;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
@@ -18,19 +17,21 @@ import com.smanzana.nostrumaetheria.api.event.LivingAetherDrawEvent.Phase;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class AetherItem extends Item implements IAetherHandlerItem {
 
@@ -38,25 +39,27 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	private static final String NBT_CLIENT_DIRTY = "aether_client_dirty"; // always true on server, set to false on client
 	private static final String NBT_PENDANT_ID = "id";
 	
-	public AetherItem() {
-		super();
+	public AetherItem(Item.Properties builder) {
+		super(builder);
 	}
 	
 	protected abstract int getDefaultMaxAether(ItemStack stack);
 	
-	protected abstract boolean shouldShowAether(@Nonnull ItemStack stack, EntityPlayer playerIn, boolean advanced);
+	protected abstract boolean shouldShowAether(@Nonnull ItemStack stack, PlayerEntity playerIn, boolean advanced);
     
 	@Override
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	@OnlyIn(Dist.CLIENT)
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		if (shouldShowAether(stack, APIProxy.getClientPlayer(), flagIn.isAdvanced())) {
 			IAetherHandlerComponent comp = getAetherHandler(stack);
 			int aether = comp.getAether(null);
 			int maxAether = comp.getMaxAether(null);
-			tooltip.add(ChatFormatting.DARK_PURPLE + I18n.format("item.info.aether", new Object[] {String.format("%.2f", (float) aether * .01f), String.format("%.2f", (float) maxAether * .01f)}));
+			tooltip.add(new TranslationTextComponent("item.info.aether", String.format("%.2f", (float) aether * .01f), String.format("%.2f", (float) maxAether * .01f))
+					.applyTextStyle(TextFormatting.DARK_PURPLE));
 		}
 	}
 	
+	@Override
 	public IAetherHandlerComponent getAetherHandler(@Nonnull ItemStack stack) {
 		return GetOrCreateCachedHandlerItem(stack).component;
 	}
@@ -109,14 +112,14 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	private void commitHandler(ItemStack stack) {
 		StackHandlerItem handlerItem = GetOrCreateCachedHandlerItem(stack);
 		if (handlerItem.dirty) {
-			NBTTagCompound nbt = stack.getTagCompound();
+			CompoundNBT nbt = stack.getTag();
 			if (nbt == null) {
-				nbt = new NBTTagCompound();
-				stack.setTagCompound(nbt);
+				nbt = new CompoundNBT();
+				stack.setTag(nbt);
 			}
 			
-			nbt.setTag(NBT_AETHER_HANDLER, handlerItem.component.writeToNBT(new NBTTagCompound()));
-			nbt.setBoolean(NBT_CLIENT_DIRTY, true);
+			nbt.put(NBT_AETHER_HANDLER, handlerItem.component.writeToNBT(new CompoundNBT()));
+			nbt.putBoolean(NBT_CLIENT_DIRTY, true);
 			handlerItem.dirty = false;
 		}
 	}
@@ -151,8 +154,8 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 				
 			}, 0, type.getDefaultMaxAether(stack));
 			
-			if (stack.hasTagCompound() && stack.getTagCompound().hasKey(NBT_AETHER_HANDLER)) {
-				adapter.component.readFromNBT(stack.getTagCompound().getCompoundTag(NBT_AETHER_HANDLER));
+			if (stack.hasTag() && stack.getTag().contains(NBT_AETHER_HANDLER)) {
+				adapter.component.readFromNBT(stack.getTag().getCompound(NBT_AETHER_HANDLER));
 			}
 			
 			StackHandlerCache.put(id, adapter);
@@ -176,18 +179,18 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 		}
 		
 		UUID id;
-		NBTTagCompound nbt;
-		if (!stack.hasTagCompound()) {
-			nbt = new NBTTagCompound();
+		CompoundNBT nbt;
+		if (!stack.hasTag()) {
+			nbt = new CompoundNBT();
 		} else {
-			nbt = stack.getTagCompound();
+			nbt = stack.getTag();
 		}
 		
-		if (!nbt.hasKey(NBT_PENDANT_ID)) {
+		if (!nbt.contains(NBT_PENDANT_ID)) {
 			id = UUID.randomUUID();
 			
-			nbt.setString(NBT_PENDANT_ID, id.toString());
-			stack.setTagCompound(nbt);
+			nbt.putString(NBT_PENDANT_ID, id.toString());
+			stack.setTag(nbt);
 		} else {
 			id = UUID.fromString(nbt.getString(NBT_PENDANT_ID));
 		}
@@ -227,8 +230,8 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	}
 	
 	@Override
-	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-		if (!stack.hasTagCompound()) {
+	public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+		if (!stack.hasTag()) {
 			// First time ticking!
 			onFirstTick(stack, worldIn, entityIn);
 		}
@@ -241,14 +244,14 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 			int toDraw = missing;
 			if (toDraw > 0) {
 				
-				LivingAetherDrawEvent event = new LivingAetherDrawEvent(Phase.BEFORE_EARLY, (EntityLivingBase) entityIn, stack, missing, toDraw);
+				LivingAetherDrawEvent event = new LivingAetherDrawEvent(Phase.BEFORE_EARLY, (LivingEntity) entityIn, stack, missing, toDraw);
 				MinecraftForge.EVENT_BUS.post(event);
 				toDraw = event.getAmtRemaining();
 				
 				if (toDraw > 0) {
 					IInventory inv = null;
-					if (entityIn instanceof EntityPlayer) {
-						inv = ((EntityPlayer) entityIn).inventory;
+					if (entityIn instanceof PlayerEntity) {
+						inv = ((PlayerEntity) entityIn).inventory;
 					}
 					// else....
 					
@@ -257,7 +260,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 					}
 				}
 				
-				event = new LivingAetherDrawEvent(Phase.BEFORE_LATE, (EntityLivingBase) entityIn, stack,  missing, toDraw);
+				event = new LivingAetherDrawEvent(Phase.BEFORE_LATE, (LivingEntity) entityIn, stack,  missing, toDraw);
 				MinecraftForge.EVENT_BUS.post(event);
 				toDraw = event.getAmtRemaining();
 				
@@ -267,7 +270,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 					this.addAether(stack, gained);
 				}
 				
-				event = new LivingAetherDrawEvent(Phase.AFTER, (EntityLivingBase) entityIn, stack,  missing, toDraw);
+				event = new LivingAetherDrawEvent(Phase.AFTER, (LivingEntity) entityIn, stack,  missing, toDraw);
 				MinecraftForge.EVENT_BUS.post(event);
 				event.getAmtRemaining();
 			}
@@ -280,20 +283,20 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 		}
 		
 		// On client side, check for dirty nbt
-		if (worldIn.isRemote && stack.hasTagCompound() && stack.getTagCompound().getBoolean(NBT_CLIENT_DIRTY)) {
+		if (worldIn.isRemote && stack.hasTag() && stack.getTag().getBoolean(NBT_CLIENT_DIRTY)) {
 			// Clear dirty flag (on client side. Will be overwritten with next update)
-			NBTTagCompound tag = stack.getTagCompound();
-			tag.setBoolean(NBT_CLIENT_DIRTY, false);
-			stack.setTagCompound(tag);
+			CompoundNBT tag = stack.getTag();
+			tag.putBoolean(NBT_CLIENT_DIRTY, false);
+			stack.setTag(tag);
 			
 			// Update local copy
-			if (!Minecraft.getMinecraft().isIntegratedServerRunning()) {
+			if (!Minecraft.getInstance().isIntegratedServerRunning()) {
 				StackHandlerCache.remove(getItemID(stack));
 				GetOrCreateCachedHandlerItem(stack); // Creates it and loads from NBT :)
 			}
 		}
 		
-		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
+		super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
 	}
 	
 	/**

@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.Validate;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingEvent;
 
@@ -24,7 +24,7 @@ public class LivingAetherDrawEvent extends LivingEvent {
 	/**
 	 * Entity involved with the aether draw
 	 */
-	public final EntityLivingBase entity;
+	public final LivingEntity entity;
 	
 	/**
 	 * Item that's doing the drawing
@@ -50,7 +50,7 @@ public class LivingAetherDrawEvent extends LivingEvent {
 	
 	public final Phase phase;
 	
-	public LivingAetherDrawEvent(Phase phase, EntityLivingBase entity, @Nonnull ItemStack originalItem, int origAmt, int drawAmt) {
+	public LivingAetherDrawEvent(Phase phase, LivingEntity entity, @Nonnull ItemStack originalItem, int origAmt, int drawAmt) {
 		super(entity);
 		this.phase = phase;
 		this.entity = entity;
@@ -61,7 +61,7 @@ public class LivingAetherDrawEvent extends LivingEvent {
 		Validate.notNull(originalItem);
 	}
 	
-	public EntityLivingBase getEntity() {
+	public LivingEntity getEntity() {
 		return entity;
 	}
 

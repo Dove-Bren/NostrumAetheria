@@ -1,0 +1,25 @@
+modLoader="javafml" #mandatory
+loaderVersion="[25,)" #botania has 28+
+
+[[mods]]
+modId="nostrumaetheria"
+version="${file.jarVersion}"
+displayName="Nostrum Aetheria"
+#logoFile="examplemod.png" #optional
+description='''
+Magical energy add-on for Nostrum Magica
+'''
+
+[[dependencies.nostrumaetheria]]
+	modId="forge"
+	mandatory=true
+	versionRange="[28.1.92,)"
+	ordering="NONE"
+	side="BOTH"
+
+[[dependencies.nostrumaetheria]]
+	modId="curios"
+	mandatory=false
+	versionRange="[FORGE-1.14.4-1.0.6.1,)"
+	ordering="AFTER"
+	side="BOTH"

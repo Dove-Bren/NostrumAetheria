@@ -2,15 +2,15 @@ package com.smanzana.nostrumaetheria.api.aether;
 
 import com.smanzana.nostrumaetheria.api.aether.AetherFlowMechanics.AetherIterateContext;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 public interface IAetherFlowHandler extends IAetherHandler {
 	
 	public static final class AetherFlowConnection {
 		public IAetherHandler handler;
-		public EnumFacing face;
+		public Direction face;
 		
-		public AetherFlowConnection(IAetherHandler handler, EnumFacing connectionFace) {
+		public AetherFlowConnection(IAetherHandler handler, Direction connectionFace) {
 			this.handler = handler;
 			this.face = connectionFace;
 		}
@@ -31,7 +31,7 @@ public interface IAetherFlowHandler extends IAetherHandler {
 		}
 	}
 
-	public int drawAether(EnumFacing side, int amount, AetherIterateContext context);
+	public int drawAether(Direction side, int amount, AetherIterateContext context);
 	
-	public int getAetherTotal(EnumFacing side, AetherIterateContext context);
+	public int getAetherTotal(Direction side, AetherIterateContext context);
 }
