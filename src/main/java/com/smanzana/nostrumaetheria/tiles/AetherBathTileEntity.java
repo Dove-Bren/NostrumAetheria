@@ -14,7 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -187,21 +187,21 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 
 	@Override
-	public int[] getSlotsForFace(EnumFacing side) {
+	public int[] getSlotsForFace(Direction side) {
 		return new int[] {0};
 	}
 
 	@Override
-	public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
-		if (index != 0 || direction == EnumFacing.DOWN || !this.isItemValidForSlot(0, itemStackIn))
+	public boolean canInsertItem(int index, ItemStack itemStackIn, Direction direction) {
+		if (index != 0 || direction == Direction.DOWN || !this.isItemValidForSlot(0, itemStackIn))
 			return false;
 		
 		return stack.isEmpty();
 	}
 
 	@Override
-	public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
-		return index == 0 && direction == EnumFacing.DOWN && !stack.isEmpty() && heldItemFull();
+	public boolean canExtractItem(int index, ItemStack stack, Direction direction) {
+		return index == 0 && direction == Direction.DOWN && !stack.isEmpty() && heldItemFull();
 	}
 	
 	public @Nullable IAetherHandler getHeldHandler() {

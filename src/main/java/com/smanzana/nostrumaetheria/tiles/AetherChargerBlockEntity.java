@@ -100,12 +100,12 @@ public class AetherChargerBlockEntity extends AetherBathTileEntity {
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public int getAetherDisplay() {
 		return clientAetherDisplay;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public int getMaxAetherDisplay() {
 		return clientAetherMaxDisplay;
 	}

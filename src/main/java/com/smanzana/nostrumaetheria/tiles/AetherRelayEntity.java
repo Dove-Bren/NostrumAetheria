@@ -15,7 +15,7 @@ import net.minecraft.block.state.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -25,15 +25,15 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 		private static final String NBT_SIDE = "relay_side";
 		
 		protected @Nullable AetherRelayComponent relayHandler;
-		private EnumFacing side;
+		private Direction side;
 		
 		private int idleTicks;
 		
 		public AetherRelayEntity() {
-			this(EnumFacing.UP);
+			this(Direction.UP);
 		}
 		
-		public AetherRelayEntity(EnumFacing facing) {
+		public AetherRelayEntity(Direction facing) {
 			super(0, 0);
 			
 			side = facing;
@@ -48,7 +48,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 //			// I wantd to override this and return a relay component but I can't think of a neasy way to get the side here.
 //			// I could relax the component to not care about side at first, and have it attached later. instead
 //			// I'll just throw the old one away?
-//			relayHandler = new AetherRelayComponent(this, EnumFacing.UP); 
+//			relayHandler = new AetherRelayComponent(this, Direction.UP); 
 //			return relayHandler;
 //		}
 		
@@ -121,7 +121,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 			relayHandler.unloadRelay();
 		}
 		
-		public EnumFacing getSide() {
+		public Direction getSide() {
 			return side;
 		}
 		
@@ -152,7 +152,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 		public void readFromNBT(CompoundNBT compound) {
 			super.readFromNBT(compound);
 			
-			this.side = EnumFacing.values()[compound.getByte(NBT_SIDE)];
+			this.side = Direction.values()[compound.getByte(NBT_SIDE)];
 			relayHandler.setSide(this.side);
 		}
 		

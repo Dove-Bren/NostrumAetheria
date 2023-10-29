@@ -14,7 +14,7 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 public class AetherHandlerComponent implements IAetherHandlerComponent {
 	
@@ -49,7 +49,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	public AetherHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
 		maxAether = defaultMaxAether;
 		aether = defaultAether;
-		sideConnections = new boolean[EnumFacing.values().length + 1]; // +1 for NULL
+		sideConnections = new boolean[Direction.values().length + 1]; // +1 for NULL
 		remoteConnections = new HashSet<>();
 		fixAether();
 		
@@ -105,8 +105,8 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 		aether = Math.min(aether, maxAether);
 	}
 	
-	private int getSideIndex(EnumFacing side) {
-		return (side == null ? EnumFacing.values().length : side.ordinal());
+	private int getSideIndex(Direction side) {
+		return (side == null ? Direction.values().length : side.ordinal());
 	}
 	
 	protected void dirty() {
@@ -118,14 +118,14 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	 * @param side The side. Note: NULL is allowed.
 	 * @param enabled
 	 */
-	public void enableSide(EnumFacing side, boolean enabled, boolean dirty) {
+	public void enableSide(Direction side, boolean enabled, boolean dirty) {
 		sideConnections[getSideIndex(side)] = enabled;
 		if (dirty) {
 			dirty();
 		}
 	}
 	
-	public void enableSide(EnumFacing side, boolean enabled) {
+	public void enableSide(Direction side, boolean enabled) {
 		enableSide(side, enabled, true);
 	}
 	
@@ -136,7 +136,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	 * @param side
 	 * @return
 	 */
-	public boolean getSideEnabled(EnumFacing side) {
+	public boolean getSideEnabled(Direction side) {
 		return sideConnections[getSideIndex(side)];
 	}
 	
@@ -148,11 +148,11 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	 * @param handler
 	 * @param dir
 	 */
-	public void addAetherConnection(IAetherHandler handler, EnumFacing dir) {
+	public void addAetherConnection(IAetherHandler handler, Direction dir) {
 		remoteConnections.add(new AetherFlowConnection(handler, dir));
 	}
 	
-	public void removeAetherConnection(IAetherHandler handler, EnumFacing dir) {
+	public void removeAetherConnection(IAetherHandler handler, Direction dir) {
 		Iterator<AetherFlowConnection> it = remoteConnections.iterator();
 		while (it.hasNext()) {
 			AetherFlowConnection conn = it.next();
@@ -171,7 +171,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	 * @param side
 	 * @return
 	 */
-	protected boolean canAcceptOnSide(EnumFacing side) {
+	protected boolean canAcceptOnSide(Direction side) {
 		return allowInboundAether && sideConnections[getSideIndex(side)];
 	}
 	
@@ -180,17 +180,17 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	 * @param side
 	 * @return
 	 */
-	protected boolean canDrawOnSide(EnumFacing side) {
+	protected boolean canDrawOnSide(Direction side) {
 		return allowOutboundAether && sideConnections[getSideIndex(side)];
 	}
 	
 	@Override
-	public int getAether(EnumFacing side) {
+	public int getAether(Direction side) {
 		return aether;
 	}
 	
 	@Override
-	public int getMaxAether(EnumFacing side) {
+	public int getMaxAether(Direction side) {
 		return maxAether;
 	}
 	
@@ -199,7 +199,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 		this.maxAether = maxAether;
 	}
 
-	public int addAether(EnumFacing side, int amount, boolean force) {
+	public int addAether(Direction side, int amount, boolean force) {
 		if (force || canAcceptOnSide(side)) {
 			int start = aether;
 			aether += amount;
@@ -220,16 +220,16 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	}
 	
 	@Override
-	public int addAether(EnumFacing side, int amount) {
+	public int addAether(Direction side, int amount) {
 		return this.addAether(side, amount, false);
 	}
 	
 	@Override
-	public boolean canAdd(EnumFacing side, int amount) {
+	public boolean canAdd(Direction side, int amount) {
 		return (canAcceptOnSide(side) && maxAether - aether >= amount);
 	}
 	
-	protected int drawAetherFromMyself(EnumFacing side, int amount, boolean internal) {
+	protected int drawAetherFromMyself(Direction side, int amount, boolean internal) {
 		if (amount != 0 && (internal || canDrawOnSide(side)) && aether != 0) {
 			amount = Math.min(amount, aether);
 			aether -= amount;
@@ -243,20 +243,20 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	}
 	
 	protected List<AetherFlowConnection> getConnections() {
-		List<AetherFlowConnection> connections = new ArrayList<>(EnumFacing.values().length + 1 + remoteConnections.size());
+		List<AetherFlowConnection> connections = new ArrayList<>(Direction.values().length + 1 + remoteConnections.size());
 		connections.addAll(remoteConnections);
 		listener.addConnections(connections);
 		return connections;
 	}
 	
 	@Override
-	public int drawAether(EnumFacing side, int amount, AetherIterateContext context) {
+	public int drawAether(Direction side, int amount, AetherIterateContext context) {
 		context.addConnections(getConnections());
 		return this.drawAetherFromMyself(side, amount, false);
 	}
 
 	@Override
-	public int drawAether(EnumFacing side, int amount) {
+	public int drawAether(Direction side, int amount) {
 		final int start = amount;
 		// Check if have enough ourselves before using the iterative approach
 		amount -= drawAetherFromMyself(side, amount, true);
@@ -327,13 +327,13 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	}
 	
 	@Override
-	public int getAetherTotal(EnumFacing side, AetherIterateContext context) {
+	public int getAetherTotal(Direction side, AetherIterateContext context) {
 		context.addConnections(getConnections());
 		return getAether(side);
 	}
 	
 	@Override
-	public boolean canDraw(EnumFacing side, int amount) {
+	public boolean canDraw(Direction side, int amount) {
 		if (canDrawOnSide(side)) {
 			return aether >= amount;
 		}
@@ -370,17 +370,17 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	}
 	
 	private static final void configFromByte(boolean[] config, byte b) {
-		for (EnumFacing facing : EnumFacing.values()) {
+		for (Direction facing : Direction.values()) {
 			config[facing.ordinal()] = ((b & 1) == 1);
 			b >>= 1;
 		}
-		config[EnumFacing.values().length] = ((b & 1) == 1);
+		config[Direction.values().length] = ((b & 1) == 1);
 	}
 	
 	private static final byte configToByte(boolean[] config) {
 		byte b = 0;
-		b |= (config[EnumFacing.values().length] ? 1 : 0);
-		EnumFacing values[] = EnumFacing.values();
+		b |= (config[Direction.values().length] ? 1 : 0);
+		Direction values[] = Direction.values();
 		for (int i = values.length - 1; i >= 0; i--) { // backwards to counter how we write
 			b <<= 1;
 			b |= (config[i] ? 1 : 0);

@@ -106,7 +106,7 @@ public class AetherRepairerGui {
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class AetherRepairerGuiContainer extends AutoGuiContainer {
 
 		private AetherRepairerContainer container;

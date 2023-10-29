@@ -110,7 +110,7 @@ public class AetherChargerGui {
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class AetherChargerGuiContainer extends AutoGuiContainer {
 
 		private AetherChargerContainer container;

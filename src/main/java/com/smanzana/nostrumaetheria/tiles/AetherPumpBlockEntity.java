@@ -7,7 +7,7 @@ import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock;
 
 import net.minecraft.block.state.BlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -38,7 +38,7 @@ public class AetherPumpBlockEntity extends AetherTickingTileEntity {
 				return;
 			}
 			
-			final EnumFacing direction = ((AetherPumpBlock) state.getBlock()).getFacing(state);
+			final Direction direction = ((AetherPumpBlock) state.getBlock()).getFacing(state);
 			
 			// Pull
 			// Note: carts handled by the cart

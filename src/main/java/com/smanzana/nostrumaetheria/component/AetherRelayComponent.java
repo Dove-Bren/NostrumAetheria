@@ -17,7 +17,7 @@ import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLong;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.World;
@@ -34,7 +34,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	private static final String NBT_LINK = "relay_links";
 	
 	protected final int range;
-	protected EnumFacing side;
+	protected Direction side;
 	protected World worldObj;
 	protected BlockPos pos;
 	
@@ -48,7 +48,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	
 	protected final AetherRelayListener listener;
 	
-	public AetherRelayComponent(AetherRelayListener listener, EnumFacing side, int range) {
+	public AetherRelayComponent(AetherRelayListener listener, Direction side, int range) {
 		super(listener, 0, 0);
 		this.range = range;
 		this.links = new HashSet<>();
@@ -60,13 +60,13 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 		setSide(side);
 	}
 	
-	public AetherRelayComponent(AetherRelayListener listener, EnumFacing side) {
+	public AetherRelayComponent(AetherRelayListener listener, Direction side) {
 		this(listener, side, 8);
 	}
 	
-	public void setSide(EnumFacing side) {
+	public void setSide(Direction side) {
 		// Configure connections to only allow the block we're actually attached to
-		for (EnumFacing s : EnumFacing.values()) { // Note: leaves out null, which we use for relay connections
+		for (Direction s : Direction.values()) { // Note: leaves out null, which we use for relay connections
 			this.enableSide(s, false, false);
 		}
 		this.enableSide(side.getOpposite(), true, false);
@@ -86,7 +86,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 		return worldObj;
 	}
 	
-	private static IAetherHandler getHandlerAt(World world, BlockPos pos, EnumFacing side) {
+	private static IAetherHandler getHandlerAt(World world, BlockPos pos, Direction side) {
 		return IAetherHandler.GetHandlerAt(world, pos, side);
 	}
 	
@@ -296,7 +296,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	}
 	
 	@Override
-	public boolean canAdd(EnumFacing side, int amount) {
+	public boolean canAdd(Direction side, int amount) {
 		if (canAcceptOnSide(side)) {
 			return canForward(amount, null);
 		}
@@ -305,7 +305,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	}
 	
 	@Override
-	public int addAether(EnumFacing side, int amount) {
+	public int addAether(Direction side, int amount) {
 		// We don't store aether and try to push it instead
 		if (canAcceptOnSide(side)) {
 			return forwardAether(amount, null);

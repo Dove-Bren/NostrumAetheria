@@ -132,7 +132,7 @@ public class AetherBoilerGui {
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class AetherBoilerGuiContainer extends AutoGuiContainer {
 
 		private AetherBoilerContainer container;

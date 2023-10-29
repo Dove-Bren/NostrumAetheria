@@ -111,7 +111,7 @@ public class AetherUnravelerGui {
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class AetherUnravelerGuiContainer extends AutoGuiContainer {
 
 		private AetherUnravelerContainer container;

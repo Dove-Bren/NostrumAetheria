@@ -35,10 +35,7 @@ public abstract class APIProxy {
 	public static Block AetherRepairerBlock = null;
 	public static Block AetherUnravelerBlock = null;
 	public static Block AetherPumpBlock = null;
-	public static Item ActivePendantItem = null;
-	public static Item PassivePendantItem = null;
-	public static Item AetherGemItem = null;
-	public static Item AetherBatteryMinecartItem = null;
+	
 	public static Class<? extends Entity> AetherBatteryMinecart = null;
 	
 	// This is a NostrumResearchTab, but using that type would cause a circular dependency

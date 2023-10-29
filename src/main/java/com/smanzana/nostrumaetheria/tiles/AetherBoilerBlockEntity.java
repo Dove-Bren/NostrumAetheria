@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -116,17 +116,17 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 		return !(oldState.getBlock().equals(newState.getBlock()));
 	}
 
-	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-		return (facing == EnumFacing.DOWN && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+	public boolean hasCapability(Capability<?> capability, Direction facing) {
+		return (facing == Direction.DOWN && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
 	}
 	
 	private IItemHandler handlerProxy = null;
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+	public <T> T getCapability(Capability<T> capability, Direction facing) {
 		if (facing != null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			if (facing == EnumFacing.DOWN) {
+			if (facing == Direction.DOWN) {
 				
 				// Proxy up to a furnace that's above us, if there is one
 				if (handlerProxy == null) {
@@ -233,7 +233,7 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		nbt.setString(NBT_BOILER_MODE, this.mode.name());
+		nbt.putString(NBT_BOILER_MODE, this.mode.name());
 		
 		return nbt;
 	}

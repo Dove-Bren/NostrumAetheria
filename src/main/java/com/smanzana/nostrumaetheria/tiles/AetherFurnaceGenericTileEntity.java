@@ -179,8 +179,8 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		
 		nbt.putInt(NBT_INVENTORY_SLOTS, slots.size());
 		nbt.setTag(NBT_INVENTORY, Inventories.serializeInventory(this));
-		nbt.setFloat(NBT_AETHER_CARRY, this.aetherCarry);
-		nbt.setFloat(NBT_AETHER_PER, this.aetherPerTick);
+		nbt.putFloat(NBT_AETHER_CARRY, this.aetherCarry);
+		nbt.putFloat(NBT_AETHER_PER, this.aetherPerTick);
 		nbt.putInt(NBT_TICKS_MAX, burnTicksMax);
 		nbt.putInt(NBT_TICKS_LEFT, burnTicksRemaining);
 		

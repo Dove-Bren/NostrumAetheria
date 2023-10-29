@@ -4,24 +4,24 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
-import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Advanced thano pendant. Stores and uses aether!
@@ -34,21 +34,9 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 	private static final int AETHER_PER_CHARGE = 500;
 	private static final int MAX_CHARGES = 3;
 	
-	private static PassivePendant instance = null;
-	public static PassivePendant instance() {
-		if (instance == null)
-			instance = new PassivePendant();
-		
-		return instance;
-	}
-	
 	public PassivePendant() {
-		super();
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(ID);
-		this.setMaxDamage(MAX_CHARGES);
-		this.setMaxStackSize(1);
-		this.setCreativeTab(APIProxy.creativeTab);
+		super(AetheriaItems.PropUnstackable()
+				.maxDamage(MAX_CHARGES));
 	}
     
     @Override
@@ -73,11 +61,11 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-		tooltip.add(I18n.format("item.info.aen.desc", (Object[]) null));
+	@OnlyIn(Dist.CLIENT)
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		tooltip.add(new TranslationTextComponent("item.info.aen.desc"));
 		int charges = getWholeCharges(stack);
-		tooltip.add(ChatFormatting.GREEN + I18n.format("item.info.pendant.charges", new Object[] {charges}));
+		tooltip.add(new TranslationTextComponent("item.info.pendant.charges", charges).applyTextStyle(TextFormatting.GREEN));
 	}
 
 	@Override
@@ -115,7 +103,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 	}
 	
 	@Override
-	public void apply(EntityLivingBase caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
 		if (stack.isEmpty())
 			return;
 		
@@ -135,7 +123,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 	private void setDurability(ItemStack pendant) {
 		int count = getWholeCharges(pendant);
 		float max = MAX_CHARGES;
-		pendant.setItemDamage((int) (max - count));
+		pendant.setDamage((int) (max - count));
 	}
 	
 	@Override

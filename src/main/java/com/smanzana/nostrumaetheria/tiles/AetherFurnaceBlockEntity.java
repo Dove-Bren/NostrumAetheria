@@ -32,7 +32,7 @@ public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		nbt.setString(NBT_TYPE, type.name());
+		nbt.putString(NBT_TYPE, type.name());
 		
 		return nbt;
 	}

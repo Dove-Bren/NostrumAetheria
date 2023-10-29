@@ -147,7 +147,7 @@ public class ActivePendantGui {
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class ActivePendantGuiContainer extends AutoGuiContainer {
 
 		//private ActivePendantContainer container;

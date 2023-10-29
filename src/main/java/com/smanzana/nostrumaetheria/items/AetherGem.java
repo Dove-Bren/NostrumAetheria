@@ -5,19 +5,19 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
-import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Basic hand-held battery
@@ -29,21 +29,9 @@ public class AetherGem extends AetherItem implements ILoreTagged {
 	public static final String ID = "aether_gem";
 	private static final int MAX_AETHER = 1000;
 	
-	private static AetherGem instance = null;
-	public static AetherGem instance() {
-		if (instance == null)
-			instance = new AetherGem();
-		
-		return instance;
-	}
-	
 	public AetherGem() {
-		super();
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(ID);
-		this.setMaxDamage(MAX_AETHER);
-		this.setMaxStackSize(1);
-		this.setCreativeTab(APIProxy.creativeTab);
+		super(AetheriaItems.PropUnstackable()
+				.maxDamage(MAX_AETHER));
 	}
     
     @Override
@@ -68,9 +56,9 @@ public class AetherGem extends AetherItem implements ILoreTagged {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-		tooltip.add(I18n.format("item.info.aether_gem.desc", (Object[]) null));
+	@OnlyIn(Dist.CLIENT)
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		tooltip.add(new TranslationTextComponent("item.info.aether_gem.desc"));
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 	}
 
@@ -87,7 +75,7 @@ public class AetherGem extends AetherItem implements ILoreTagged {
 	
 	private void setDurability(ItemStack pendant) {
 		int aether = getAether(pendant);
-		pendant.setItemDamage(MAX_AETHER - aether);
+		pendant.setDamage(MAX_AETHER - aether);
 	}
 	
 	@Override
@@ -104,8 +92,8 @@ public class AetherGem extends AetherItem implements ILoreTagged {
 	}
 	
 	@Override
-	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
+	public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+		super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
 	}
 
 	@Override

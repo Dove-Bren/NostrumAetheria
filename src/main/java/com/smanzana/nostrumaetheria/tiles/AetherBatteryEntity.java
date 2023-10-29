@@ -9,7 +9,7 @@ import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock.Size;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
@@ -44,11 +44,11 @@ public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 	protected void flowIntoNearby() {
 		// Look for adjacent batteries to flow into or fill from.
 		// Get total sum'ed aether to figure out how much it looks like each should have.
-		AetherBatteryEntity[] batteries = new AetherBatteryEntity[EnumFacing.values().length];
+		AetherBatteryEntity[] batteries = new AetherBatteryEntity[Direction.values().length];
 		int myAether = this.handler.getAether(null);
 		
 		// First, try to flow down.
-		if (handler.getSideEnabled(EnumFacing.DOWN)) {
+		if (handler.getSideEnabled(Direction.DOWN)) {
 			TileEntity te = world.getTileEntity(pos.down());
 			if (te != null && te instanceof AetherBatteryEntity) {
 				AetherBatteryEntity other = (AetherBatteryEntity) te;
@@ -63,7 +63,7 @@ public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 			int neighborCount = 0;
 			int max = totalAether;
 			int min = totalAether;
-			for (EnumFacing dir : new EnumFacing[]{EnumFacing.SOUTH, EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.WEST}) {
+			for (Direction dir : new Direction[]{Direction.SOUTH, Direction.NORTH, Direction.EAST, Direction.WEST}) {
 				if (!handler.getSideEnabled(dir)) {
 					continue;
 				}
@@ -143,7 +143,7 @@ public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		nbt.setString(NBT_SIZE, this.size.name());
+		nbt.putString(NBT_SIZE, this.size.name());
 		return nbt;
 	}
 	

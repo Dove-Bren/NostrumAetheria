@@ -22,7 +22,7 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.SoundEvents;
@@ -30,8 +30,8 @@ import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.NonNullList;
@@ -161,12 +161,12 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return true;
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 		if (!worldIn.isRemote) {
 			//worldIn.notifyBlockUpdate(pos, worldIn.getBlockState(pos), worldIn.getBlockState(pos), 2);
 			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherFurnaceID, worldIn, pos.getX(), pos.getY(), pos.getZ());
@@ -181,7 +181,7 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer, Hand hand) {
 		final @Nonnull ItemStack stack = placer.getHeldItem(hand);
 		return this.getDefaultState()
 				.withProperty(TYPE, typeFromMeta(stack.getMetadata()))
@@ -193,7 +193,7 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 		return metaFromType(state.getValue(TYPE));
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
 		for (Type type : Type.values()) {
@@ -229,7 +229,7 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 		
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		if (null == stateIn || !stateIn.getValue(ON))
@@ -239,7 +239,7 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 		final double d1 = (double)pos.getY() + 0.2D;
 		final double d2 = (double)pos.getZ() + 0.5D;
 		
-		for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+		for (Direction facing : Direction.HORIZONTALS) {
 			if (!rand.nextBoolean()) {
 				continue;
 			}
@@ -281,16 +281,16 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	public static final IItemPropertyGetter SIZE_GETTER = new IItemPropertyGetter() {
-		@SideOnly(Side.CLIENT)
-		public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
+		@OnlyIn(Dist.CLIENT)
+		public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 			Type type = AetherFurnaceBlock.instance.typeFromMeta(stack.getMetadata());
 			return (float) type.ordinal();
 		}
 	};
 	
 	public static final IItemPropertyGetter ON_GETTER = new IItemPropertyGetter() {
-		@SideOnly(Side.CLIENT)
-		public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
+		@OnlyIn(Dist.CLIENT)
+		public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 			return AetherFurnaceBlock.instance.onFromMeta(stack.getMetadata()) ? 1.0F : 0.0F;
 		}
 	};

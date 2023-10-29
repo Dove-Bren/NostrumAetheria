@@ -17,14 +17,14 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.BlockState;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -72,7 +72,7 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 		this.setTickRandomly(true);
 		this.setLightOpacity(0);
 		this.setLightLevel(4f/16f);
-		this.setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.UP));
+		this.setDefaultState(blockState.getBaseState().withProperty(FACING, Direction.UP));
 	}
 	
 	@Override
@@ -80,8 +80,8 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 		return new BlockStateContainer(this, FACING);
 	}
 	
-	private EnumFacing getFacingFromMeta(int meta) {
-		return EnumFacing.values()[meta];
+	private Direction getFacingFromMeta(int meta) {
+		return Direction.values()[meta];
 	}
 	
 	@Override
@@ -100,7 +100,7 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
 		return state.getValue(FACING) == side;
 	}
 	
@@ -140,7 +140,7 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 	}
 	
 	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-		for (EnumFacing enumfacing : FACING.getAllowedValues()) {
+		for (Direction enumfacing : FACING.getAllowedValues()) {
 			if (this.canPlaceAt(worldIn, pos, enumfacing)) {
 				return true;
 			}
@@ -149,18 +149,18 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 		return false;
 	}
 
-	private boolean canPlaceAt(World worldIn, BlockPos pos, EnumFacing facing) {
+	private boolean canPlaceAt(World worldIn, BlockPos pos, Direction facing) {
 		BlockPos blockpos = pos.offset(facing.getOpposite());
-		return worldIn.isSideSolid(blockpos, facing, true);// || facing.equals(EnumFacing.UP) && this.canPlaceOn(worldIn, blockpos);
+		return worldIn.isSideSolid(blockpos, facing, true);// || facing.equals(Direction.UP) && this.canPlaceOn(worldIn, blockpos);
 	}
 
 	@Override
-	public BlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer) {
 		return this.getDefaultState().withProperty(FACING, facing);
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
 		
 		if (!worldIn.isRemote) {
 			// r equest an update
@@ -203,19 +203,19 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public BlockRenderLayer getBlockLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean isTranslucent(BlockState state) {
 		return true;
 	}
@@ -229,7 +229,7 @@ public class AetherRelay extends BlockContainer implements ILoreTagged {
 			return;
 		}
 		
-		EnumFacing facing = state.getValue(FACING);
+		Direction facing = state.getValue(FACING);
 		if (worldIn.isAirBlock(pos.offset(facing.getOpposite()))) {
 			this.dropBlockAsItem(worldIn, pos, state, 0);
 			worldIn.setBlockToAir(pos);

@@ -15,7 +15,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
@@ -108,14 +108,14 @@ public class EntityAetherBatteryMinecart extends EntityMinecart {
 		}
 		
 		// Look for nearby pumps
-		for (EnumFacing dir : new EnumFacing[] {EnumFacing.EAST, EnumFacing.WEST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.UP}) {
+		for (Direction dir : new Direction[] {Direction.EAST, Direction.WEST, Direction.NORTH, Direction.SOUTH, Direction.UP}) {
 			final BlockPos at = pos.offset(dir);
 			BlockState state = world.getBlockState(at);
 			if (state.getBlock() instanceof AetherPumpBlock) {
 				TileEntity te = world.getTileEntity(at);
 				if (te != null && te instanceof AetherPumpBlockEntity) {
 					AetherPumpBlockEntity ent = (AetherPumpBlockEntity) te;
-					final EnumFacing pumpDir = AetherPumpBlock.instance().getFacing(state);
+					final Direction pumpDir = AetherPumpBlock.instance().getFacing(state);
 					if (pumpDir == dir.getOpposite()) {
 						//Taking from
 						final int leftover = ent.getHandler().addAether(dir.getOpposite(), this.getAether());

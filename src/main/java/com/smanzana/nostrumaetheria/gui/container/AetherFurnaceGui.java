@@ -117,7 +117,7 @@ public class AetherFurnaceGui {
 		
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static class AetherFurnaceGuiContainer extends AutoGuiContainer {
 
 		private AetherFurnaceContainer container;

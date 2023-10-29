@@ -2,17 +2,17 @@ package com.smanzana.nostrumaetheria.items;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.entities.EntityAetherBatteryMinecart;
 
-import net.minecraft.block.BlockRailBase;
-import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.item.minecart.MinecartEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -25,41 +25,39 @@ public class AetherBatteryMinecartItem extends Item {
 
 	public static final String ID = "aether_battery_cart_item";
 	
-	private static AetherBatteryMinecartItem instance = null;
-	public static AetherBatteryMinecartItem instance() {
-		if (instance == null)
-			instance = new AetherBatteryMinecartItem();
-		
-		return instance;
-	}
 	
 	public AetherBatteryMinecartItem() {
-		super();
-		this.setUnlocalizedName(ID);
-		this.setRegistryName(ID);
-		this.setMaxStackSize(16);
-		this.setCreativeTab(APIProxy.creativeTab);
+		super(AetheriaItems.PropBase().maxStackSize(16));
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public ActionResultType onItemUse(ItemUseContext context) {
+		final PlayerEntity player = context.getPlayer();
+		final BlockPos pos = context.getPos();
+		final Hand hand = context.getHand();
+		final World world = context.getWorld();
+		final BlockState blockstate = world.getBlockState(pos);
+		
 		final @Nonnull ItemStack stack = player.getHeldItem(hand);
-		if(BlockRailBase.isRailBlock(world.getBlockState(pos))) {
-			if(!world.isRemote) {
-				EntityMinecart entityminecart = new EntityAetherBatteryMinecart(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+		if(!blockstate.isIn(BlockTags.RAILS)) {
+			return ActionResultType.FAIL;
+		} else {
+			if(!world.isRemote()) {
+				MinecartEntity entityminecart = new EntityAetherBatteryMinecart(AetheriaEntities.aetherMinecart, world);
+				entityminecart.setPosition(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
 				if(stack.hasDisplayName()) {
-					entityminecart.setCustomNameTag(stack.getDisplayName());
+					entityminecart.setCustomName(stack.getDisplayName());
 				}
 
-				world.spawnEntity(entityminecart);
+				world.addEntity(entityminecart);
 			}
 
 			stack.shrink(1);
-			return EnumActionResult.SUCCESS;
+			return ActionResultType.SUCCESS;
 		}
 
-		return EnumActionResult.PASS;
+		return ActionResultType.PASS;
 	}
     
 }
