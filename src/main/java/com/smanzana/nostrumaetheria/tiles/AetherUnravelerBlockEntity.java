@@ -11,14 +11,14 @@ import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
 import com.smanzana.nostrumaetheria.recipes.UnravelerRecipeManager;
 
 import net.minecraft.block.state.BlockState;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -291,8 +291,8 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 		NonNullList<ItemStack> items = recipe.unravel(stack);
 		if (items != null && items.size() > 0) {
 			for (ItemStack item : items) {
-				EntityItem ent = new EntityItem(world, pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5, item);
-				world.spawnEntity(ent);
+				ItemEntity ent = new ItemEntity(world, pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5, item);
+				world.addEntity(ent);
 			}
 		}
 		
@@ -300,7 +300,7 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 		double x = pos.getX() + .5;
 		double y = pos.getY() + 1.2;
 		double z = pos.getZ() + .5;
-		((WorldServer) world).spawnParticle(EnumParticleTypes.CRIT_MAGIC,
+		((WorldServer) world).spawnParticle(ParticleTypes.CRIT_MAGIC,
 				x,
 				y,
 				z,
@@ -362,7 +362,7 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 			}
 			
 			if (aetherTick != on) {
-				world.setBlockState(pos, AetherUnravelerBlock.instance().getDefaultState().withProperty(AetherUnravelerBlock.ON, aetherTick));
+				world.setBlockState(pos, AetherUnravelerBlock.instance().getDefaultState().with(AetherUnravelerBlock.ON, aetherTick));
 			}
 			
 			on = aetherTick;

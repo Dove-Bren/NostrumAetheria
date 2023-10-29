@@ -13,7 +13,7 @@ import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
-import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
+import com.smanzana.nostrumaetheria.blocks.InfiniteAetherBlock;
 import com.smanzana.nostrumaetheria.entities.EntityAetherBatteryMinecart;
 import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
 import com.smanzana.nostrumaetheria.items.ActivePendant;
@@ -128,7 +128,7 @@ public class CommonProxy {
     	APIProxy.AetherBatteryMinecartItem = AetherBatteryMinecartItem.instance();
     	
     	// Blocks
-    	registerBlockItem(InfineAetherBlock.instance(), InfineAetherBlock.ID, registry);
+    	registerBlockItem(InfiniteAetherBlock.instance(), InfiniteAetherBlock.ID, registry);
     	for (AetherBatteryBlock block : new AetherBatteryBlock[]{
     			AetherBatteryBlock.small(),
     			AetherBatteryBlock.medium(),
@@ -192,8 +192,8 @@ public class CommonProxy {
     public void registerBlocks(RegistryEvent.Register<Block> event) {
 		final IForgeRegistry<Block> registry = event.getRegistry();
 		
-    	registerBlock(InfineAetherBlock.instance(), InfineAetherBlock.ID, registry);
-    	APIProxy.InfiniteAetherBlock = InfineAetherBlock.instance();
+    	registerBlock(InfiniteAetherBlock.instance(), InfiniteAetherBlock.ID, registry);
+    	APIProxy.InfiniteAetherBlock = InfiniteAetherBlock.instance();
     	
     	for (AetherBatteryBlock block : new AetherBatteryBlock[]{
     			AetherBatteryBlock.small(),
@@ -237,18 +237,8 @@ public class CommonProxy {
     	registerTileEntities();
     }
     
-    private void registerTileEntities() {
-    	GameRegistry.registerTileEntity(AetherRelayEntity.class, new ResourceLocation(NostrumAetheria.MODID, "aether_relay_te"));
-    	GameRegistry.registerTileEntity(InfiniteAetherBlockEntity.class, new ResourceLocation(NostrumAetheria.MODID, "infinite_aether_block_te"));
-    	GameRegistry.registerTileEntity(AetherBatteryEntity.class, new ResourceLocation(NostrumAetheria.MODID, "aether_battery_te"));
-    	GameRegistry.registerTileEntity(AetherFurnaceBlockEntity.class, new ResourceLocation(NostrumAetheria.MODID, "aether_furnace_block_te"));
-    	GameRegistry.registerTileEntity(AetherBoilerBlockEntity.class, new ResourceLocation(NostrumAetheria.MODID, "aether_boiler_block_te"));
-    	GameRegistry.registerTileEntity(AetherBathTileEntity.class, new ResourceLocation(NostrumAetheria.MODID, "nostrum_aether_altar_te"));
-    	GameRegistry.registerTileEntity(AetherChargerBlockEntity.class, new ResourceLocation(NostrumAetheria.MODID, "aether_charger_te"));
-    	GameRegistry.registerTileEntity(AetherRepairerBlockEntity.class, new ResourceLocation(NostrumAetheria.MODID, "aether_repairer_te"));
-    	GameRegistry.registerTileEntity(AetherUnravelerBlockEntity.class, new ResourceLocation(NostrumAetheria.MODID, "aether_unraveler_te"));
-    	GameRegistry.registerTileEntity(AetherPumpBlockEntity.class, new ResourceLocation(NostrumAetheria.MODID, "aether_pump_te"));
-    }
+    //private void registerTileEntities() {
+ //   }
     
     @SubscribeEvent
     public void registerEntities(RegistryEvent.Register<EntityEntry> event) {

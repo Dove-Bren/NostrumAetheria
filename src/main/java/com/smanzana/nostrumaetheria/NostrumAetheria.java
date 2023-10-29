@@ -6,7 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
-import com.smanzana.nostrumaetheria.blocks.InfineAetherBlock;
+import com.smanzana.nostrumaetheria.blocks.InfiniteAetherBlock;
 import com.smanzana.nostrumaetheria.items.AetherGem;
 import com.smanzana.nostrumaetheria.proxy.AetheriaAPIProxy;
 import com.smanzana.nostrumaetheria.proxy.ClientProxy;
@@ -44,7 +44,7 @@ public class NostrumAetheria
 	    	@Override
 	    	@OnlyIn(Dist.CLIENT)
 	        public ItemStack createIcon(){
-	    		return new ItemStack(InfineAetherBlock.instance());
+	    		return new ItemStack(InfiniteAetherBlock.instance());
 	        }
 	    };
 	    //InfineAetherBlock.instance().setCreativeTab(APIProxy.creativeTab);

@@ -16,95 +16,63 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particles.ParticleTypes;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 
-public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged {
+public class AetherUnravelerBlock extends Block implements ILoreTagged {
 	
-	public static final PropertyBool ON = PropertyBool.create("on");
+	public static final BooleanProperty ON = BooleanProperty.create("on");
 	public static final String ID = "aether_unraveler";
-	
-	
-	private static AetherUnravelerBlock instance = null;
-	public static AetherUnravelerBlock instance() {
-		if (instance == null)
-			instance = new AetherUnravelerBlock();
-		
-		return instance;
-	}
 	
 	public static void initDefaultRecipes() {
 		APIProxy.addUnravelerRecipe(new ScrollUnravelerRecipe());
 	}
 	
 	public AetherUnravelerBlock() {
-		super(Material.ROCK, MapColor.OBSIDIAN);
-		this.setUnlocalizedName(ID);
-		this.setHardness(3.0f);
-		this.setResistance(10.0f);
-		this.setCreativeTab(APIProxy.creativeTab);
-		this.setSoundType(SoundType.STONE);
-		this.setHarvestLevel("pickaxe", 0);
+		super(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(3.0f, 10.0f)
+				.sound(SoundType.STONE)
+				.harvestTool(ToolType.PICKAXE)
+				);
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, ON);
-	}
-	
-	private static boolean onFromMeta(int meta) {
-		return (meta & 1) == 1;
-	}
-	
-	private static int metaFromOn(boolean on) {
-		return (on ? 1 : 0);
-	}
-	
-	@Override
-	public BlockState getStateFromMeta(int meta) {
-		return getDefaultState()
-				.withProperty(ON, onFromMeta(meta));
-	}
-	
-	@Override
-	public int getMetaFromState(BlockState state) {
-		return metaFromOn(state.getValue(ON));
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(ON);
 	}
 	
 	public boolean getFurnaceOn(BlockState state) {
-		return state.getValue(ON);
+		return state.get(ON);
 	}
 	
-	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-		return true;
-	}
+//	@Override
+//	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+//		return true;
+//	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (!worldIn.isRemote) {
 			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherUnravelerID, worldIn, pos.getX(), pos.getY(), pos.getZ());
 			return true;
@@ -114,36 +82,27 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new AetherUnravelerBlockEntity();
 	}
 	
+	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+		TileEntity tileentity = worldIn.getTileEntity(pos);
+		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+	}
+	
 	@Override
-	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer, Hand hand) {
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		return this.getDefaultState()
-				.withProperty(ON, false);
+				.with(ON, false);
 	}
 	
 	@Override
-	public int damageDropped(BlockState state) {
-		return 0;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
-		super.getSubBlocks(tab, list);
-	}
-	
-	@Override
-	public EnumBlockRenderType getRenderType(BlockState state) {
-		return EnumBlockRenderType.MODEL;
-	}
-	
-	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
-		destroy(world, pos, state);
-		super.breakBlock(world, pos, state);
+	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (state.getBlock() != newState.getBlock()) {
+			destroy(world, pos, state);
+			world.removeTileEntity(pos);
+		}
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
@@ -154,10 +113,10 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 		AetherUnravelerBlockEntity furnace = (AetherUnravelerBlockEntity) ent;
 		for (int i = 0; i < furnace.getSizeInventory(); i++) {
 			if (furnace.getStackInSlot(i) != null) {
-				EntityItem item = new EntityItem(
+				ItemEntity item = new ItemEntity(
 						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
 						furnace.removeStackFromSlot(i));
-				world.spawnEntity(item);
+				world.addEntity(item);
 			}
 		}
 		
@@ -165,16 +124,16 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
-		if (null == stateIn || !stateIn.getValue(ON))
+	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		if (null == stateIn || !stateIn.get(ON))
 			return;
 		
 		double d0 = (double)pos.getX() + 0.5D;
 		double d1 = (double)pos.getY() + 1.2D;
 		double d2 = (double)pos.getZ() + 0.5D;
 		
-		worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
-		worldIn.spawnParticle(EnumParticleTypes.CRIT_MAGIC, d0, d1, d2, (rand.nextFloat() - .5) * .2, .75, (rand.nextFloat() - .5) * .2, new int[0]);
+		worldIn.addParticle(ParticleTypes.SMOKE, d0, d1, d2, 0.0D, 0.0D, 0.0D);
+		worldIn.addParticle(ParticleTypes.WITCH, d0, d1, d2, (rand.nextFloat() - .5) * .2, .75, (rand.nextFloat() - .5) * .2);
 		
 		if (rand.nextFloat() < .1f) {
 			worldIn.playSound((double)pos.getX() + 0.5D, (double)pos.getY(), (double)pos.getZ() + 0.5D, SoundEvents.BLOCK_WATER_AMBIENT, SoundCategory.BLOCKS, 1.0F, 0.25F, false);
@@ -241,7 +200,7 @@ public class AetherUnravelerBlock extends BlockContainer implements ILoreTagged 
 			NonNullList<ItemStack> runes = NonNullList.create();
 			for (SpellPart part : parts) {
 				runes.clear();
-				runes = SpellRune.decomposeRune(SpellRune.getRune(part, 1), runes);
+				runes = SpellRune.decomposeRune(SpellRune.getRune(part), runes);
 				
 //				if (part.isTrigger()) {
 //					SpellTrigger trigger = part.getTrigger();

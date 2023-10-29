@@ -241,7 +241,7 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 			}
 			
 			if (aetherTick != on) {
-				world.setBlockState(pos, AetherRepairerBlock.instance().getDefaultState().withProperty(AetherRepairerBlock.ON, aetherTick));
+				world.setBlockState(pos, AetherRepairerBlock.instance().getDefaultState().with(AetherRepairerBlock.ON, aetherTick));
 			}
 			
 			on = aetherTick;

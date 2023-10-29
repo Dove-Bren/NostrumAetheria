@@ -22,19 +22,6 @@ import net.minecraft.world.World;
 public abstract class APIProxy {
 	
     public static ItemGroup creativeTab;
-	public static Block InfiniteAetherBlock = null;
-	public static Block AetherBatterySmallBlock = null;
-	public static Block AetherBatteryMediumBlock = null;
-	public static Block AetherBatteryLargeBlock = null;
-	public static Block AetherBatteryGiantBlock = null;
-	public static Block AetherRelay = null;
-	public static Block AetherFurnaceBlock = null;
-	public static Block AetherBoilerBlock = null;
-	public static Block AetherBathBlock = null;
-	public static Block AetherChargerBlock = null;
-	public static Block AetherRepairerBlock = null;
-	public static Block AetherUnravelerBlock = null;
-	public static Block AetherPumpBlock = null;
 	
 	public static Class<? extends Entity> AetherBatteryMinecart = null;
 	

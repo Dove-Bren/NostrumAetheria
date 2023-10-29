@@ -2,104 +2,72 @@ package com.smanzana.nostrumaetheria.blocks;
 
 import java.util.Random;
 
-import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.tiles.AetherPumpBlockEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 
-public class AetherPumpBlock extends BlockContainer implements ILoreTagged {
+public class AetherPumpBlock extends Block implements ILoreTagged {
 	
-	public static final PropertyDirection FACING = PropertyDirection.create("facing");
+	public static final DirectionProperty FACING = DirectionProperty.create("facing");
 	public static final String ID = "aether_pump";
 	
-	private static final double BBWIDTH = 1.0/4.0;
-	protected static final AxisAlignedBB PUMP_AABBS[] = new AxisAlignedBB[] {
-			new AxisAlignedBB(.5 - BBWIDTH, 0, .5 - BBWIDTH, .5 + BBWIDTH, 1, .5 + BBWIDTH), //down
-			new AxisAlignedBB(.5 - BBWIDTH, 0, .5 - BBWIDTH, .5 + BBWIDTH, 1, .5 + BBWIDTH), //up
-			new AxisAlignedBB(.5 - BBWIDTH, .5 - BBWIDTH, 0, .5 + BBWIDTH, .5 + BBWIDTH, 1), //north
-			new AxisAlignedBB(.5 - BBWIDTH, .5 - BBWIDTH, 0, .5 + BBWIDTH, .5 + BBWIDTH, 1), //south
-			new AxisAlignedBB(0, .5 - BBWIDTH, .5 - BBWIDTH, 1, .5 + BBWIDTH, .5 + BBWIDTH), //east
-			new AxisAlignedBB(0, .5 - BBWIDTH, .5 - BBWIDTH, 1, .5 + BBWIDTH, .5 + BBWIDTH), //west
+	private static final double BBWIDTH = 4.0/16.0;
+	protected static final VoxelShape PUMP_AABBS[] = new VoxelShape[] {
+			Block.makeCuboidShape(8 - BBWIDTH, 0, 8 - BBWIDTH, 8 + BBWIDTH, 16, 8 + BBWIDTH), //down
+			Block.makeCuboidShape(8 - BBWIDTH, 0, 8 - BBWIDTH, 8 + BBWIDTH, 16, 8 + BBWIDTH), //up
+			Block.makeCuboidShape(8 - BBWIDTH, 8 - BBWIDTH, 0, 8 + BBWIDTH, 8 + BBWIDTH, 16), //north
+			Block.makeCuboidShape(8 - BBWIDTH, 8 - BBWIDTH, 0, 8 + BBWIDTH, 8 + BBWIDTH, 16), //south
+			Block.makeCuboidShape(0, 8 - BBWIDTH, 8 - BBWIDTH, 16, 8 + BBWIDTH, 8 + BBWIDTH), //east
+			Block.makeCuboidShape(0, 8 - BBWIDTH, 8 - BBWIDTH, 16, 8 + BBWIDTH, 8 + BBWIDTH), //west
 	};
 	
-	private static AetherPumpBlock instance = null;
-	public static AetherPumpBlock instance() {
-		if (instance == null)
-			instance = new AetherPumpBlock();
-		
-		return instance;
-	}
-	
 	public AetherPumpBlock() {
-		super(Material.ROCK, MapColor.OBSIDIAN);
-		this.setUnlocalizedName(ID);
-		this.setHardness(1.0f);
-		this.setResistance(10.0f);
-		this.setCreativeTab(APIProxy.creativeTab);
-		this.setSoundType(SoundType.STONE);
-		this.setHarvestLevel("pickaxe", 0);
+		super(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(1.0f, 10.0f)
+				.sound(SoundType.STONE)
+				.harvestTool(ToolType.PICKAXE)
+				);
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, FACING);
-	}
-	
-	private static Direction facingFromMeta(int meta) {
-		return Direction.VALUES[meta % Direction.VALUES.length];
-	}
-	
-	private static int metaFromFacing(Direction facing) {
-		return facing.ordinal();
-	}
-	
-	@Override
-	public BlockState getStateFromMeta(int meta) {
-		return getDefaultState()
-				.withProperty(FACING, facingFromMeta(meta));
-	}
-	
-	@Override
-	public int getMetaFromState(BlockState state) {
-		return metaFromFacing(state.getValue(FACING));
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(FACING);
 	}
 	
 	public Direction getFacing(BlockState state) {
-		return state.getValue(FACING);
+		return state.get(FACING);
 	}
 	
-	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-		return true;
-	}
+//	@Override
+//	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+//		return true;
+//	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 //		if (!worldIn.isRemote) {
 //			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherChargerID, worldIn, pos.getX(), pos.getY(), pos.getZ());
 //			return true;
@@ -109,29 +77,18 @@ public class AetherPumpBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new AetherPumpBlockEntity();
 	}
 	
-	@Override
-	public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, LivingEntity placer, Hand hand) {
-		return this.getDefaultState().withProperty(FACING, Direction.getDirectionFromEntityLiving(pos, placer));
+	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+		TileEntity tileentity = worldIn.getTileEntity(pos);
+		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
 	}
 	
 	@Override
-	public int damageDropped(BlockState state) {
-		return 0;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
-		super.getSubBlocks(tab, list);
-	}
-	
-	@Override
-	public EnumBlockRenderType getRenderType(BlockState state) {
-		return EnumBlockRenderType.MODEL;
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
+		return this.getDefaultState().with(FACING, context.getNearestLookingDirection());
 	}
 	
 //	@Override
@@ -144,53 +101,42 @@ public class AetherPumpBlock extends BlockContainer implements ILoreTagged {
 //		return false;
 //	}
 	
-	@Override
-	public boolean isFullBlock(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isOpaqueCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isFullCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
-		return BlockRenderLayer.CUTOUT;
-	}
+//	@Override
+//	public boolean isFullBlock(BlockState state) {
+//		return false;
+//	}
+//	
+//	@Override
+//	public boolean isOpaqueCube(BlockState state) {
+//		return false;
+//	}
+//	
+//	@Override
+//	public boolean isFullCube(BlockState state) {
+//		return false;
+//	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean isTranslucent(BlockState state) {
-		return true;
+	public BlockRenderLayer getRenderLayer() {
+		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
 	
-	@Override
-	public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-		return PUMP_AABBS[blockState.getValue(FACING).ordinal()];
-	}
+//	@Override
+//	@OnlyIn(Dist.CLIENT)
+//	public boolean isTranslucent(BlockState state) {
+//		return true;
+//	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
-		return PUMP_AABBS[state.getValue(FACING).ordinal()];
-	}
-	
-	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
-		world.removeTileEntity(pos);
-		super.breakBlock(world, pos, state);
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		return PUMP_AABBS[state.get(FACING).ordinal()];
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
-		super.randomDisplayTick(stateIn, worldIn, pos, rand);
+	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		super.animateTick(stateIn, worldIn, pos, rand);
 	}
 	
 	@Override

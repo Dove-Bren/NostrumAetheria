@@ -192,7 +192,7 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	@Override
 	protected void onBurningChange(boolean newBurning) {
 		BlockState state = world.getBlockState(pos);
-		world.setBlockState(pos, AetherBoilerBlock.instance().getDefaultState().withProperty(AetherBoilerBlock.ON, newBurning).withProperty(AetherBoilerBlock.FACING, state.getValue(AetherBoilerBlock.FACING)));
+		world.setBlockState(pos, AetherBoilerBlock.instance().getDefaultState().with(AetherBoilerBlock.ON, newBurning).with(AetherBoilerBlock.FACING, state.getValue(AetherBoilerBlock.FACING)));
 	}
 	
 	@Override

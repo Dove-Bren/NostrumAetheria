@@ -92,7 +92,7 @@ public class AetherChargerBlockEntity extends AetherBathTileEntity {
 		if (!world.isRemote && this.ticksExisted % 5 == 0) {
 			if (aetherTick != on) {
 				BlockState state = world.getBlockState(pos);
-				world.setBlockState(pos, AetherChargerBlock.instance().getDefaultState().withProperty(AetherChargerBlock.ON, aetherTick).withProperty(AetherChargerBlock.FACING, state.getValue(AetherChargerBlock.FACING)));
+				world.setBlockState(pos, AetherChargerBlock.instance().getDefaultState().with(AetherChargerBlock.ON, aetherTick).with(AetherChargerBlock.FACING, state.getValue(AetherChargerBlock.FACING)));
 			}
 			
 			on = aetherTick;

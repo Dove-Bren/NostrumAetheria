@@ -4,61 +4,45 @@ import java.util.Random;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.tiles.AetherBathTileEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class AetherBathBlock extends Block implements ITileEntityProvider, ILoreTagged {
+public class AetherBathBlock extends Block implements ILoreTagged {
 	
 	public static final String ID = "aether_bath";
-	protected static final AxisAlignedBB ALTAR_AABB = new AxisAlignedBB(0.2D, 0.0D, 0.2D, 0.8D, 0.9D, 0.8D);
-	
-	private static AetherBathBlock instance = null;
-	public static AetherBathBlock instance() {
-		if (instance == null)
-			instance = new AetherBathBlock();
-		
-		return instance;
-	}
+	protected static final VoxelShape ALTAR_AABB = Block.makeCuboidShape(3.2D, 0.0D, 3.2D, 12.8D, 14.4D, 12.8D);
 	
 	public AetherBathBlock() {
-		super(Material.ROCK, MapColor.OBSIDIAN);
-		this.setUnlocalizedName(ID);
-		this.setHardness(3.5f);
-		this.setResistance(10.0f);
-		this.setCreativeTab(APIProxy.creativeTab);
-		this.setSoundType(SoundType.STONE);
-		
-		this.hasTileEntity = true;
-		this.setLightOpacity(1);
-		this.setTickRandomly(true);
+		super(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(3.5f, 10.0f)
+				.sound(SoundType.STONE)
+				.lightValue(1)
+				);
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		return ALTAR_AABB;
 	}
 	
@@ -67,62 +51,51 @@ public class AetherBathBlock extends Block implements ITileEntityProvider, ILore
 //		return false;
 //	}
 	
-	@Override
-	public boolean isOpaqueCube(BlockState state) {
-		return false;
-	}
+//	@Override
+//	public boolean isOpaqueCube(BlockState state) {
+//		return false;
+//	}
+//	
+//	@Override
+//	public boolean isFullCube(BlockState state) {
+//        return false;
+//    }
+	
+//	@Override
+//	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+//		return true;
+//	}
+//	
+//	@Override
+//	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+//		return false;
+//	}
 	
 	@Override
-	public boolean isFullCube(BlockState state) {
-        return false;
-    }
-	
-	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-		return true;
-	}
-	
-	@Override
-	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
-		return false;
-	}
-	
-	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		AetherBathTileEntity ent = new AetherBathTileEntity();
 		
 		return ent;
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
-//		EntityItem item = new EntityItem(world,
-//				pos.getX() + .5,
-//				pos.getY() + .5,
-//				pos.getZ() + .5,
-//				new ItemStack(AltarItem.instance()));
-//		world.spawnEntity(item);
-		
-		TileEntity te = world.getTileEntity(pos);
-		if (te != null) {
-			AetherBathTileEntity altar = (AetherBathTileEntity) te;
-			if (!altar.getItem().isEmpty()) {
-				EntityItem item = new EntityItem(world,
-						pos.getX() + .5,
-						pos.getY() + .5,
-						pos.getZ() + .5,
-						altar.getItem());
-				world.spawnEntity(item);
+	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (state.getBlock() != newState.getBlock()) {
+			TileEntity te = world.getTileEntity(pos);
+			if (te != null) {
+				AetherBathTileEntity altar = (AetherBathTileEntity) te;
+				if (!altar.getItem().isEmpty()) {
+					ItemEntity item = new ItemEntity(world,
+							pos.getX() + .5,
+							pos.getY() + .5,
+							pos.getZ() + .5,
+							altar.getItem());
+					world.addEntity(item);
+				}
 			}
+			
+	        world.removeTileEntity(pos);
 		}
-		
-        world.removeTileEntity(pos);
-		super.breakBlock(world, pos, state);
-	}
-	
-	@Override
-	public Item getItemDropped(BlockState state, Random rand, int fortune) {
-		return super.getItemDropped(state, rand, fortune);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -134,7 +107,7 @@ public class AetherBathBlock extends Block implements ITileEntityProvider, ILore
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
 		if (worldIn.isRemote) {
 			return true;
 		}
@@ -143,22 +116,22 @@ public class AetherBathBlock extends Block implements ITileEntityProvider, ILore
 		if (te == null)
 			return false;
 		
-		final @Nonnull ItemStack heldItem = playerIn.getHeldItem(hand);
+		final @Nonnull ItemStack heldItem = player.getHeldItem(hand);
 		
 		AetherBathTileEntity altar = (AetherBathTileEntity) te;
 		if (altar.getItem().isEmpty()) {
 			// Accepting items
 			if (!heldItem.isEmpty() && altar.isItemValidForSlot(0, heldItem)) {
-				altar.setItem(heldItem.splitStack(1));
+				altar.setItem(heldItem.split(1));
 				return true;
 			} else
 				return false;
 		} else {
 			// Has an item
 			if (heldItem.isEmpty()) {
-				if (!playerIn.inventory.addItemStackToInventory(altar.getItem())) {
-					worldIn.spawnEntity(
-							new EntityItem(worldIn,
+				if (!player.inventory.addItemStackToInventory(altar.getItem())) {
+					worldIn.addEntity(
+							new ItemEntity(worldIn,
 									pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5,
 									altar.getItem())
 							);
@@ -173,8 +146,8 @@ public class AetherBathBlock extends Block implements ITileEntityProvider, ILore
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
-		super.randomDisplayTick(stateIn, worldIn, pos, rand);
+	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		super.animateTick(stateIn, worldIn, pos, rand);
 		
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null) {
@@ -182,14 +155,9 @@ public class AetherBathBlock extends Block implements ITileEntityProvider, ILore
 		}
 		AetherBathTileEntity altar = (AetherBathTileEntity) te;
 		if (!altar.getItem().isEmpty() && !altar.heldItemFull()) {
-			worldIn.spawnParticle(EnumParticleTypes.ENCHANTMENT_TABLE, pos.getX() + .5, pos.getY() + 1.5, pos.getZ() + .5,
-					2 * rand.nextFloat() - .5f, 0, 2 * rand.nextFloat() - .5f, new int[0]);
+			worldIn.addParticle(ParticleTypes.ENCHANT, pos.getX() + .5, pos.getY() + 1.5, pos.getZ() + .5,
+					2 * rand.nextFloat() - .5f, 0, 2 * rand.nextFloat() - .5f);
 		}
-	}
-	
-	@Override
-	public void updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
-		super.updateTick(worldIn, pos, state, rand);
 	}
 	
 	@Override

@@ -1,105 +1,67 @@
 package com.smanzana.nostrumaetheria.blocks;
 
-import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class AetherBatteryBlock extends BlockContainer implements ILoreTagged {
+public class AetherBatteryBlock extends Block implements ILoreTagged {
 	
 	public static enum Size {
-		SMALL("aether_battery_small", 1000),
-		MEDIUM("aether_battery_medium", 3000),
-		LARGE("aether_battery_large", 10000),
-		GIANT("aether_battery_giant", 50000);
+		SMALL(1000),
+		MEDIUM(3000),
+		LARGE(10000),
+		GIANT(50000);
 		
-		public final String ID;
 		public final int capacity;
 		
-		private Size(String id, int capacity) {
-			ID = id;
+		private Size(int capacity) {
 			this.capacity = capacity;
 		}
 	}
 	
-	private static AetherBatteryBlock small = null;
-	private static AetherBatteryBlock medium = null;
-	private static AetherBatteryBlock large = null;
-	private static AetherBatteryBlock giant = null;
-	
-	public static AetherBatteryBlock small() {
-		if (small == null)
-			small = new AetherBatteryBlock(Size.SMALL);
-		
-		return small;
-	}
-	
-	public static AetherBatteryBlock medium() {
-		if (medium == null)
-			medium = new AetherBatteryBlock(Size.MEDIUM);
-		
-		return medium;
-	}
-	
-	public static AetherBatteryBlock large() {
-		if (large == null)
-			large = new AetherBatteryBlock(Size.LARGE);
-		
-		return large;
-	}
-	
-	public static AetherBatteryBlock giant() {
-		if (giant == null)
-			giant = new AetherBatteryBlock(Size.GIANT);
-		
-		return giant;
-	}
+	protected static final String ID_PREFIX = "aether_battery_";
+	public static final String ID_SMALL = ID_PREFIX + "small";
+	public static final String ID_MEDIUM = ID_PREFIX + "medium";
+	public static final String ID_LARGE = ID_PREFIX + "large";
+	public static final String ID_GIANT = ID_PREFIX + "giant";
 	
 	private final Size size;
 	
-	private AetherBatteryBlock(Size size) {
-		super(Material.ROCK, MapColor.OBSIDIAN);
+	public AetherBatteryBlock(Size size) {
+		super(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(3.0f, 10.0f)
+				.sound(SoundType.GLASS)
+				);
+		
 		this.size = size;
-		this.setUnlocalizedName(size.ID);
-		this.setHardness(3.0f);
-		this.setResistance(10.0f);
-		this.setCreativeTab(APIProxy.creativeTab);
-		this.setSoundType(SoundType.GLASS);
-		this.setHarvestLevel("axe", 0);
 	}
 	
-	public String getID() {
-		return size.ID;
-	}
+//	@Override
+//	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
+//		return true;
+//	}
 	
 	@Override
-	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-		return true;
-	}
-	
-	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
 		if (!worldIn.isRemote) {
-			// r equest an update
+			// request an update
 			worldIn.notifyBlockUpdate(pos, worldIn.getBlockState(pos), worldIn.getBlockState(pos), 2);
 		}
 		
@@ -107,51 +69,53 @@ public class AetherBatteryBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new AetherBatteryEntity(size);
 	}
 	
-	@Override
-	public EnumBlockRenderType getRenderType(BlockState state) {
-		return EnumBlockRenderType.MODEL;
+	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+		TileEntity tileentity = worldIn.getTileEntity(pos);
+		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public boolean isTranslucent(BlockState state) {
-		return true;
-	}
+//	@Override
+//	@OnlyIn(Dist.CLIENT)
+//	public boolean isTranslucent(BlockState state) {
+//		return true;
+//	}
 	
 //	@Override
 //	public boolean isFullyOpaque(BlockState state) {
 //		return false;
 //	}
 	
-	@Override
-	public boolean isFullBlock(BlockState state) {
-		return false;
-	}
+//	@Override
+//	public boolean isFullBlock(BlockState state) {
+//		return false;
+//	}
+//	
+//	@Override
+//	public boolean isOpaqueCube(BlockState state) {
+//		return false;
+//	}
+//	
+//	@Override
+//	public boolean isFullCube(BlockState state) {
+//		return false;
+//	}
 	
 	@Override
-	public boolean isOpaqueCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isFullCube(BlockState state) {
-		return false;
-	}
-	
-	@Override
-	public void breakBlock(World world, BlockPos pos, BlockState state) {
-		destroy(world, pos, state);
-		super.breakBlock(world, pos, state);
+	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (state.getBlock() != newState.getBlock()) {
+			destroy(world, pos, state);
+			world.removeTileEntity(pos);
+		}
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
@@ -162,10 +126,10 @@ public class AetherBatteryBlock extends BlockContainer implements ILoreTagged {
 //		AetherBlockEntity table = (AetherBlockEntity) ent;
 //		for (int i = 0; i < table.getSizeInventory(); i++) {
 //			if (table.getStackInSlot(i) != null) {
-//				EntityItem item = new EntityItem(
+//				ItemEntity item = new ItemEntity(
 //						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
 //						table.removeStackFromSlot(i));
-//				world.spawnEntity(item);
+//				world.addEntity(item);
 //			}
 //		}
 		
