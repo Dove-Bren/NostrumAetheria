@@ -1,7 +1,9 @@
 package com.smanzana.nostrumaetheria.tiles;
 
+import com.smanzana.nostrumaetheria.NostrumAetheria;
+import com.smanzana.nostrumaetheria.blocks.AetherInfuser;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
-import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrumaetheria.blocks.WispBlock;
 
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.event.RegistryEvent;
@@ -10,8 +12,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
-@Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-@ObjectHolder(NostrumMagica.MODID)
+@Mod.EventBusSubscriber(modid = NostrumAetheria.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@ObjectHolder(NostrumAetheria.MODID)
 public class AetheriaTileEntities {
 
 	private static final String ID_BATH = "nostrum_aether_altar_te";
@@ -24,6 +26,8 @@ public class AetheriaTileEntities {
 	private static final String ID_REPAIRER = "aether_repairer_te";
 	private static final String ID_UNRAVELER = "aether_unraveler_te";	
 	private static final String ID_INFINITE = "infinite_aether_block_te";
+	private static final String ID_WISPBLOCK = WispBlock.ID + "_entity";
+	private static final String ID_INFUSER = AetherInfuser.ID + "_entity";
 
 	@ObjectHolder(ID_BATH) public static TileEntityType<AetherBathTileEntity> Bath;
 	@ObjectHolder(ID_BATTERY) public static TileEntityType<AetherBatteryEntity> Battery;
@@ -35,6 +39,8 @@ public class AetheriaTileEntities {
 	@ObjectHolder(ID_REPAIRER) public static TileEntityType<AetherRepairerBlockEntity> Repairer;
 	@ObjectHolder(ID_UNRAVELER) public static TileEntityType<AetherUnravelerBlockEntity> Unraveler;
 	@ObjectHolder(ID_INFINITE) public static TileEntityType<InfiniteAetherBlockEntity> InfiniteBlock;
+	@ObjectHolder(ID_WISPBLOCK) public static TileEntityType<WispBlockTileEntity> WispBlockEnt;
+	@ObjectHolder(ID_INFUSER) public static TileEntityType<AetherInfuserTileEntity> AetherInfuserEnt;
 	
 	private static void register(IForgeRegistry<TileEntityType<?>> registry, TileEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -54,5 +60,7 @@ public class AetheriaTileEntities {
     	register(registry, TileEntityType.Builder.create(AetherRepairerBlockEntity::new, AetheriaBlocks.repairer).build(null), ID_REPAIRER);
     	register(registry, TileEntityType.Builder.create(AetherUnravelerBlockEntity::new, AetheriaBlocks.unraveler).build(null), ID_UNRAVELER);
     	register(registry, TileEntityType.Builder.create(InfiniteAetherBlockEntity::new, AetheriaBlocks.infiteAetherBlock).build(null), ID_INFINITE);
+    	register(registry, TileEntityType.Builder.create(WispBlockTileEntity::new, AetheriaBlocks.wispBlock).build(null), ID_WISPBLOCK);
+    	register(registry, TileEntityType.Builder.create(AetherInfuserTileEntity::new, AetheriaBlocks.infuser).build(null), ID_INFUSER);
 	}
 }

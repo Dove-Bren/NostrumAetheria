@@ -1,7 +1,7 @@
 package com.smanzana.nostrumaetheria.blocks;
 
+import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.items.AetheriaItems;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
@@ -15,8 +15,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
-@Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-@ObjectHolder(NostrumMagica.MODID)
+@Mod.EventBusSubscriber(modid = NostrumAetheria.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@ObjectHolder(NostrumAetheria.MODID)
 public class AetheriaBlocks {
 	
 	@ObjectHolder(InfiniteAetherBlock.ID) public static InfiniteAetherBlock infiteAetherBlock;
@@ -34,6 +34,8 @@ public class AetheriaBlocks {
 	@ObjectHolder(AetherRepairerBlock.ID) public static AetherRepairerBlock repairer;
 	@ObjectHolder(AetherUnravelerBlock.ID) public static AetherUnravelerBlock unraveler;
 	@ObjectHolder(AetherPumpBlock.ID) public static AetherPumpBlock pump;
+	@ObjectHolder(WispBlock.ID) public static Block wispBlock;
+	@ObjectHolder(AetherInfuser.ID) public static Block infuser;
 
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -64,6 +66,8 @@ public class AetheriaBlocks {
     	registerBlockItem(repairer, repairer.getRegistryName(), registry);
     	registerBlockItem(unraveler, unraveler.getRegistryName(), registry);
     	registerBlockItem(pump, pump.getRegistryName(), registry);
+    	registerBlockItem(wispBlock, wispBlock.getRegistryName(), registry);
+    	registerBlockItem(infuser, infuser.getRegistryName(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -94,5 +98,7 @@ public class AetheriaBlocks {
     	registerBlock(new AetherRepairerBlock(), AetherRepairerBlock.ID, registry);
     	registerBlock(new AetherUnravelerBlock(), AetherUnravelerBlock.ID, registry);
     	registerBlock(new AetherPumpBlock(), AetherPumpBlock.ID, registry);
+    	registerBlock(new WispBlock(), WispBlock.ID, registry);
+    	registerBlock(new AetherInfuser(), AetherInfuser.ID, registry);
 	}
 }

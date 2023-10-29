@@ -31,6 +31,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
 
 public class AetheriaAPIProxy extends APIProxy {
@@ -42,8 +43,9 @@ public class AetheriaAPIProxy extends APIProxy {
 	
 	@Override
 	protected void handleSyncTEAether(AetherTileEntity te) {
-		NetworkHandler.getSyncChannel().sendToAllAround(new AetherTileEntityMessage(te),
-				new TargetPoint(te.getWorld().getDimension().getType(), te.getPos().getX(), te.getPos().getY(), te.getPos().getZ(), 64));
+		NetworkHandler.getSyncChannel().send(PacketDistributor.NEAR.with(() ->
+				new TargetPoint(te.getPos().getX(), te.getPos().getY(), te.getPos().getZ(), 64, te.getWorld().getDimension().getType())),
+				new AetherTileEntityMessage(te));
 	}
 
 	@Override

@@ -12,14 +12,26 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
-@Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-@ObjectHolder(NostrumMagica.MODID)
+@Mod.EventBusSubscriber(modid = NostrumAetheria.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@ObjectHolder(NostrumAetheria.MODID)
 public class AetheriaItems {
 
 	@ObjectHolder(ActivePendant.ID) public static ActivePendant activePendant = null;
 	@ObjectHolder(PassivePendant.ID) public static PassivePendant passivePendant = null;
 	@ObjectHolder(AetherGem.ID) public static AetherGem aetherGem = null;
 	@ObjectHolder(AetherBatteryMinecartItem.ID) public static AetherBatteryMinecartItem aetherBatteryMinecart = null;
+	@ObjectHolder(NostrumAetherResourceItem.ID_GINSENG_FLOWER) public static Item ginsengFlower;
+	@ObjectHolder(NostrumAetherResourceItem.ID_MANDRAKE_FLOWER) public static Item mandrakeFlower;
+	@ObjectHolder(ItemAetherLens.ID_SPREAD) public static Item spreadAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_CHARGE) public static Item chargeAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_GROW) public static Item growAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_SWIFTNESS) public static Item swiftnessAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_ELEVATOR) public static Item elevatorAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_HEAL) public static Item healAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_BORE) public static Item boreAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_BORE_REVERSED) public static Item reversedBoreAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_MANA_REGEN) public static Item manaRegenAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_NO_SPAWN) public static Item noSpawnAetherLens;
 	
 	public static Item.Properties PropBase() {
 		return new Item.Properties()
@@ -53,6 +65,18 @@ public class AetheriaItems {
 		register(registry, new PassivePendant().setRegistryName(PassivePendant.ID));
 		register(registry, new AetherGem().setRegistryName(AetherGem.ID));
 		register(registry, new AetherBatteryMinecartItem().setRegistryName(AetherBatteryMinecartItem.ID));
+		registry.register(new NostrumAetherResourceItem(300, 450, PropBase()).setRegistryName(NostrumAetherResourceItem.ID_GINSENG_FLOWER));
+		registry.register(new NostrumAetherResourceItem(300, 350, PropBase()).setRegistryName(NostrumAetherResourceItem.ID_MANDRAKE_FLOWER));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.SPREAD, PropBase()).setRegistryName(ItemAetherLens.ID_SPREAD));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.CHARGE, PropBase()).setRegistryName(ItemAetherLens.ID_CHARGE));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.GROW, PropBase()).setRegistryName(ItemAetherLens.ID_GROW));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.SWIFTNESS, PropBase()).setRegistryName(ItemAetherLens.ID_SWIFTNESS));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.ELEVATOR, PropBase()).setRegistryName(ItemAetherLens.ID_ELEVATOR));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.HEAL, PropBase()).setRegistryName(ItemAetherLens.ID_HEAL));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.BORE, PropBase()).setRegistryName(ItemAetherLens.ID_BORE));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.BORE_REVERSED, PropBase()).setRegistryName(ItemAetherLens.ID_BORE_REVERSED));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.MANA_REGEN, PropBase()).setRegistryName(ItemAetherLens.ID_MANA_REGEN));
+    	registry.register(new ItemAetherLens(ItemAetherLens.LensType.NO_SPAWN, PropBase()).setRegistryName(ItemAetherLens.ID_NO_SPAWN));
 	}
 	
 }

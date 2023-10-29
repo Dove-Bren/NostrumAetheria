@@ -2,7 +2,8 @@ package com.smanzana.nostrumaetheria.items;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrumaetheria.entities.EntityAetherBatteryMinecart;
+import com.smanzana.nostrumaetheria.entity.AetheriaEntityTypes;
+import com.smanzana.nostrumaetheria.entity.EntityAetherBatteryMinecart;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.minecart.MinecartEntity;
@@ -43,7 +44,7 @@ public class AetherBatteryMinecartItem extends Item {
 			return ActionResultType.FAIL;
 		} else {
 			if(!world.isRemote()) {
-				MinecartEntity entityminecart = new EntityAetherBatteryMinecart(AetheriaEntities.aetherMinecart, world);
+				MinecartEntity entityminecart = new EntityAetherBatteryMinecart(AetheriaEntityTypes.batteryCart, world);
 				entityminecart.setPosition(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
 				if(stack.hasDisplayName()) {
@@ -56,8 +57,6 @@ public class AetherBatteryMinecartItem extends Item {
 			stack.shrink(1);
 			return ActionResultType.SUCCESS;
 		}
-
-		return ActionResultType.PASS;
 	}
     
 }

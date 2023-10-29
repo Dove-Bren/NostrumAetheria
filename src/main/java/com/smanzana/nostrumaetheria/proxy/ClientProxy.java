@@ -16,31 +16,44 @@ import com.smanzana.nostrumaetheria.client.render.AetherBatteryRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherRelayRenderer;
 import com.smanzana.nostrumaetheria.client.render.RenderAetherBatteryMinecart;
 import com.smanzana.nostrumaetheria.client.render.TileEntityAetherDebugRenderer;
-import com.smanzana.nostrumaetheria.entities.EntityAetherBatteryMinecart;
+import com.smanzana.nostrumaetheria.client.render.TileEntityAetherInfuserRenderer;
+import com.smanzana.nostrumaetheria.client.render.TileEntityWispBlockRenderer;
+import com.smanzana.nostrumaetheria.entity.EntityAetherBatteryMinecart;
+import com.smanzana.nostrumaetheria.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrumaetheria.items.ActivePendant;
 import com.smanzana.nostrumaetheria.items.AetherBatteryMinecartItem;
 import com.smanzana.nostrumaetheria.items.AetherGem;
 import com.smanzana.nostrumaetheria.items.PassivePendant;
 import com.smanzana.nostrumaetheria.tiles.AetherBathTileEntity;
 import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity;
 import com.smanzana.nostrumaetheria.tiles.AetherRelayEntity;
 import com.smanzana.nostrumaetheria.tiles.InfiniteAetherBlockEntity;
+import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.IUnbakedModel;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.BasicState;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ClientProxy extends CommonProxy {
 	
@@ -134,6 +147,20 @@ public class ClientProxy extends CommonProxy {
     			new ModelResourceLocation(NostrumAetheria.MODID + ":" + modelName, "inventory"));
 	}
 	
+	@SubscribeEvent
+	public void onModelBake(ModelBakeEvent event) {
+		for (ModelResourceLocation loc : AetherCloakItem.AllCapeModels) {
+			ResourceLocation modelLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + ".obj");
+			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(modelLoc, "Failed to get obj model for " + modelLoc);
+			
+			if (model != null && model instanceof OBJModel) {
+				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+				// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
+				event.getModelRegistry().put(loc, bakedModel);
+			}
+		}
+	}
+	
 	private void registerEntityRenderers() {
 		RenderingRegistry.registerEntityRenderingHandler(EntityAetherBatteryMinecart.class, new IRenderFactory<EntityAetherBatteryMinecart>() {
 			@Override
@@ -152,6 +179,8 @@ public class ClientProxy extends CommonProxy {
 				new AetherBatteryRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(AetherBathTileEntity.class,
 				new AetherBathRenderer());
+		ClientRegistry.bindTileEntitySpecialRenderer(AetherInfuserTileEntity.class, new TileEntityAetherInfuserRenderer());
+		ClientRegistry.bindTileEntitySpecialRenderer(WispBlockTileEntity.class, new TileEntityWispBlockRenderer());
 	}
 
 	@Override

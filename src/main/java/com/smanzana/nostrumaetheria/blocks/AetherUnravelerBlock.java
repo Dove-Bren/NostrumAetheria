@@ -3,6 +3,8 @@ package com.smanzana.nostrumaetheria.blocks;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
@@ -11,6 +13,7 @@ import com.smanzana.nostrumaetheria.tiles.AetherUnravelerBlockEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -47,6 +50,7 @@ public class AetherUnravelerBlock extends Block implements ILoreTagged {
 	
 	public static void initDefaultRecipes() {
 		APIProxy.addUnravelerRecipe(new ScrollUnravelerRecipe());
+		APIProxy.addUnravelerRecipe(new TomeUnravelerRecipe());
 	}
 	
 	public AetherUnravelerBlock() {
@@ -236,4 +240,47 @@ public class AetherUnravelerBlock extends Block implements ILoreTagged {
 		}
 		
 	}
+	
+	protected static class TomeUnravelerRecipe implements IAetherUnravelerRecipe {
+
+		private static final int AETHER_COST = 5000;
+		private static final int DURATION = 20 * 120;
+		
+		@Override
+		public boolean matches(@Nonnull ItemStack stack) {
+			return stack.getItem() instanceof SpellTome && !SpellTome.getSpells(stack).isEmpty();
+		}
+
+		@Override
+		public int getAetherCost(ItemStack stack) {
+			return AETHER_COST;
+		}
+		
+		@Override
+		public int getDuration(ItemStack stack) {
+			return DURATION;
+		}
+
+		@Override
+		public NonNullList<ItemStack> unravel(ItemStack stack) {
+			NonNullList<ItemStack> ret = NonNullList.create();
+			ret.add(stack.copy());
+			
+			List<Spell> spells = SpellTome.getSpells(stack);
+			if (spells == null || spells.isEmpty()) {
+				;
+			} else {
+				for (Spell spell : spells) {
+					ItemStack scroll = SpellScroll.create(spell);
+					ret.add(scroll);
+				}
+			}
+			
+			// Clear tome
+			SpellTome.clearSpells(ret.get(0));
+			
+			return ret;
+		}
+	}
+
 }

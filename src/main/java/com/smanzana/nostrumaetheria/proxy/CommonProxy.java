@@ -3,12 +3,22 @@ package com.smanzana.nostrumaetheria.proxy;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
+import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
+import com.smanzana.nostrumaetheria.items.AetherResourceType;
+import com.smanzana.nostrumaetheria.items.AetheriaItems;
+import com.smanzana.nostrumaetheria.items.ItemAetherLens;
+import com.smanzana.nostrumaetheria.items.ItemAetherLens.LensType;
+import com.smanzana.nostrumaetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
+import com.smanzana.nostrumaetheria.rituals.OutcomeCreateAetherInfuser;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
-import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
+import com.smanzana.nostrummagica.effects.NostrumPotions;
+import com.smanzana.nostrummagica.effects.NostrumPotions.PotionIngredient;
+import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.items.NostrumItemTags;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -28,7 +38,14 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.Potions;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class CommonProxy {
 	
@@ -60,37 +77,37 @@ public class CommonProxy {
     	NostrumResearch.startBuilding()
 			.hiddenParent("rituals")
 			.hiddenParent("thano_pendant")
-			.lore(ThanoPendant.instance())
-			.reference(APIProxy.ActivePendantItem)
+			.lore(NostrumItems.thanoPendant)
+			.reference(AetheriaItems.activePendant)
 			.reference("ritual::active_pendant", "ritual.active_pendant.name")
-		.build("active_pendant", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 0, -1, true, new ItemStack(APIProxy.ActivePendantItem));
+		.build("active_pendant", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 0, -1, true, new ItemStack(AetheriaItems.activePendant));
 	
 		NostrumResearch.startBuilding()
 			.parent("active_pendant")
 			.hiddenParent("aether_bath")
 			.hiddenParent("kani")
-			.lore((ILoreTagged) APIProxy.ActivePendantItem)
+			.lore((ILoreTagged) AetheriaItems.activePendant)
 			.lore(NostrumAetherResourceItem.instance())
-			.reference(APIProxy.PassivePendantItem)
+			.reference(AetheriaItems.passivePendant)
 			.reference("ritual::passive_pendant", "ritual.passive_pendant.name")
-		.build("passive_pendant", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, -1, true, new ItemStack(APIProxy.PassivePendantItem));
+		.build("passive_pendant", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, -1, true, new ItemStack(AetheriaItems.passivePendant));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("active_pendant")
-			.lore((ILoreTagged) APIProxy.ActivePendantItem)
+			.lore((ILoreTagged) AetheriaItems.activePendant)
 			.reference("ritual::aether_furnace_small", "ritual.aether_furnace_small.name")
-		.build("aether_furnace", (NostrumResearchTab) APIProxy.ResearchTab, Size.GIANT, 0, 0, true, new ItemStack(APIProxy.AetherFurnaceBlock));
+		.build("aether_furnace", (NostrumResearchTab) APIProxy.ResearchTab, Size.GIANT, 0, 0, true, new ItemStack(AetheriaBlocks.Furnace));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_furnace")
 			.hiddenParent("aether_boiler")
 			.reference("ritual::aether_furnace_medium", "ritual.aether_furnace_medium.name")
 			.reference("ritual::aether_furnace_large", "ritual.aether_furnace_large.name")
-		.build("aether_furnace_adv", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -1, 1, true, new ItemStack(APIProxy.AetherFurnaceBlock, 1, 2));
+		.build("aether_furnace_adv", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -1, 1, true, new ItemStack(AetheriaBlocks.Furnace, 1, 2));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_furnace")
-			.lore((ILoreTagged) APIProxy.ActivePendantItem)
+			.lore((ILoreTagged) AetheriaItems.activePendant)
 			.reference("ritual::aether_bath", "ritual.aether_bath.name")
 		.build("aether_bath", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 2, 1, true, new ItemStack(APIProxy.AetherBathBlock));
 		
@@ -153,66 +170,86 @@ public class CommonProxy {
 			.reference("ritual::aether_battery_cart", "ritual.aether_battery_cart.name")
 			.reference("ritual::aether_pump", "ritual.aether_pump.name")
 		.build("aether_carts", (NostrumResearchTab) APIProxy.ResearchTab, Size.GIANT, 3, 3, true, new ItemStack(APIProxy.AetherBatteryMinecartItem));
+		
+		NostrumResearch.startBuilding()
+			.hiddenParent("kani")
+			.hiddenParent("aether_battery")
+			.lore(EntityWisp.LoreKey)
+			.reference("ritual::wisp_crystal", "ritual.wisp_crystal.name")
+		.build("wispblock", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -3, 2, true, new ItemStack(BlockWisp));
+		
+		NostrumResearch.startBuilding()
+			.hiddenParent("aether_battery")
+			.parent("aether_charger")
+			.reference("ritual::construct_aether_infuser", "ritual.construct_aether_infuser.name")
+			.reference("ritual::make_lens_spread", "ritual.make_lens_spread.name")
+			.reference("ritual::make_lens_charge", "ritual.make_lens_wide_charge.name")
+			.reference("ritual::make_lens_grow", "ritual.make_lens_grow.name")
+			.reference("ritual::make_lens_heal", "ritual.make_lens_heal.name")
+			.reference("ritual::make_lens_bore", "ritual.make_lens_bore.name")
+			.reference("ritual::make_lens_elevator", "ritual.make_lens_elevator.name")
+			.reference("ritual::make_lens_swiftness", "ritual.make_lens_swiftness.name")
+		.build("aether_infusers", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 0, 2, true, new ItemStack(BlockInfuser));
     }
     
     private void registerRituals() {
     	RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("active_pendant",
-						new ItemStack(APIProxy.ActivePendantItem),
+						new ItemStack(AetheriaItems.activePendant),
 						null,
 						new ReagentType[] {ReagentType.GINSENG, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
 						new ItemStack(ThanoPendant.instance(), 1, OreDictionary.WILDCARD_VALUE),
 						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), InfusedGemItem.instance().getGem(EMagicElement.FIRE, 1), new ItemStack(Blocks.LAPIS_BLOCK, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
 						new RRequirementResearch("active_pendant"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.ActivePendantItem))
+						new OutcomeSpawnItem(new ItemStack(AetheriaItems.activePendant))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("passive_pendant",
-						new ItemStack(APIProxy.PassivePendantItem),
+						new ItemStack(AetheriaItems.passivePendant),
 						null,
 						new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.SKY_ASH},
-						new ItemStack(APIProxy.ActivePendantItem, 1, OreDictionary.WILDCARD_VALUE),
+						new ItemStack(AetheriaItems.activePendant, 1, OreDictionary.WILDCARD_VALUE),
 						new ItemStack[] {NostrumMagica.aetheria.getResourceItem(AetherResourceType.FLOWER_GINSENG, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), NostrumMagica.aetheria.getResourceItem(AetherResourceType.FLOWER_MANDRAKE, 1)},
 						new RRequirementResearch("passive_pendant"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.PassivePendantItem))
+						new OutcomeSpawnItem(new ItemStack(AetheriaItems.passivePendant))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_furnace_small",
-						new ItemStack(APIProxy.AetherFurnaceBlock),
+						new ItemStack(AetheriaBlocks.Furnace),
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH},
 						new ItemStack(Blocks.FURNACE),
 						new ItemStack[] {ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), new ItemStack(Blocks.OBSIDIAN, 1, OreDictionary.WILDCARD_VALUE), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1)},
 						new RRequirementResearch("aether_furnace"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherFurnaceBlock, 1, 0))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.Furnace, 1, 0))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_furnace_medium",
-						new ItemStack(APIProxy.AetherFurnaceBlock, 1, 1),
+						new ItemStack(AetheriaBlocks.Furnace, 1, 1),
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH},
-						new ItemStack(APIProxy.AetherFurnaceBlock, 1, 0),
+						new ItemStack(AetheriaBlocks.Furnace, 1, 0),
 						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), new ItemStack(Blocks.FURNACE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
 						new RRequirementResearch("aether_furnace_adv"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherFurnaceBlock, 1, 1))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.Furnace, 1, 1))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_furnace_large",
-						new ItemStack(APIProxy.AetherFurnaceBlock, 1, 2),
+						new ItemStack(AetheriaBlocks.Furnace, 1, 2),
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH},
-						new ItemStack(APIProxy.AetherFurnaceBlock, 1, 1),
+						new ItemStack(AetheriaBlocks.Furnace, 1, 1),
 						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), new ItemStack(Blocks.FURNACE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
 						new RRequirementResearch("aether_furnace_adv"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherFurnaceBlock, 1, 2))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.Furnace, 1, 2))
 						)
 				);
 		
@@ -221,7 +258,7 @@ public class CommonProxy {
 						new ItemStack(APIProxy.AetherBoilerBlock),
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.BLACK_PEARL},
-						new ItemStack(APIProxy.AetherFurnaceBlock, 1, 0),
+						new ItemStack(AetheriaBlocks.Furnace, 1, 0),
 						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), new ItemStack(Items.IRON_INGOT), new ItemStack(Items.CAULDRON), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
 						new RRequirementResearch("aether_boiler"),
 						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherBoilerBlock))
@@ -371,7 +408,75 @@ public class CommonProxy {
 						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherPumpBlock, 1))
 						)
 				);
+		
+		for (LensType type : LensType.values()) {
+			Ingredient ingredient = type.getIngredient();
+			if (ingredient == Ingredient.EMPTY) {
+				continue;
+			}
+			
+			RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("make_lens_" + type.getUnlocSuffix(),
+						new ItemStack(ItemAetherLens.GetLens(type)),
+						null,
+						new ReagentType[] {ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
+						Ingredient.fromTag(Tags.Items.GLASS_PANES),
+						new Ingredient[] {Ingredient.EMPTY, ingredient, Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.EMPTY},
+						new RRequirementResearch("aether_infusers"),
+						new OutcomeSpawnItem(new ItemStack(ItemAetherLens.GetLens(type)))
+				)
+			);
+		}
+		
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("wisp_crystal",
+						new ItemStack(BlockWisp),
+						null,
+						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
+						Ingredient.fromItems(NostrumItems.altarItem),
+						new Ingredient[] {
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromItems(APIProxy.AetherBatterySmallBlock),
+								Ingredient.fromTag(Tags.Items.OBSIDIAN),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								},
+						new RRequirementResearch("wispblock"),
+						new OutcomeSpawnItem(new ItemStack(BlockWisp))
+						)
+				);
+		
+		RitualRegistry.instance().addRitual(
+				RitualRecipe.createTier3("construct_aether_infuser",
+						new ItemStack(BlockInfuser),
+						null,
+						new ReagentType[] {ReagentType.GINSENG, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
+						Ingredient.fromTag(Tags.Items.OBSIDIAN),
+						new Ingredient[] {
+								Ingredient.fromStacks(new ItemStack(APIProxy.AetherBatterySmallBlock)),
+								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromStacks(new ItemStack(APIProxy.AetherBatterySmallBlock)),
+								Ingredient.fromStacks(new ItemStack(APIProxy.AetherBatterySmallBlock))},
+						new RRequirementResearch("aether_infusers"),
+						new OutcomeCreateAetherInfuser()
+						)
+				);
     }
+    
+    @SubscribeEvent
+	public static void register(RegistryEvent.Register<Potion> event) {
+		registerPotionMixes();
+	}
+	
+	protected static final void registerPotionMixes() {
+		// Mana regen potion
+		BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN_STRONG.getType()),
+    			Ingredient.fromStacks(AetheriaItems.mandrakeFlower),
+    			NostrumPotions.MakePotion(NostrumPotions.MANAREGEN_REALLY_STRONG.getType()));
+		
+		BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN_STRONG.getType()),
+    			Ingredient.fromStacks(AetheriaItems.ginsengFlower),
+    			NostrumPotions.MakePotion(NostrumPotions.MANAREGEN_STRONG_AND_LONG.getType()));
+	}
     
 //    private void registerLore() {
 //    	LoreRegistry.instance().register(AetherBathBlock.instance());

@@ -1,4 +1,4 @@
-package com.smanzana.nostrumaetheria.entities;
+package com.smanzana.nostrumaetheria.entity;
 
 import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
@@ -29,11 +29,11 @@ public class EntityAetherBatteryMinecart extends MinecartEntity {
 	
 	private static final DataParameter<Integer> AETHER = EntityDataManager.createKey(EntityAetherBatteryMinecart.class, DataSerializers.VARINT);
 
-	public EntityAetherBatteryMinecart(EntityType<?> type, World worldIn) {
+	public EntityAetherBatteryMinecart(EntityType<? extends EntityAetherBatteryMinecart> type, World worldIn) {
 		super(type, worldIn);
 	}
 	
-	public EntityAetherBatteryMinecart(EntityType<?> type, World worldIn, double x, double y, double z) {
+	public EntityAetherBatteryMinecart(EntityType<? extends EntityAetherBatteryMinecart> type, World worldIn, double x, double y, double z) {
 		this(type, worldIn);
 		this.setPosition(x, y, z);
 	}
