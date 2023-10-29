@@ -1,49 +1,20 @@
 package com.smanzana.nostrumaetheria.proxy;
 
-import javax.annotation.Nullable;
-
-import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
-import com.smanzana.nostrumaetheria.blocks.AetherBathBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
-import com.smanzana.nostrumaetheria.blocks.InfiniteAetherBlock;
-import com.smanzana.nostrumaetheria.entities.EntityAetherBatteryMinecart;
-import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
-import com.smanzana.nostrumaetheria.items.ActivePendant;
-import com.smanzana.nostrumaetheria.items.AetherBatteryMinecartItem;
-import com.smanzana.nostrumaetheria.items.AetherGem;
-import com.smanzana.nostrumaetheria.items.PassivePendant;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
-import com.smanzana.nostrumaetheria.tiles.AetherBathTileEntity;
-import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
-import com.smanzana.nostrumaetheria.tiles.AetherBoilerBlockEntity;
-import com.smanzana.nostrumaetheria.tiles.AetherChargerBlockEntity;
-import com.smanzana.nostrumaetheria.tiles.AetherFurnaceBlockEntity;
-import com.smanzana.nostrumaetheria.tiles.AetherPumpBlockEntity;
-import com.smanzana.nostrumaetheria.tiles.AetherRelayEntity;
-import com.smanzana.nostrumaetheria.tiles.AetherRepairerBlockEntity;
-import com.smanzana.nostrumaetheria.tiles.AetherUnravelerBlockEntity;
-import com.smanzana.nostrumaetheria.tiles.InfiniteAetherBlockEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
 import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrummagica.items.AltarItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.NostrumResourceItem.ResourceType;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
-import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
@@ -53,24 +24,11 @@ import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import net.minecraft.block.Block;
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.item.Items;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.registry.EntityEntry;
-import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class CommonProxy {
 	
@@ -81,8 +39,6 @@ public class CommonProxy {
 	}
 	
 	public void init() {
-		NetworkRegistry.INSTANCE.registerGuiHandler(NostrumAetheria.instance, new NostrumAetheriaGui());
-
     	this.registerRituals();
     	
     	NostrumMagica.instance.registerResearchReloadHook((i) -> {
@@ -91,7 +47,7 @@ public class CommonProxy {
     	});
     	
 		this.registerResearch();
-		this.registerLore();
+		//this.registerLore();
 	}
 	
 	public void postinit() {
@@ -99,160 +55,6 @@ public class CommonProxy {
 		AetherUnravelerBlock.initDefaultRecipes();
 	}
 	
-	private void registerBlockItem(Block block, String registryName, @Nullable CreativeTabs tab, IForgeRegistry<Item> registry) {
-    	ItemBlock item = new ItemBlock(block);
-    	item.setRegistryName(registryName);
-    	item.setUnlocalizedName(registryName);
-    	item.setCreativeTab(tab == null ? APIProxy.creativeTab : tab);
-    	registry.register(item);
-    }
-	
-	private void registerBlockItem(Block block, String registryName, IForgeRegistry<Item> registry) {
-		registerBlockItem(block, registryName, null, registry);
-    }
-	
-	@SubscribeEvent
-    public void registerItems(RegistryEvent.Register<Item> event) {
-		final IForgeRegistry<Item> registry = event.getRegistry();
-		
-		registry.register(ActivePendant.instance());
-    	APIProxy.ActivePendantItem = ActivePendant.instance();
-    	
-    	registry.register(PassivePendant.instance());
-    	APIProxy.PassivePendantItem = PassivePendant.instance();
-    	
-    	registry.register(AetherGem.instance());
-    	APIProxy.AetherGemItem = AetherGem.instance();
-    	
-    	registry.register(AetherBatteryMinecartItem.instance());
-    	APIProxy.AetherBatteryMinecartItem = AetherBatteryMinecartItem.instance();
-    	
-    	// Blocks
-    	registerBlockItem(InfiniteAetherBlock.instance(), InfiniteAetherBlock.ID, registry);
-    	for (AetherBatteryBlock block : new AetherBatteryBlock[]{
-    			AetherBatteryBlock.small(),
-    			AetherBatteryBlock.medium(),
-    			AetherBatteryBlock.large(),
-    			AetherBatteryBlock.giant()
-    	}) {
-    		registerBlockItem(block, block.getID(), registry);
-    	}
-    	registerBlockItem(AetherRelay.instance(), AetherRelay.ID, registry);
-    	ItemBlock furnaceItem = new ItemBlock(AetherFurnaceBlock.instance()){
-			@Override
-			public String getUnlocalizedName(ItemStack stack) {
-				AetherFurnaceBlock.Type type;
-				try {
-					type = AetherFurnaceBlock.Type.values()[stack.getMetadata()];
-				} catch (Exception e) {
-					type = AetherFurnaceBlock.Type.SMALL;
-				}
-				return "tile." + AetherFurnaceBlock.UnlocalizedForType(type);
-			}
-		};
-    	furnaceItem.setRegistryName(AetherFurnaceBlock.ID)
-				.setCreativeTab(APIProxy.creativeTab)
-				.setUnlocalizedName(AetherFurnaceBlock.ID)
-				.setHasSubtypes(true);
-    	furnaceItem.addPropertyOverride(new ResourceLocation("on"), AetherFurnaceBlock.ON_GETTER);
-    	furnaceItem.addPropertyOverride(new ResourceLocation("size"), AetherFurnaceBlock.SIZE_GETTER);
-    	registry.register(furnaceItem);
-    	registerBlockItem(AetherBoilerBlock.instance(), AetherBoilerBlock.ID, registry);
-    	registerBlockItem(AetherBathBlock.instance(), AetherBathBlock.ID, registry);
-    	registerBlockItem(AetherChargerBlock.instance(), AetherChargerBlock.ID, registry);
-    	registerBlockItem(AetherRepairerBlock.instance(), AetherRepairerBlock.ID, registry);
-    	registerBlockItem(AetherUnravelerBlock.instance(), AetherUnravelerBlock.ID, registry);
-    	registerBlockItem(AetherPumpBlock.instance(), AetherPumpBlock.ID, registry);
-    	
-    	/*
-    	 * String[] subnames = new String[AetherFurnaceBlock.Type.values().length];
-    	int i = 0;
-    	for (AetherFurnaceBlock.Type type : AetherFurnaceBlock.Type.values()) {
-    		subnames[i++] = type.name().toLowerCase();
-    	}
-    	registry.register((new ItemMultiTexture(AetherFurnaceBlock.instance(), AetherFurnaceBlock.instance(), subnames))
-    			.setRegistryName(AetherFurnaceBlock.ID).setCreativeTab(APIProxy.creativeTab));
-    	
-    	registerBlockItem(AetherBoilerBlock.instance(), AetherBoilerBlock.ID, registry);
-    	registerBlockItem(AetherBathBlock.instance(), AetherBathBlock.ID, registry);
-    	registerBlockItem(AetherChargerBlock.instance(), AetherChargerBlock.ID, registry);
-    	registerBlockItem(AetherRepairerBlock.instance(), AetherRepairerBlock.ID, registry);
-    	registerBlockItem(AetherUnravelerBlock.instance(), AetherUnravelerBlock.ID, registry);
-    	registerBlockItem(AetherPumpBlock.instance(), AetherPumpBlock.ID, registry);
-    	 * 
-    	 */
-    }
-	
-	 private void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
-    	block.setRegistryName(registryName);
-    	registry.register(block);
-    }
-    
-    @SubscribeEvent
-    public void registerBlocks(RegistryEvent.Register<Block> event) {
-		final IForgeRegistry<Block> registry = event.getRegistry();
-		
-    	registerBlock(InfiniteAetherBlock.instance(), InfiniteAetherBlock.ID, registry);
-    	APIProxy.InfiniteAetherBlock = InfiniteAetherBlock.instance();
-    	
-    	for (AetherBatteryBlock block : new AetherBatteryBlock[]{
-    			AetherBatteryBlock.small(),
-    			AetherBatteryBlock.medium(),
-    			AetherBatteryBlock.large(),
-    			AetherBatteryBlock.giant()
-    	}) {
-    		registerBlock(block, block.getID(), registry);
-    	}
-    	APIProxy.AetherBatterySmallBlock = AetherBatteryBlock.small();
-    	APIProxy.AetherBatteryMediumBlock = AetherBatteryBlock.medium();
-    	APIProxy.AetherBatteryLargeBlock = AetherBatteryBlock.large();
-    	APIProxy.AetherBatteryGiantBlock = AetherBatteryBlock.giant();
-    	
-    	registerBlock(AetherRelay.instance(), AetherRelay.ID, registry);
-    	APIProxy.AetherRelay = AetherRelay.instance();
-    	
-    	registerBlock(AetherFurnaceBlock.instance(), AetherFurnaceBlock.ID, registry);
-    	APIProxy.AetherFurnaceBlock = AetherFurnaceBlock.instance();
-    	
-    	registerBlock(AetherBoilerBlock.instance(), AetherBoilerBlock.ID, registry);
-    	APIProxy.AetherBoilerBlock = AetherBoilerBlock.instance();
-    	
-    	registerBlock(AetherBathBlock.instance(), AetherBathBlock.ID, registry);
-    	APIProxy.AetherBathBlock = AetherBathBlock.instance();
-    	
-    	
-    	registerBlock(AetherChargerBlock.instance(), AetherChargerBlock.ID, registry);
-    	APIProxy.AetherChargerBlock = AetherChargerBlock.instance();
-    	
-    	
-    	registerBlock(AetherRepairerBlock.instance(), AetherRepairerBlock.ID, registry);
-    	APIProxy.AetherRepairerBlock = AetherRepairerBlock.instance();
-    	
-    	registerBlock(AetherUnravelerBlock.instance(), AetherUnravelerBlock.ID, registry);
-    	APIProxy.AetherUnravelerBlock = AetherUnravelerBlock.instance();
-    	
-    	registerBlock(AetherPumpBlock.instance(), AetherPumpBlock.ID, registry);
-    	APIProxy.AetherPumpBlock = AetherPumpBlock.instance();
-    	
-    	registerTileEntities();
-    }
-    
-    //private void registerTileEntities() {
- //   }
-    
-    @SubscribeEvent
-    public void registerEntities(RegistryEvent.Register<EntityEntry> event) {
-    	final IForgeRegistry<EntityEntry> registry = event.getRegistry();
-    	
-    	int entityID = 0;
-    	registry.register(EntityEntryBuilder.create()
-    			.entity(EntityAetherBatteryMinecart.class)
-    			.id("aether_battery_minecart", entityID++)
-    			.name(NostrumMagica.MODID + ".aether_battery_minecart")
-    			.tracker(128, 1, false)
-    			.build());
-    	APIProxy.AetherBatteryMinecart = EntityAetherBatteryMinecart.class;
-    }
     
     private void registerResearch() {
     	NostrumResearch.startBuilding()
@@ -571,20 +373,20 @@ public class CommonProxy {
 				);
     }
     
-    private void registerLore() {
-    	LoreRegistry.instance().register(AetherBathBlock.instance());
-    	LoreRegistry.instance().register(AetherBatteryBlock.small());
-    	LoreRegistry.instance().register(AetherBoilerBlock.instance());
-    	LoreRegistry.instance().register(AetherChargerBlock.instance());
-    	LoreRegistry.instance().register(AetherFurnaceBlock.instance());
-    	LoreRegistry.instance().register(AetherRelay.instance());
-    	LoreRegistry.instance().register(AetherRepairerBlock.instance());
-    	LoreRegistry.instance().register(ActivePendant.instance());
-    	LoreRegistry.instance().register(PassivePendant.instance());
-    	LoreRegistry.instance().register(AetherGem.instance());
-    	LoreRegistry.instance().register(AetherUnravelerBlock.instance());
-    	LoreRegistry.instance().register(AetherPumpBlock.instance());
-    }
+//    private void registerLore() {
+//    	LoreRegistry.instance().register(AetherBathBlock.instance());
+//    	LoreRegistry.instance().register(AetherBatteryBlock.small());
+//    	LoreRegistry.instance().register(AetherBoilerBlock.instance());
+//    	LoreRegistry.instance().register(AetherChargerBlock.instance());
+//    	LoreRegistry.instance().register(AetherFurnaceBlock.instance());
+//    	LoreRegistry.instance().register(AetherRelay.instance());
+//    	LoreRegistry.instance().register(AetherRepairerBlock.instance());
+//    	LoreRegistry.instance().register(ActivePendant.instance());
+//    	LoreRegistry.instance().register(PassivePendant.instance());
+//    	LoreRegistry.instance().register(AetherGem.instance());
+//    	LoreRegistry.instance().register(AetherUnravelerBlock.instance());
+//    	LoreRegistry.instance().register(AetherPumpBlock.instance());
+//    }
 
 	public PlayerEntity getPlayer() {
 		return null; // Doesn't mean anything on the server

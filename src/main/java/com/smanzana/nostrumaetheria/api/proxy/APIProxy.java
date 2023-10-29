@@ -23,8 +23,6 @@ public abstract class APIProxy {
 	
     public static ItemGroup creativeTab;
 	
-	public static Class<? extends Entity> AetherBatteryMinecart = null;
-	
 	// This is a NostrumResearchTab, but using that type would cause a circular dependency
 	public static Object ResearchTab = null;
 	
