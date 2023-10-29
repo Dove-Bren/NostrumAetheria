@@ -18,7 +18,7 @@ import com.smanzana.nostrumaetheria.tiles.AetherFurnaceBlockEntity;
 import com.smanzana.nostrumaetheria.tiles.AetherRepairerBlockEntity;
 import com.smanzana.nostrumaetheria.tiles.AetherUnravelerBlockEntity;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -35,7 +35,7 @@ public class NostrumAetheriaGui implements IGuiHandler {
 	public static final int aetherUnravelerID = 5;
 	
 	@Override
-	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object getServerGuiElement(int ID, PlayerEntity player, World world, int x, int y, int z) {
 		
 		if (ID == aetherFurnaceID) {
 			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));
@@ -102,7 +102,7 @@ public class NostrumAetheriaGui implements IGuiHandler {
 
 	
 	@Override
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object getClientGuiElement(int ID, PlayerEntity player, World world, int x, int y, int z) {
 		
 		if (ID == aetherFurnaceID) {
 			TileEntity ent = world.getTileEntity(new BlockPos(x, y, z));

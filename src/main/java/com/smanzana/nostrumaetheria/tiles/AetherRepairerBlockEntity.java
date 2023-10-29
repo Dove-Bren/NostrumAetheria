@@ -7,11 +7,11 @@ import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.recipes.RepairerRecipeManager;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -47,11 +47,11 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	private static final String NBT_ITEM = "item";
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
 		if (!stack.isEmpty()) {
-			NBTTagCompound tag = new NBTTagCompound();
+			CompoundNBT tag = new CompoundNBT();
 			tag = stack.writeToNBT(tag);
 			nbt.setTag(NBT_ITEM, tag);
 		}
@@ -60,7 +60,7 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
 		if (nbt == null)
@@ -69,7 +69,7 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 		if (!nbt.hasKey(NBT_ITEM, NBT.TAG_COMPOUND)) {
 			stack = ItemStack.EMPTY;
 		} else {
-			NBTTagCompound tag = nbt.getCompoundTag(NBT_ITEM);
+			CompoundNBT tag = nbt.getCompoundTag(NBT_ITEM);
 			stack = new ItemStack(tag);
 		}
 	}
@@ -126,17 +126,17 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player) {
+	public void openInventory(PlayerEntity player) {
 		;
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player) {
+	public void closeInventory(PlayerEntity player) {
 		;
 	}
 
@@ -155,7 +155,7 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 
 	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
 		return !(oldState.getBlock().equals(newState.getBlock()));
 	}
 	

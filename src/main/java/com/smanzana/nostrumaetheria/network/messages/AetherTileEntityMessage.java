@@ -1,17 +1,17 @@
 package com.smanzana.nostrumaetheria.network.messages;
 
-import javax.xml.ws.handler.MessageContext;
+import java.util.function.Supplier;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
+import com.smanzana.nostrummagica.NostrumMagica;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Server is sending an update about the aether level of a tile entity
@@ -20,56 +20,58 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
  */
 public class AetherTileEntityMessage {
 
-	public static void handle(AetherTileEntityMessage message, MessageContext ctx) {
+	public static void handle(AetherTileEntityMessage message, Supplier<NetworkEvent.Context> ctx) {
 		
-		int dim = message.tag.getInteger(NBT_DIM);
-		BlockPos pos = BlockPos.fromLong(message.tag.getLong(NBT_POS));
-		int aether = message.tag.getInteger(NBT_AETHER);
-		
-		Minecraft.getMinecraft().addScheduledTask(() -> {
-			if (Minecraft.getMinecraft().player.world.provider.getDimension() == dim) {
-				World world = Minecraft.getMinecraft().player.world;
-				if (!world.isBlockLoaded(pos)) {
+		ctx.get().enqueueWork(() -> {
+			Minecraft mc = Minecraft.getInstance();
+			if (mc.player.world.getDimension().getType() == message.dimension) {
+				World world = mc.player.world;
+				if (!NostrumMagica.isBlockLoaded(world, message.pos)) {
 					return;
 				}
-				TileEntity te = world.getTileEntity(pos);
+				TileEntity te = world.getTileEntity(message.pos);
 				if (te != null && te instanceof AetherTileEntity) {
-					((AetherTileEntity) te).syncAether(aether);
+					((AetherTileEntity) te).syncAether(message.aether);
 				}
 			}
 		});
 	}
-
-	private static final String NBT_DIM = "dim";
-	private static final String NBT_POS = "pos";
-	private static final String NBT_AETHER = "aether";
 	
-	protected NBTTagCompound tag;
-	
-	public AetherTileEntityMessage() {
-		tag = new NBTTagCompound();
-	}
+	private final DimensionType dimension;
+	private final BlockPos pos;
+	private final int aether;
 	
 	public AetherTileEntityMessage(World world, BlockPos pos, int aether) {
-		tag = new NBTTagCompound();
-		
-		tag.setInteger(NBT_DIM, world.provider.getDimension());
-		tag.setLong(NBT_POS, pos.toLong());
-		tag.setInteger(NBT_AETHER, aether);
+		this(world.getDimension().getType(), pos, aether);
+	}
+	
+	public AetherTileEntityMessage(DimensionType dimension, BlockPos pos, int aether) {
+		this.dimension = dimension;
+		this.pos = pos;
+		this.aether = aether;
 	}
 	
 	public AetherTileEntityMessage(AetherTileEntity te) {
 		this(te.getWorld(), te.getPos(), te.getHandler().getAether(null));
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static AetherTileEntityMessage decode(PacketBuffer buf) {
+		final int dimID = buf.readVarInt();
+		final BlockPos pos = buf.readBlockPos();
+		final int aether = buf.readVarInt();
+		
+		DimensionType dim = DimensionType.getById(dimID);
+		if (dim == null) {
+			dim = DimensionType.OVERWORLD;
+		}
+		
+		return new AetherTileEntityMessage(dim, pos, aether);
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(AetherTileEntityMessage message, PacketBuffer buf) {
+		buf.writeVarInt(message.dimension.getId());
+		buf.writeBlockPos(message.pos);
+		buf.writeVarInt(message.aether);
 	}
 
 }

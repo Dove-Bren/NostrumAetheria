@@ -10,8 +10,8 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
@@ -91,12 +91,12 @@ public class AetherBatteryBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
 		return true;
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		
 		if (!worldIn.isRemote) {
 			// r equest an update
@@ -112,7 +112,7 @@ public class AetherBatteryBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public EnumBlockRenderType getRenderType(IBlockState state) {
+	public EnumBlockRenderType getRenderType(BlockState state) {
 		return EnumBlockRenderType.MODEL;
 	}
 	
@@ -124,37 +124,37 @@ public class AetherBatteryBlock extends BlockContainer implements ILoreTagged {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean isTranslucent(IBlockState state) {
+	public boolean isTranslucent(BlockState state) {
 		return true;
 	}
 	
 //	@Override
-//	public boolean isFullyOpaque(IBlockState state) {
+//	public boolean isFullyOpaque(BlockState state) {
 //		return false;
 //	}
 	
 	@Override
-	public boolean isFullBlock(IBlockState state) {
+	public boolean isFullBlock(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(BlockState state) {
 		return false;
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, BlockPos pos, BlockState state) {
 		destroy(world, pos, state);
 		super.breakBlock(world, pos, state);
 	}
 	
-	private void destroy(World world, BlockPos pos, IBlockState state) {
+	private void destroy(World world, BlockPos pos, BlockState state) {
 //		TileEntity ent = world.getTileEntity(pos);
 //		if (ent == null || !(ent instanceof AetherBlockEntity))
 //			return;

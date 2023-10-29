@@ -4,7 +4,7 @@ import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -25,13 +25,13 @@ public class AetherStatUpdateRequestMessage implements IMessage {
 		@Override
 		public IMessage onMessage(AetherStatUpdateRequestMessage message, MessageContext ctx) {
 			
-			int dim = message.tag.getInteger(NBT_DIM);
+			int dim = message.tag.getInt(NBT_DIM);
 			BlockPos pos = BlockPos.fromLong(message.tag.getLong(NBT_POS));
-			int aether = message.tag.getInteger(NBT_AETHER);
+			int aether = message.tag.getInt(NBT_AETHER);
 			
-			Minecraft.getMinecraft().addScheduledTask(() -> {
-				if (Minecraft.getMinecraft().player.world.provider.getDimension() == dim) {
-					World world = Minecraft.getMinecraft().player.world;
+			Minecraft.getInstance().addScheduledTask(() -> {
+				if (Minecraft.getInstance().player.world.provider.getDimension() == dim) {
+					World world = Minecraft.getInstance().player.world;
 					if (!world.isBlockLoaded(pos)) {
 						return;
 					}
@@ -51,18 +51,18 @@ public class AetherStatUpdateRequestMessage implements IMessage {
 	private static final String NBT_POS = "pos";
 	private static final String NBT_AETHER = "aether";
 	
-	protected NBTTagCompound tag;
+	protected CompoundNBT tag;
 	
 	public AetherStatUpdateRequestMessage() {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 	}
 	
 	public AetherStatUpdateRequestMessage(World world, BlockPos pos, int aether) {
-		tag = new NBTTagCompound();
+		tag = new CompoundNBT();
 		
-		tag.setInteger(NBT_DIM, world.provider.getDimension());
-		tag.setLong(NBT_POS, pos.toLong());
-		tag.setInteger(NBT_AETHER, aether);
+		tag.putInt(NBT_DIM, world.provider.getDimension());
+		tag.putLong(NBT_POS, pos.toLong());
+		tag.putInt(NBT_AETHER, aether);
 	}
 	
 	public AetherStatUpdateRequestMessage(AetherTileEntity te) {

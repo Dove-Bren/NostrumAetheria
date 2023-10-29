@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -34,7 +34,7 @@ public class AetherChargerBlockEntity extends AetherBathTileEntity {
 	}
 	
 	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
 		return !(oldState.getBlock().equals(newState.getBlock()));
 	}
 	
@@ -91,7 +91,7 @@ public class AetherChargerBlockEntity extends AetherBathTileEntity {
 		
 		if (!world.isRemote && this.ticksExisted % 5 == 0) {
 			if (aetherTick != on) {
-				IBlockState state = world.getBlockState(pos);
+				BlockState state = world.getBlockState(pos);
 				world.setBlockState(pos, AetherChargerBlock.instance().getDefaultState().withProperty(AetherChargerBlock.ON, aetherTick).withProperty(AetherChargerBlock.FACING, state.getValue(AetherChargerBlock.FACING)));
 			}
 			

@@ -10,10 +10,10 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -46,11 +46,11 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	private static final String NBT_ITEM = "item";
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
 		if (!stack.isEmpty()) {
-			NBTTagCompound tag = new NBTTagCompound();
+			CompoundNBT tag = new CompoundNBT();
 			tag = stack.writeToNBT(tag);
 			nbt.setTag(NBT_ITEM, tag);
 		}
@@ -59,7 +59,7 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
 		if (nbt == null)
@@ -68,7 +68,7 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 		if (!nbt.hasKey(NBT_ITEM, NBT.TAG_COMPOUND)) {
 			stack = ItemStack.EMPTY;
 		} else {
-			NBTTagCompound tag = nbt.getCompoundTag(NBT_ITEM);
+			CompoundNBT tag = nbt.getCompoundTag(NBT_ITEM);
 			stack = new ItemStack(tag);
 		}
 	}
@@ -125,17 +125,17 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player) {
+	public void openInventory(PlayerEntity player) {
 		;
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player) {
+	public void closeInventory(PlayerEntity player) {
 		;
 	}
 

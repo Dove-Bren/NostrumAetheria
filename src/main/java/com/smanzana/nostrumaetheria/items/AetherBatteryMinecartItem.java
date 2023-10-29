@@ -7,7 +7,7 @@ import com.smanzana.nostrumaetheria.entities.EntityAetherBatteryMinecart;
 
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.entity.item.EntityMinecart;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -42,7 +42,7 @@ public class AetherBatteryMinecartItem extends Item {
 	}
 	
 	@Override
-	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		final @Nonnull ItemStack stack = player.getHeldItem(hand);
 		if(BlockRailBase.isRailBlock(world.getBlockState(pos))) {
 			if(!world.isRemote) {

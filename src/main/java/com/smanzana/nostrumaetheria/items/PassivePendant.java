@@ -17,7 +17,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -125,7 +125,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 		
 		int charges = getWholeCharges(stack);
 		if (charges > 0) {
-			if ((!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) && !caster.world.isRemote) {
+			if ((!(caster instanceof PlayerEntity) || !((PlayerEntity) caster).isCreative()) && !caster.world.isRemote) {
 				spendCharge(stack);
 			}
 			summary.addReagentCost(-1f);
@@ -139,7 +139,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 	}
 	
 	@Override
-	public void onCreated(ItemStack stack, World worldIn, EntityPlayer playerIn) {
+	public void onCreated(ItemStack stack, World worldIn, PlayerEntity playerIn) {
 		super.onCreated(stack, worldIn, playerIn);
 		// Update durability to be correct as soon as it's created
 		setDurability(stack);
@@ -157,7 +157,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 	}
 
 	@Override
-	protected boolean shouldShowAether(ItemStack stack, EntityPlayer playerIn, boolean advanced) {
+	protected boolean shouldShowAether(ItemStack stack, PlayerEntity playerIn, boolean advanced) {
 		return false;
 	}
 

@@ -6,10 +6,10 @@ import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock;
 import com.smanzana.nostrumaetheria.items.AetherBatteryMinecartItem;
 import com.smanzana.nostrumaetheria.tiles.AetherPumpBlockEntity;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -42,7 +42,7 @@ public class EntityAetherBatteryMinecart extends EntityMinecart {
 	}
 	
 	@Override
-	public IBlockState getDisplayTile() {
+	public BlockState getDisplayTile() {
 		return AetherBatteryBlock.medium().getDefaultState();
 	}
 	
@@ -110,7 +110,7 @@ public class EntityAetherBatteryMinecart extends EntityMinecart {
 		// Look for nearby pumps
 		for (EnumFacing dir : new EnumFacing[] {EnumFacing.EAST, EnumFacing.WEST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.UP}) {
 			final BlockPos at = pos.offset(dir);
-			IBlockState state = world.getBlockState(at);
+			BlockState state = world.getBlockState(at);
 			if (state.getBlock() instanceof AetherPumpBlock) {
 				TileEntity te = world.getTileEntity(at);
 				if (te != null && te instanceof AetherPumpBlockEntity) {
@@ -134,17 +134,17 @@ public class EntityAetherBatteryMinecart extends EntityMinecart {
 	}
 	
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound nbt) {
+	protected void writeEntityToNBT(CompoundNBT nbt) {
 		super.writeEntityToNBT(nbt);
 		
-		nbt.setInteger("cart_aether", this.getAether());
+		nbt.putInt("cart_aether", this.getAether());
 	}
 	
 	@Override
-	public void readEntityFromNBT(NBTTagCompound nbt) {
+	public void readEntityFromNBT(CompoundNBT nbt) {
 		super.readEntityFromNBT(nbt);
 		
-		this.setAether(nbt.getInteger("cart_aether"));
+		this.setAether(nbt.getInt("cart_aether"));
 	}
 	
 	public int getAether() {

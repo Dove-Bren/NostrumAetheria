@@ -30,7 +30,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
@@ -160,13 +160,13 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public EntityPlayer getPlayer() {
-		return Minecraft.getMinecraft().player;
+	public PlayerEntity getPlayer() {
+		return Minecraft.getInstance().player;
 	}
 	
 	@SubscribeEvent
 	public void onClientConnect(EntityJoinWorldEvent event) {
-//		if (event.getEntity() == Minecraft.getMinecraft().thePlayer) {
+//		if (event.getEntity() == Minecraft.getInstance().thePlayer) {
 //			// Every time we join a world, request a copy of its networks
 //			
 //			NostrumFairies.logger.info("Requested automatic logistics network refresh");

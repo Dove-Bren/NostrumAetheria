@@ -22,7 +22,7 @@ public class TileEntityAetherDebugRenderer<T extends AetherTileEntity> extends T
 //		final int aether = te.getHandler().getAether(null);
 //		final int maxAether = te.getHandler().getMaxAether(null);
 //		final String str = aether + " / " + maxAether;
-//		final FontRenderer fonter = Minecraft.getMinecraft().fontRendererObj;
+//		final FontRenderer fonter = Minecraft.getInstance().fontRendererObj;
 //		
 //		GlStateManager.pushMatrix();
 //		GlStateManager.translate(x + .5, y + 1.5, z + .5);

@@ -22,10 +22,10 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -146,9 +146,9 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 			points = (float) MAX_POINTS;
 		}
 		
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null)
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		
 		nbt.setFloat(NBT_PENDANT_POINTS, points);
 		stack.setTagCompound(nbt);
@@ -160,9 +160,9 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 		if (stack.isEmpty() || !stack.hasTagCompound())
 			return 0;
 		
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		}
 		return nbt.getFloat(NBT_PENDANT_POINTS);
 	}
@@ -180,9 +180,9 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 			return;
 		}
 		
-		NBTTagCompound nbt = stack.getTagCompound();
+		CompoundNBT nbt = stack.getTagCompound();
 		if (nbt == null) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		}
 		if (reagent == null) {
 			nbt.removeTag(NBT_PENDANT_REAGENTS);
@@ -216,9 +216,9 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 		}
 		
 		UUID id;
-		NBTTagCompound nbt;
+		CompoundNBT nbt;
 		if (!stack.hasTagCompound()) {
-			nbt = new NBTTagCompound();
+			nbt = new CompoundNBT();
 		} else {
 			nbt = stack.getTagCompound();
 		}
@@ -245,7 +245,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 		
 		int charges = lyonGetWholeCharges(stack);
 		if (charges > 0) {
-			if ((!(caster instanceof EntityPlayer) || !((EntityPlayer) caster).isCreative()) && !caster.world.isRemote) {
+			if ((!(caster instanceof PlayerEntity) || !((PlayerEntity) caster).isCreative()) && !caster.world.isRemote) {
 				lyonSpendCharge(stack);
 			}
 			summary.addReagentCost(-1f);
@@ -259,7 +259,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 	}
 	
 	@Override
-	public void onCreated(ItemStack stack, World worldIn, EntityPlayer playerIn) {
+	public void onCreated(ItemStack stack, World worldIn, PlayerEntity playerIn) {
 		super.onCreated(stack, worldIn, playerIn);
 		// Update durability to be correct as soon as it's created
 		setDurability(stack);
@@ -276,8 +276,8 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 		
 		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
 		if (!worldIn.isRemote && entityIn.ticksExisted % (int) ((float) 20 / REAGENT_PER_SECOND) == 0) {
-			if (entityIn instanceof EntityPlayer) {
-				EntityPlayer player = (EntityPlayer) entityIn;
+			if (entityIn instanceof PlayerEntity) {
+				PlayerEntity player = (PlayerEntity) entityIn;
 				if (player.openContainer != null && player.openContainer instanceof ActivePendantContainer) {
 					ActivePendantContainer gui = (ActivePendantContainer) player.openContainer;
 					if (Objects.equals(lyonGetID(gui.getPendant()), lyonGetID(stack))) {
@@ -312,7 +312,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, EnumHand hand) {
 		playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.activePendantID, worldIn,
 				(int) playerIn.posX, (int) playerIn.posY, (int) playerIn.posZ);
 		

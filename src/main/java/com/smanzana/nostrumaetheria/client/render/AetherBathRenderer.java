@@ -106,7 +106,7 @@ public class AetherBathRenderer extends TileEntitySpecialRenderer<AetherBathTile
 		GlStateManager.enableTexture2D();
 		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 		
-		Minecraft.getMinecraft().getRenderItem()
+		Minecraft.getInstance().getRenderItem()
 			.renderItem(item, TransformType.GROUND);
 		GlStateManager.popMatrix();
 		GlStateManager.enableTexture2D();

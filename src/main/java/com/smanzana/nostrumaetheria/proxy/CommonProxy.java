@@ -55,7 +55,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -596,7 +596,7 @@ public class CommonProxy {
     	LoreRegistry.instance().register(AetherPumpBlock.instance());
     }
 
-	public EntityPlayer getPlayer() {
+	public PlayerEntity getPlayer() {
 		return null; // Doesn't mean anything on the server
 	}
 	

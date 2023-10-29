@@ -3,7 +3,7 @@ package com.smanzana.nostrumaetheria.client.render;
 import com.smanzana.nostrumaetheria.entities.EntityAetherBatteryMinecart;
 import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderMinecart;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -16,7 +16,7 @@ public class RenderAetherBatteryMinecart extends RenderMinecart<EntityAetherBatt
 	}
 	
 	@Override
-	protected void renderCartContents(EntityAetherBatteryMinecart cart, float partialTicks, IBlockState state) {
+	protected void renderCartContents(EntityAetherBatteryMinecart cart, float partialTicks, BlockState state) {
 		super.renderCartContents(cart, partialTicks, state);
 		if (cart.getAether() > 0) {
 			TileEntitySpecialRenderer<?> render = TileEntityRendererDispatcher.instance.getRenderer(AetherBatteryEntity.class); 

@@ -20,11 +20,11 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
@@ -141,32 +141,32 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		return getDefaultState()
 				.withProperty(TYPE, typeFromMeta(meta))
 				.withProperty(ON, onFromMeta(meta));
 	}
 	
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return metaFromState(state.getValue(TYPE), state.getValue(ON));
 	}
 	
-	public Type getType(IBlockState state) {
+	public Type getType(BlockState state) {
 		return state.getValue(TYPE);
 	}
 	
-	public boolean getFurnaceOn(IBlockState state) {
+	public boolean getFurnaceOn(BlockState state) {
 		return state.getValue(ON);
 	}
 	
 	@Override
-	public boolean isSideSolid(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
 		return true;
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (!worldIn.isRemote) {
 			//worldIn.notifyBlockUpdate(pos, worldIn.getBlockState(pos), worldIn.getBlockState(pos), 2);
 			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherFurnaceID, worldIn, pos.getX(), pos.getY(), pos.getZ());
@@ -181,7 +181,7 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+	public BlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
 		final @Nonnull ItemStack stack = placer.getHeldItem(hand);
 		return this.getDefaultState()
 				.withProperty(TYPE, typeFromMeta(stack.getMetadata()))
@@ -189,7 +189,7 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public int damageDropped(IBlockState state) {
+	public int damageDropped(BlockState state) {
 		return metaFromType(state.getValue(TYPE));
 	}
 
@@ -202,17 +202,17 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 	}
 	
 	@Override
-	public EnumBlockRenderType getRenderType(IBlockState state) {
+	public EnumBlockRenderType getRenderType(BlockState state) {
 		return EnumBlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void breakBlock(World world, BlockPos pos, BlockState state) {
 		destroy(world, pos, state);
 		super.breakBlock(world, pos, state);
 	}
 	
-	private void destroy(World world, BlockPos pos, IBlockState state) {
+	private void destroy(World world, BlockPos pos, BlockState state) {
 		TileEntity ent = world.getTileEntity(pos);
 		if (ent == null || !(ent instanceof AetherFurnaceBlockEntity))
 			return;
@@ -231,7 +231,7 @@ public class AetherFurnaceBlock extends BlockContainer implements ILoreTagged {
 	
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		if (null == stateIn || !stateIn.getValue(ON))
 			return;
 		

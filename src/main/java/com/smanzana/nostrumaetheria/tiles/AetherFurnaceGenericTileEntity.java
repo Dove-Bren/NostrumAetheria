@@ -10,11 +10,11 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
 import com.smanzana.nostrummagica.utils.Inventories;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 
 public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTickingTileEntity implements IInventory {
@@ -174,24 +174,24 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		nbt.setInteger(NBT_INVENTORY_SLOTS, slots.size());
+		nbt.putInt(NBT_INVENTORY_SLOTS, slots.size());
 		nbt.setTag(NBT_INVENTORY, Inventories.serializeInventory(this));
 		nbt.setFloat(NBT_AETHER_CARRY, this.aetherCarry);
 		nbt.setFloat(NBT_AETHER_PER, this.aetherPerTick);
-		nbt.setInteger(NBT_TICKS_MAX, burnTicksMax);
-		nbt.setInteger(NBT_TICKS_LEFT, burnTicksRemaining);
+		nbt.putInt(NBT_TICKS_MAX, burnTicksMax);
+		nbt.putInt(NBT_TICKS_LEFT, burnTicksRemaining);
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
-		int slotCount = nbt.getInteger(NBT_INVENTORY_SLOTS);
+		int slotCount = nbt.getInt(NBT_INVENTORY_SLOTS);
 		if (slotCount <= 0) {
 			slotCount = 1;
 		}
@@ -200,8 +200,8 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		Inventories.deserializeInventory(this, nbt.getTag(NBT_INVENTORY));
 		this.aetherCarry = nbt.getFloat(NBT_AETHER_CARRY);
 		this.aetherPerTick = nbt.getFloat(NBT_AETHER_PER);
-		this.burnTicksMax = nbt.getInteger(NBT_TICKS_MAX);
-		this.burnTicksRemaining = nbt.getInteger(NBT_TICKS_LEFT);
+		this.burnTicksMax = nbt.getInt(NBT_TICKS_MAX);
+		this.burnTicksRemaining = nbt.getInt(NBT_TICKS_LEFT);
 	}
 	
 	@Override
@@ -259,16 +259,16 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player) {
+	public void openInventory(PlayerEntity player) {
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player) {
+	public void closeInventory(PlayerEntity player) {
 	}
 
 	@Override

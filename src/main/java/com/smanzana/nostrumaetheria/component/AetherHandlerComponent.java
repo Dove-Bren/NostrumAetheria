@@ -12,7 +12,7 @@ import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
@@ -398,18 +398,18 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 				| (output ? 1 : 0) << 0);
 	}
 	
-	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-		compound.setInteger(NBT_AETHER, aether);
-		compound.setInteger(NBT_MAX_AETHER, maxAether);
+	public CompoundNBT writeToNBT(CompoundNBT compound) {
+		compound.putInt(NBT_AETHER, aether);
+		compound.putInt(NBT_MAX_AETHER, maxAether);
 		compound.setByte(NBT_SIDE_CONFIG, configToByte(sideConnections));
 		compound.setByte(NBT_INOUTBOUND_CONFIG, inoutConfigToByte(allowInboundAether, allowOutboundAether));
 		
 		return compound;
 	}
 	
-	public void readFromNBT(NBTTagCompound compound) {
-		this.aether = compound.getInteger(NBT_AETHER);
-		this.maxAether = compound.getInteger(NBT_MAX_AETHER);
+	public void readFromNBT(CompoundNBT compound) {
+		this.aether = compound.getInt(NBT_AETHER);
+		this.maxAether = compound.getInt(NBT_MAX_AETHER);
 		configFromByte(sideConnections, compound.getByte(NBT_SIDE_CONFIG));
 		inoutConfigFromByte(this, compound.getByte(NBT_INOUTBOUND_CONFIG));
 		fixAether();

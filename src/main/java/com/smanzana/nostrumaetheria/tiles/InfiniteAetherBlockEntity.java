@@ -1,6 +1,6 @@
 package com.smanzana.nostrumaetheria.tiles;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 
 public class InfiniteAetherBlockEntity extends NativeAetherTickingTileEntity {
 
@@ -25,12 +25,12 @@ public class InfiniteAetherBlockEntity extends NativeAetherTickingTileEntity {
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		return super.writeToNBT(nbt);
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 	}
 }

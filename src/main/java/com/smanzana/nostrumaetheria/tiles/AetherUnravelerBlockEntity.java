@@ -10,13 +10,13 @@ import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
 import com.smanzana.nostrumaetheria.recipes.UnravelerRecipeManager;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
@@ -74,24 +74,24 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 	private static final String NBT_WORK_TICKS = "work_ticks";
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
 		if (!stack.isEmpty()) {
-			NBTTagCompound tag = new NBTTagCompound();
+			CompoundNBT tag = new CompoundNBT();
 			tag = stack.writeToNBT(tag);
 			nbt.setTag(NBT_ITEM, tag);
 		}
 		
 		if (workTicks > 0) {
-			nbt.setInteger(NBT_WORK_TICKS, workTicks);
+			nbt.putInt(NBT_WORK_TICKS, workTicks);
 		}
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
 		if (nbt == null)
@@ -100,12 +100,12 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 		if (!nbt.hasKey(NBT_ITEM, NBT.TAG_COMPOUND)) {
 			stack = ItemStack.EMPTY;
 		} else {
-			NBTTagCompound tag = nbt.getCompoundTag(NBT_ITEM);
+			CompoundNBT tag = nbt.getCompoundTag(NBT_ITEM);
 			stack = new ItemStack(tag);
 		}
 		refreshRecipe();
 		
-		workTicks = nbt.getInteger(NBT_WORK_TICKS); // defaults 0 :)
+		workTicks = nbt.getInt(NBT_WORK_TICKS); // defaults 0 :)
 	}
 	
 	private void forceUpdate() {
@@ -162,17 +162,17 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player) {
+	public void openInventory(PlayerEntity player) {
 		;
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player) {
+	public void closeInventory(PlayerEntity player) {
 		;
 	}
 
@@ -190,7 +190,7 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 	}
 
 	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
 		return !(oldState.getBlock().equals(newState.getBlock()));
 	}
 	

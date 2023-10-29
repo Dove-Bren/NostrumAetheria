@@ -11,8 +11,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.EnumFacing;
@@ -109,7 +109,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 		@Override
 		public void onLinkChange() {
 			this.markDirty();
-			IBlockState state = world.getBlockState(pos);
+			BlockState state = world.getBlockState(pos);
 			world.notifyBlockUpdate(pos, state, state, 2);
 		}
 		
@@ -131,8 +131,8 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 		}
 
 		@Override
-		public NBTTagCompound getUpdateTag() {
-			return this.writeToNBT(new NBTTagCompound());
+		public CompoundNBT getUpdateTag() {
+			return this.writeToNBT(new CompoundNBT());
 		}
 		
 		@Override
@@ -141,7 +141,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 			handleUpdateTag(pkt.getNbtCompound());
 		}
 		
-		public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+		public CompoundNBT writeToNBT(CompoundNBT compound) {
 			super.writeToNBT(compound);
 			
 			compound.setByte(NBT_SIDE, (byte) this.side.ordinal());
@@ -149,7 +149,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 			return compound;
 		}
 		
-		public void readFromNBT(NBTTagCompound compound) {
+		public void readFromNBT(CompoundNBT compound) {
 			super.readFromNBT(compound);
 			
 			this.side = EnumFacing.values()[compound.getByte(NBT_SIDE)];

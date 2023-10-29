@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -62,7 +62,7 @@ public class ActivePendantGui {
 				for (int x = 0; x < 9; x++) {
 					this.addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, GUI_PLAYER_INV_HOFFSET + (x * 18), GUI_PLAYER_INV_VOFFSET + (y * 18)) {
 						@Override
-						public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
+						public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
 							if (!stack.isEmpty() && stack.getItem() instanceof ActivePendant) {
 								if (Objects.equals(ActivePendant.lyonGetID(stack), ActivePendant.lyonGetID(pendant))) {
 									//playerIn.closeScreen(); // Assumes just one player is looking
@@ -79,7 +79,7 @@ public class ActivePendantGui {
 			for (int x = 0; x < 9; x++) {
 				this.addSlotToContainer(new Slot(playerInv, x, GUI_HOTBAR_INV_HOFFSET + x * 18, GUI_HOTBAR_INV_VOFFSET) {
 					@Override
-					public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
+					public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
 						if (!stack.isEmpty() && stack.getItem() instanceof ActivePendant) {
 							if (Objects.equals(ActivePendant.lyonGetID(stack), ActivePendant.lyonGetID(pendant))) {
 								//playerIn.closeScreen(); // Assumes just one player is looking
@@ -100,7 +100,7 @@ public class ActivePendantGui {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
+		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
 			ItemStack prev = ItemStack.EMPTY;	
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 			
@@ -138,7 +138,7 @@ public class ActivePendantGui {
 		}
 		
 		@Override
-		public boolean canInteractWith(EntityPlayer playerIn) {
+		public boolean canInteractWith(PlayerEntity playerIn) {
 			return valid;
 		}
 		

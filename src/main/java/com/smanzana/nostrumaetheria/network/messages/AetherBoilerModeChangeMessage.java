@@ -1,78 +1,57 @@
 package com.smanzana.nostrumaetheria.network.messages;
 
+import java.util.function.Supplier;
+
 import com.smanzana.nostrumaetheria.tiles.AetherBoilerBlockEntity;
 import com.smanzana.nostrumaetheria.tiles.AetherBoilerBlockEntity.BoilerBurnMode;
+import com.smanzana.nostrummagica.NostrumMagica;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
  * Client has tried to change the aether boiler mode
  * @author Skyler
  *
  */
-public class AetherBoilerModeChangeMessage implements IMessage {
+public class AetherBoilerModeChangeMessage {
 
-	public static class Handler implements IMessageHandler<AetherBoilerModeChangeMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(AetherBoilerModeChangeMessage message, MessageContext ctx) {
-			
-			BlockPos pos = BlockPos.fromLong(message.tag.getLong(NBT_POS));
-			BoilerBurnMode mode = BoilerBurnMode.valueOf(message.tag.getString(NBT_NEXT_MODE));
-			
-			EntityPlayerMP player = ctx.getServerHandler().player;
-			player.getServerWorld().addScheduledTask(() -> {
-				if (!player.world.isBlockLoaded(pos)) {
-					return;
-				}
-				TileEntity te = player.world.getTileEntity(pos);
-				if (te != null && te instanceof AetherBoilerBlockEntity) {
-					((AetherBoilerBlockEntity) te).setBoilerMode(mode);
-					
-					// Cause an update to be sent back
-					IBlockState state = player.world.getBlockState(pos);
-					player.world.notifyBlockUpdate(pos, state, state, 2);
-				}
-			});
-			
-			return null;
-		}
-		
+	public static void handle(AetherBoilerModeChangeMessage message, Supplier<NetworkEvent.Context> ctx) {
+		ServerPlayerEntity player = ctx.get().getSender();
+		ctx.get().enqueueWork(() -> {
+			if (!NostrumMagica.isBlockLoaded(player.world, message.pos)) {
+				return;
+			}
+			TileEntity te = player.world.getTileEntity(message.pos);
+			if (te != null && te instanceof AetherBoilerBlockEntity) {
+				((AetherBoilerBlockEntity) te).setBoilerMode(message.next_mode);
+				
+				// Cause an update to be sent back
+				BlockState state = player.world.getBlockState(message.pos);
+				player.world.notifyBlockUpdate(message.pos, state, state, 2);
+			}
+		});
 	}
-
-	private static final String NBT_POS = "pos";
-	private static final String NBT_NEXT_MODE = "next_mode";
 	
-	protected NBTTagCompound tag;
-	
-	public AetherBoilerModeChangeMessage() {
-		tag = new NBTTagCompound();
-	}
+	private final BlockPos pos;
+	private final BoilerBurnMode next_mode;
 	
 	public AetherBoilerModeChangeMessage(BlockPos pos, BoilerBurnMode mode) {
-		tag = new NBTTagCompound();
-		
-		tag.setLong(NBT_POS, pos.toLong());
-		tag.setString(NBT_NEXT_MODE, mode.name());
+		this.pos = pos;
+		this.next_mode = mode;
 	}
 	
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		tag = ByteBufUtils.readTag(buf);
+	public static AetherBoilerModeChangeMessage decode(PacketBuffer buf) {
+		return new AetherBoilerModeChangeMessage(buf.readBlockPos(), buf.readEnumValue(BoilerBurnMode.class));
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		ByteBufUtils.writeTag(buf, tag);
+	public static void encode(AetherBoilerModeChangeMessage msg, PacketBuffer buf) {
+		buf.writeBlockPos(msg.pos);
+		buf.writeEnumValue(msg.next_mode);
 	}
 
 }

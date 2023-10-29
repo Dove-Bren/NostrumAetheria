@@ -8,9 +8,9 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock;
 
 import net.minecraft.block.BlockFurnace;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
@@ -112,7 +112,7 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
 		return !(oldState.getBlock().equals(newState.getBlock()));
 	}
 
@@ -191,7 +191,7 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 
 	@Override
 	protected void onBurningChange(boolean newBurning) {
-		IBlockState state = world.getBlockState(pos);
+		BlockState state = world.getBlockState(pos);
 		world.setBlockState(pos, AetherBoilerBlock.instance().getDefaultState().withProperty(AetherBoilerBlock.ON, newBurning).withProperty(AetherBoilerBlock.FACING, state.getValue(AetherBoilerBlock.FACING)));
 	}
 	
@@ -230,7 +230,7 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
 		nbt.setString(NBT_BOILER_MODE, this.mode.name());
@@ -239,7 +239,7 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		super.readFromNBT(nbt);
 		
 		if (nbt.hasKey(NBT_BOILER_MODE, NBT.TAG_STRING)) {

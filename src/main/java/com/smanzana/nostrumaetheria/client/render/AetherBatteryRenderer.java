@@ -37,7 +37,7 @@ public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherB
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 //		GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA,
 //				SourceFactor.ONE, DestFactor.ZERO);
-		//Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		//Minecraft.getInstance().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		GlStateManager.disableBlend();
 		GlStateManager.enableBlend();
 		GlStateManager.enableAlpha();
