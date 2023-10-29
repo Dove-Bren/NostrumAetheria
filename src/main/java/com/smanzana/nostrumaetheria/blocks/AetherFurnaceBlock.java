@@ -249,4 +249,18 @@ public class AetherFurnaceBlock extends Block implements ILoreTagged {
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_BLOCKS;
 	}
+	
+	public static AetherFurnaceBlock GetForType(Type type) {
+		switch (type) {
+		case SMALL:
+			return AetheriaBlocks.smallFurnace;
+		case MEDIUM:
+			return AetheriaBlocks.mediumFurnace;
+		case LARGE:
+			return AetheriaBlocks.largeFurnace;
+		}
+		
+		NostrumAetheria.logger.error("Failed to find furnace for type " + (type == null ? "NULL" : type));
+		return null;
+	}
 }

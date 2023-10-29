@@ -1,23 +1,23 @@
 package com.smanzana.nostrumaetheria.tiles;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IAutoContainerInventory;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.NonNullList;
 
-public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTickingTileEntity implements IInventory {
+public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTickingTileEntity implements IInventory, IAutoContainerInventory {
 
 	private static final String NBT_INVENTORY_SLOTS = "slots";
 	private static final String NBT_INVENTORY = "inventory";
@@ -34,8 +34,8 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	private boolean burning;
 	private float aetherCarry; // for handling floating point in an int world
 	
-	public AetherFurnaceGenericTileEntity(int slotCount, int defaultAether, int defaultMaxAether) {
-		super(defaultAether, defaultMaxAether);
+	public AetherFurnaceGenericTileEntity(TileEntityType<? extends AetherFurnaceGenericTileEntity> type, int slotCount, int defaultAether, int defaultMaxAether) {
+		super(type, defaultAether, defaultMaxAether);
 		
 		this.setAutoSync(5);
 		this.handler.configureInOut(false, true);
@@ -54,11 +54,11 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	 * allowEmpty allows there to be empty slots as long as all are unique.
 	 */
 	protected boolean allReagentsValid(ItemStack reagent, boolean allowEmpty) {
-		Set<ReagentType> seen = new HashSet<>();
+		Set<ReagentItem> seen = new HashSet<>();
 		
 		
 		if (reagent != null) {
-			seen.add(ReagentType.getAndSet(reagent));
+			seen.add((ReagentItem) reagent.getItem());
 		}
 		
 		boolean success = true;
@@ -73,15 +73,10 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 				continue;
 			}
 			
-			ReagentType reagentType = ReagentType.getAndSet(stack);
-			if (!seen.add(reagentType)) {
+			if (!seen.add((ReagentItem) stack.getItem())) {
 				success = false;
 				break;
 			}
-		}
-		
-		for (ReagentType type : seen) {
-			ReagentType.release(type);
 		}
 		
 		return success;
@@ -144,7 +139,7 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	protected abstract void onBurningChange(boolean newBurning);
 	
 	@Override
-	public void update() {
+	public void tick() {
 		if (!world.isRemote) {
 			this.handler.pushAether(500);
 			if (shouldTryBurn() && consumeTick()) {
@@ -161,7 +156,7 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 				}
 			}
 		}
-		super.update();
+		super.tick();
 	}
 	
 	@Override
@@ -174,11 +169,11 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		nbt.putInt(NBT_INVENTORY_SLOTS, slots.size());
-		nbt.setTag(NBT_INVENTORY, Inventories.serializeInventory(this));
+		nbt.put(NBT_INVENTORY, Inventories.serializeInventory(this));
 		nbt.putFloat(NBT_AETHER_CARRY, this.aetherCarry);
 		nbt.putFloat(NBT_AETHER_PER, this.aetherPerTick);
 		nbt.putInt(NBT_TICKS_MAX, burnTicksMax);
@@ -188,8 +183,8 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		int slotCount = nbt.getInt(NBT_INVENTORY_SLOTS);
 		if (slotCount <= 0) {
@@ -197,7 +192,7 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		}
 		initInventory(slotCount);
 		
-		Inventories.deserializeInventory(this, nbt.getTag(NBT_INVENTORY));
+		Inventories.deserializeInventory(this, nbt.getCompound(NBT_INVENTORY));
 		this.aetherCarry = nbt.getFloat(NBT_AETHER_CARRY);
 		this.aetherPerTick = nbt.getFloat(NBT_AETHER_PER);
 		this.burnTicksMax = nbt.getInt(NBT_TICKS_MAX);
@@ -334,55 +329,5 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		}
 		
 		return true;
-	}
-
-	private static final class ReagentType {
-		private Item item;
-		private int meta;
-		
-		private ReagentType() {
-			;
-		}
-		
-		public void set(Item item, int meta) {
-			this.item = item;
-			this.meta = meta;
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			return o instanceof ReagentType && ((ReagentType) o).item == item && ((ReagentType) o).meta == meta;
-		}
-		
-		@Override
-		public int hashCode() {
-			return item.hashCode() * 503 + meta * 71; 
-		}
-		
-		private static List<ReagentType> Pool = new LinkedList<>();
-		
-		public static ReagentType get() {
-			if (Pool.isEmpty()) {
-				return new ReagentType();
-			}
-			
-			return Pool.remove(0);
-		}
-		
-		public static ReagentType getAndSet(Item item, int meta) {
-			ReagentType type = get();
-			type.set(item, meta);
-			return type;
-		}
-		
-		public static ReagentType getAndSet(ItemStack stack) {
-			return getAndSet(stack.getItem(), stack.getMetadata());
-		}
-		
-		public static void release(ReagentType type) {
-			type.item = null;
-			type.meta = 0;
-			Pool.add(type);
-		}
 	}
 }

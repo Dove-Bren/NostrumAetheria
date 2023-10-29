@@ -6,20 +6,13 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock;
 
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class AetherPumpBlockEntity extends AetherTickingTileEntity {
 	
 	public AetherPumpBlockEntity() {
-		super(0, 500);
-	}
-	
-	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
-		return !(oldState.getBlock().equals(newState.getBlock()));
+		super(AetheriaTileEntities.Pump, 0, 500);
 	}
 	
 	@Override
@@ -28,8 +21,8 @@ public class AetherPumpBlockEntity extends AetherTickingTileEntity {
 	}
 	
 	@Override
-	public void update() {
-		super.update();
+	public void tick() {
+		super.tick();
 		
 		if (!world.isRemote) {
 			BlockState state = world.getBlockState(pos);

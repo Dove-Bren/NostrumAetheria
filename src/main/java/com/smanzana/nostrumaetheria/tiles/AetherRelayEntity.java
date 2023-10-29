@@ -11,10 +11,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -34,7 +34,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 		}
 		
 		public AetherRelayEntity(Direction facing) {
-			super(0, 0);
+			super(AetheriaTileEntities.Relay, 0, 0);
 			
 			side = facing;
 			this.relayHandler = new AetherRelayComponent(this, facing);
@@ -65,7 +65,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 		public void setWorld(World world) {
 			super.setWorld(world);
 			
-			if (this.pos != null && !this.pos.equals(BlockPos.ORIGIN)) {
+			if (this.pos != null && !this.pos.equals(BlockPos.ZERO)) {
 				relayHandler.setPosition(world, pos.toImmutable());
 			}
 			// if this is too early for side, let's save it :(
@@ -114,8 +114,8 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 		}
 		
 		@Override
-		public void onChunkUnload() {
-			super.onChunkUnload();
+		public void onChunkUnloaded() {
+			super.onChunkUnloaded();
 			
 			// For any linked relays, let them know we're going away (but weren't destroyed)
 			relayHandler.unloadRelay();
@@ -126,31 +126,33 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 		}
 		
 		@Override
-		public SPacketUpdateTileEntity getUpdatePacket() {
-			return new SPacketUpdateTileEntity(this.pos, 3, this.getUpdateTag());
+		public SUpdateTileEntityPacket getUpdatePacket() {
+			return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
 		}
 
 		@Override
 		public CompoundNBT getUpdateTag() {
-			return this.writeToNBT(new CompoundNBT());
+			return this.write(new CompoundNBT());
 		}
 		
 		@Override
-		public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+		public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 			super.onDataPacket(net, pkt);
 			handleUpdateTag(pkt.getNbtCompound());
 		}
 		
-		public CompoundNBT writeToNBT(CompoundNBT compound) {
-			super.writeToNBT(compound);
+		@Override
+		public CompoundNBT write(CompoundNBT compound) {
+			super.write(compound);
 			
-			compound.setByte(NBT_SIDE, (byte) this.side.ordinal());
+			compound.putByte(NBT_SIDE, (byte) this.side.ordinal());
 			
 			return compound;
 		}
 		
-		public void readFromNBT(CompoundNBT compound) {
-			super.readFromNBT(compound);
+		@Override
+		public void read(CompoundNBT compound) {
+			super.read(compound);
 			
 			this.side = Direction.values()[compound.getByte(NBT_SIDE)];
 			relayHandler.setSide(this.side);
@@ -184,8 +186,8 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 		}
 		
 		@Override
-		public void update() {
-			super.update();
+		public void tick() {
+			super.tick();
 			
 			if (this.world != null && this.world.isRemote) {
 				if (ticksExisted > idleTicks) {

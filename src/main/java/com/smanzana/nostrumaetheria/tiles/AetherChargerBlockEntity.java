@@ -4,14 +4,14 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock;
+import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IAutoContainerInventory;
 
-import net.minecraft.block.state.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.block.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class AetherChargerBlockEntity extends AetherBathTileEntity {
+public class AetherChargerBlockEntity extends AetherBathTileEntity implements IAutoContainerInventory {
 	
 	private boolean on;
 	private boolean aetherTick;
@@ -20,22 +20,7 @@ public class AetherChargerBlockEntity extends AetherBathTileEntity {
 	private int clientAetherMaxDisplay; // Client-only.
 	
 	public AetherChargerBlockEntity() {
-		super(0, 500);
-	}
-	
-	@Override
-	public String getName() {
-		return "Aether Charger Inventory";
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
-	}
-	
-	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
-		return !(oldState.getBlock().equals(newState.getBlock()));
+		super(AetheriaTileEntities.Charger, 0, 500);
 	}
 	
 	@Override
@@ -86,13 +71,13 @@ public class AetherChargerBlockEntity extends AetherBathTileEntity {
 	}
 	
 	@Override
-	public void update() {
-		super.update();
+	public void tick() {
+		super.tick();
 		
 		if (!world.isRemote && this.ticksExisted % 5 == 0) {
 			if (aetherTick != on) {
 				BlockState state = world.getBlockState(pos);
-				world.setBlockState(pos, AetherChargerBlock.instance().getDefaultState().with(AetherChargerBlock.ON, aetherTick).with(AetherChargerBlock.FACING, state.getValue(AetherChargerBlock.FACING)));
+				world.setBlockState(pos, AetheriaBlocks.charger.getDefaultState().with(AetherChargerBlock.ON, aetherTick).with(AetherChargerBlock.FACING, state.get(AetherChargerBlock.FACING)));
 			}
 			
 			on = aetherTick;

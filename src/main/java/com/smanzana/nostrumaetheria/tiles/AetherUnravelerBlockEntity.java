@@ -8,25 +8,25 @@ import org.apache.commons.lang3.Validate;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
+import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.recipes.UnravelerRecipeManager;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IAutoContainerInventory;
 
-import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory {
+public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory, IAutoContainerInventory {
 	
 	private boolean on;
 	private boolean aetherTick;
@@ -36,7 +36,7 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 	private int workTicks;
 	
 	public AetherUnravelerBlockEntity(int aether, int maxAether) {
-		super(aether, maxAether);
+		super(AetheriaTileEntities.Unraveler, aether, maxAether);
 		
 		this.setAutoSync(5);
 		this.handler.configureInOut(true, false);
@@ -74,13 +74,13 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 	private static final String NBT_WORK_TICKS = "work_ticks";
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		if (!stack.isEmpty()) {
 			CompoundNBT tag = new CompoundNBT();
-			tag = stack.writeToNBT(tag);
-			nbt.setTag(NBT_ITEM, tag);
+			tag = stack.write(tag);
+			nbt.put(NBT_ITEM, tag);
 		}
 		
 		if (workTicks > 0) {
@@ -91,17 +91,17 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		if (nbt == null)
 			return;
 			
-		if (!nbt.hasKey(NBT_ITEM, NBT.TAG_COMPOUND)) {
+		if (!nbt.contains(NBT_ITEM, NBT.TAG_COMPOUND)) {
 			stack = ItemStack.EMPTY;
 		} else {
-			CompoundNBT tag = nbt.getCompoundTag(NBT_ITEM);
-			stack = new ItemStack(tag);
+			CompoundNBT tag = nbt.getCompound(NBT_ITEM);
+			stack = ItemStack.read(tag);
 		}
 		refreshRecipe();
 		
@@ -129,7 +129,7 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 	public ItemStack decrStackSize(int index, int count) {
 		if (index > 0)
 			return ItemStack.EMPTY;
-		ItemStack ret = this.stack.splitStack(count);
+		ItemStack ret = this.stack.split(count);
 		if (this.stack.isEmpty())
 			this.stack = ItemStack.EMPTY;
 		this.forceUpdate();
@@ -189,11 +189,6 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 		return UnravelerRecipeManager.instance().findRecipe(stack) != null;
 	}
 
-	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
-		return !(oldState.getBlock().equals(newState.getBlock()));
-	}
-	
 	public int getMaxTicks() {
 		if (this.recipe == null) {
 			return 0;
@@ -256,16 +251,6 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 	}
 
 	@Override
-	public String getName() {
-		return "Aether Unraveler";
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
-	}
-
-	@Override
 	public int[] getSlotsForFace(Direction side) {
 		return new int[] {0};
 	}
@@ -300,7 +285,7 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 		double x = pos.getX() + .5;
 		double y = pos.getY() + 1.2;
 		double z = pos.getZ() + .5;
-		((WorldServer) world).spawnParticle(ParticleTypes.CRIT_MAGIC,
+		((ServerWorld) world).spawnParticle(ParticleTypes.CRIT,
 				x,
 				y,
 				z,
@@ -308,14 +293,14 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 				.25,
 				.6,
 				.25,
-				.1,
-				new int[0]);
+				.1
+				);
 		//world.playSound(null, pos, SoundEvents.BLOCK_ANVIL_USE, null
 		world.playSound(null, pos, SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1f, 1f);
 	}
 	
 	@Override
-	public void update() {
+	public void tick() {
 		// If we have an item, work and break it down
 		if (!world.isRemote) {
 			if (!stack.isEmpty() && recipe != null) {
@@ -362,14 +347,14 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 			}
 			
 			if (aetherTick != on) {
-				world.setBlockState(pos, AetherUnravelerBlock.instance().getDefaultState().with(AetherUnravelerBlock.ON, aetherTick));
+				world.setBlockState(pos, AetheriaBlocks.unraveler.getDefaultState().with(AetherUnravelerBlock.ON, aetherTick));
 			}
 			
 			on = aetherTick;
 			aetherTick = false;
 		}
 			
-		super.update();
+		super.tick();
 	}
 	
 	@Override

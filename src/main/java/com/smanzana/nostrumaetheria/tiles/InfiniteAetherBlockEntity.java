@@ -5,13 +5,13 @@ import net.minecraft.nbt.CompoundNBT;
 public class InfiniteAetherBlockEntity extends NativeAetherTickingTileEntity {
 
 	public InfiniteAetherBlockEntity() {
-		super(0, 10000);
+		super(AetheriaTileEntities.InfiniteBlock, 0, 10000);
 		this.setAutoSync(5);
 		this.handler.configureInOut(false, true);
 	}
 
 	@Override
-	public void update() {
+	public void tick() {
 		if (!world.isRemote) {
 			int leftoverGen = this.handler.addAether(null, 10000, true); // 'force' to disable having aether added by others but force ourselves.
 			
@@ -21,16 +21,16 @@ public class InfiniteAetherBlockEntity extends NativeAetherTickingTileEntity {
 				this.handler.addAether(null, leftoverGen, true);
 			}
 		}
-		super.update();
+		super.tick();
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		return super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		return super.write(nbt);
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 	}
 }

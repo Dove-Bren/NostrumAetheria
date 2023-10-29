@@ -3,10 +3,7 @@ package com.smanzana.nostrumaetheria.tiles;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock.Type;
 
-import net.minecraft.block.state.BlockState;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 
@@ -19,18 +16,18 @@ public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	public AetherFurnaceBlockEntity(Type type) {
-		super(AetherFurnaceBlock.getFurnaceSlotsForType(type), 0, 500);
+		super(AetheriaTileEntities.Furnace, AetherFurnaceBlock.getFurnaceSlotsForType(type), 0, 500);
 		this.type = type;
 		
 	}
 	
-	public Type getType() {
+	public Type getFurnceType() {
 		return this.type;
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		nbt.putString(NBT_TYPE, type.name());
 		
@@ -38,8 +35,8 @@ public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		try {
 			this.type = Type.valueOf(nbt.getString(NBT_TYPE));
@@ -48,21 +45,6 @@ public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 		}
 	}
 	
-	@Override
-	public String getName() {
-		return "Aether Furnace Inventory";
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
-	}
-	
-	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
-		return !(oldState.getBlock().equals(newState.getBlock()) && AetherFurnaceBlock.instance().getType(oldState) == AetherFurnaceBlock.instance().getType(newState));
-	}
-
 	@Override
 	protected float getAetherMultiplier() {
 		return this.type.getAetherMultiplier();
@@ -75,6 +57,6 @@ public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 
 	@Override
 	protected void onBurningChange(boolean newBurning) {
-		world.setBlockState(pos, AetherFurnaceBlock.instance().getDefaultState().with(AetherFurnaceBlock.TYPE, this.type).with(AetherFurnaceBlock.ON, newBurning));
+		world.setBlockState(pos, AetherFurnaceBlock.GetForType(getFurnceType()).getDefaultState().with(AetherFurnaceBlock.ON, newBurning));
 	}
 }

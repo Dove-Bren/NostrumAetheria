@@ -19,7 +19,7 @@ public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 	private Size size;
 	
 	public AetherBatteryEntity(Size size) {
-		super(0, size.capacity);
+		super(AetheriaTileEntities.Battery, 0, size.capacity);
 		this.size = size;
 		this.setAutoSync(5);
 	}
@@ -33,12 +33,12 @@ public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 	}
 
 	@Override
-	public void update() {
+	public void tick() {
 		if (this.ticksExisted % 5 == 0) {
 			this.flowIntoNearby();
 		}
 		
-		super.update();
+		super.tick();
 	}
 	
 	protected void flowIntoNearby() {
@@ -140,16 +140,16 @@ public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		nbt.putString(NBT_SIZE, this.size.name());
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		try {
 			this.size = Size.valueOf(nbt.getString(NBT_SIZE));

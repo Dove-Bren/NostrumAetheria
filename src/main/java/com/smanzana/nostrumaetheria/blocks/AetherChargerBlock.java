@@ -40,15 +40,6 @@ public class AetherChargerBlock extends Block implements ILoreTagged {
 	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
 	public static final String ID = "aether_charger";
 	
-	
-	private static AetherChargerBlock instance = null;
-	public static AetherChargerBlock instance() {
-		if (instance == null)
-			instance = new AetherChargerBlock();
-		
-		return instance;
-	}
-	
 	public AetherChargerBlock() {
 		super(Block.Properties.create(Material.ROCK)
 				.hardnessAndResistance(3.0f, 10.0f)

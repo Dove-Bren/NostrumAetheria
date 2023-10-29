@@ -14,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -22,15 +23,15 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	
 	private ItemStack stack = ItemStack.EMPTY;
 	
-	public AetherBathTileEntity(int aether, int maxAether) {
-		super(aether, maxAether);
+	public AetherBathTileEntity(TileEntityType<? extends AetherBathTileEntity> type, int aether, int maxAether) {
+		super(type, aether, maxAether);
 		
 		this.setAutoSync(5);
 		this.handler.configureInOut(true, false);
 	}
 	
 	public AetherBathTileEntity() {
-		this(0, 250);
+		this(AetheriaTileEntities.Bath, 0, 250);
 	}
 	
 	public @Nonnull ItemStack getItem() {
@@ -46,30 +47,30 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	private static final String NBT_ITEM = "item";
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		if (!stack.isEmpty()) {
 			CompoundNBT tag = new CompoundNBT();
-			tag = stack.writeToNBT(tag);
-			nbt.setTag(NBT_ITEM, tag);
+			tag = stack.write(tag);
+			nbt.put(NBT_ITEM, tag);
 		}
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		if (nbt == null)
 			return;
 			
-		if (!nbt.hasKey(NBT_ITEM, NBT.TAG_COMPOUND)) {
+		if (!nbt.contains(NBT_ITEM, NBT.TAG_COMPOUND)) {
 			stack = ItemStack.EMPTY;
 		} else {
-			CompoundNBT tag = nbt.getCompoundTag(NBT_ITEM);
-			stack = new ItemStack(tag);
+			CompoundNBT tag = nbt.getCompound(NBT_ITEM);
+			stack = ItemStack.read(tag);
 		}
 	}
 	
@@ -94,7 +95,7 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	public ItemStack decrStackSize(int index, int count) {
 		if (index > 0)
 			return ItemStack.EMPTY;
-		ItemStack ret = this.stack.splitStack(count);
+		ItemStack ret = this.stack.split(count);
 		if (this.stack.isEmpty())
 			this.stack = ItemStack.EMPTY;
 		this.forceUpdate();
@@ -156,34 +157,9 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 
 	@Override
-	public int getField(int id) {
-		return 0;
-	}
-
-	@Override
-	public void setField(int id, int value) {
-		
-	}
-
-	@Override
-	public int getFieldCount() {
-		return 0;
-	}
-
-	@Override
 	public void clear() {
 		this.stack = ItemStack.EMPTY;
 		forceUpdate();
-	}
-
-	@Override
-	public String getName() {
-		return "Aether Bath";
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
 	}
 
 	@Override
@@ -235,7 +211,7 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 	
 	@Override
-	public void update() {
+	public void tick() {
 		// If we have an item, try to add aether to it
 		if (!world.isRemote) {
 			
@@ -261,7 +237,7 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 			}
 		}
 		
-		super.update();
+		super.tick();
 	}
 	
 	@Override

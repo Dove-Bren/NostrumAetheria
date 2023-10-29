@@ -19,21 +19,21 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(NostrumMagica.MODID)
 public class AetheriaBlocks {
 	
-	@ObjectHolder(InfiniteAetherBlock.ID) public static Block infiteAetherBlock;
-	@ObjectHolder(AetherBatteryBlock.ID_SMALL) public static Block smallBattery;
-	@ObjectHolder(AetherBatteryBlock.ID_MEDIUM) public static Block mediumBattery;
-	@ObjectHolder(AetherBatteryBlock.ID_LARGE) public static Block largeBattery;
-	@ObjectHolder(AetherBatteryBlock.ID_GIANT) public static Block giantBattery;
-	@ObjectHolder(AetherRelay.ID) public static Block relay;
-	@ObjectHolder(AetherFurnaceBlock.ID_SMALL) public static Block smallFurnace;
-	@ObjectHolder(AetherFurnaceBlock.ID_MEDIUM) public static Block mediumFurnace;
-	@ObjectHolder(AetherFurnaceBlock.ID_LARGE) public static Block largeFurnace;
-	@ObjectHolder(AetherBoilerBlock.ID) public static Block boiler;
-	@ObjectHolder(AetherBathBlock.ID) public static Block bath;
-	@ObjectHolder(AetherChargerBlock.ID) public static Block charger;
-	@ObjectHolder(AetherRepairerBlock.ID) public static Block repairer;
-	@ObjectHolder(AetherUnravelerBlock.ID) public static Block unraveler;
-	@ObjectHolder(AetherPumpBlock.ID) public static Block pump;
+	@ObjectHolder(InfiniteAetherBlock.ID) public static InfiniteAetherBlock infiteAetherBlock;
+	@ObjectHolder(AetherBatteryBlock.ID_SMALL) public static AetherBatteryBlock smallBattery;
+	@ObjectHolder(AetherBatteryBlock.ID_MEDIUM) public static AetherBatteryBlock mediumBattery;
+	@ObjectHolder(AetherBatteryBlock.ID_LARGE) public static AetherBatteryBlock largeBattery;
+	@ObjectHolder(AetherBatteryBlock.ID_GIANT) public static AetherBatteryBlock giantBattery;
+	@ObjectHolder(AetherRelay.ID) public static AetherRelay relay;
+	@ObjectHolder(AetherFurnaceBlock.ID_SMALL) public static AetherFurnaceBlock smallFurnace;
+	@ObjectHolder(AetherFurnaceBlock.ID_MEDIUM) public static AetherFurnaceBlock mediumFurnace;
+	@ObjectHolder(AetherFurnaceBlock.ID_LARGE) public static AetherFurnaceBlock largeFurnace;
+	@ObjectHolder(AetherBoilerBlock.ID) public static AetherBoilerBlock boiler;
+	@ObjectHolder(AetherBathBlock.ID) public static AetherBathBlock bath;
+	@ObjectHolder(AetherChargerBlock.ID) public static AetherChargerBlock charger;
+	@ObjectHolder(AetherRepairerBlock.ID) public static AetherRepairerBlock repairer;
+	@ObjectHolder(AetherUnravelerBlock.ID) public static AetherUnravelerBlock unraveler;
+	@ObjectHolder(AetherPumpBlock.ID) public static AetherPumpBlock pump;
 
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);

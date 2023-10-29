@@ -5,19 +5,19 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
+import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.recipes.RepairerRecipeManager;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IAutoContainerInventory;
 
-import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory {
+public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory, IAutoContainerInventory {
 	
 	private boolean on;
 	private boolean aetherTick;
@@ -25,7 +25,7 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	private @Nonnull ItemStack stack = ItemStack.EMPTY;
 	
 	public AetherRepairerBlockEntity(int aether, int maxAether) {
-		super(aether, maxAether);
+		super(AetheriaTileEntities.Repairer, aether, maxAether);
 		
 		this.setAutoSync(5);
 		this.handler.configureInOut(true, false);
@@ -47,30 +47,30 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	private static final String NBT_ITEM = "item";
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		nbt = super.writeToNBT(nbt);
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
 		
 		if (!stack.isEmpty()) {
 			CompoundNBT tag = new CompoundNBT();
-			tag = stack.writeToNBT(tag);
-			nbt.setTag(NBT_ITEM, tag);
+			tag = stack.write(tag);
+			nbt.put(NBT_ITEM, tag);
 		}
 		
 		return nbt;
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		super.readFromNBT(nbt);
+	public void read(CompoundNBT nbt) {
+		super.read(nbt);
 		
 		if (nbt == null)
 			return;
 			
-		if (!nbt.hasKey(NBT_ITEM, NBT.TAG_COMPOUND)) {
+		if (!nbt.contains(NBT_ITEM, NBT.TAG_COMPOUND)) {
 			stack = ItemStack.EMPTY;
 		} else {
-			CompoundNBT tag = nbt.getCompoundTag(NBT_ITEM);
-			stack = new ItemStack(tag);
+			CompoundNBT tag = nbt.getCompound(NBT_ITEM);
+			stack = ItemStack.read(tag);
 		}
 	}
 	
@@ -95,7 +95,7 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	public ItemStack decrStackSize(int index, int count) {
 		if (index > 0)
 			return ItemStack.EMPTY;
-		ItemStack ret = this.stack.splitStack(count);
+		ItemStack ret = this.stack.split(count);
 		if (this.stack.isEmpty())
 			this.stack = ItemStack.EMPTY;
 		this.forceUpdate();
@@ -155,11 +155,6 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 
 	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newState) {
-		return !(oldState.getBlock().equals(newState.getBlock()));
-	}
-	
-	@Override
 	public int getField(int id) {
 		if (id == 0) {
 			return this.handler.getAether(null);
@@ -194,16 +189,6 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 
 	@Override
-	public String getName() {
-		return "Aether Repairer";
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
-	}
-
-	@Override
 	public int[] getSlotsForFace(Direction side) {
 		return new int[] {0};
 	}
@@ -225,7 +210,7 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 	
 	@Override
-	public void update() {
+	public void tick() {
 		// If we have an item, try to repair it
 		if (!world.isRemote && this.ticksExisted % 20 == 0) {
 			if (!stack.isEmpty()) {
@@ -241,14 +226,14 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 			}
 			
 			if (aetherTick != on) {
-				world.setBlockState(pos, AetherRepairerBlock.instance().getDefaultState().with(AetherRepairerBlock.ON, aetherTick));
+				world.setBlockState(pos, AetheriaBlocks.repairer.getDefaultState().with(AetherRepairerBlock.ON, aetherTick));
 			}
 			
 			on = aetherTick;
 			aetherTick = false;
 		}
 			
-		super.update();
+		super.tick();
 	}
 	
 	@Override
