@@ -1,16 +1,16 @@
-package com.smanzana.nostrumaetheria.blocks.tiles;
+package com.smanzana.nostrumaetheria.tiles;
 
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
-import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
+import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
 import com.smanzana.nostrumaetheria.component.AetherHandlerComponent;
 
-public class NativeAetherTickingTileEntity extends AetherTickingTileEntity {
+public class NativeAetherTileEntity extends AetherTileEntity {
 
 	protected AetherHandlerComponent handler;
 	
-	public NativeAetherTickingTileEntity(int defaultAether, int defaultMaxAether) {
+	public NativeAetherTileEntity(int defaultAether, int defaultMaxAether) {
 		super(defaultAether, defaultMaxAether);
 		
 		this.handler = (AetherHandlerComponent) this.compWrapper.getHandlerIfPresent();
@@ -20,5 +20,4 @@ public class NativeAetherTickingTileEntity extends AetherTickingTileEntity {
 	public @Nullable IAetherHandler getHandler() {
 		return handler; // importantly, lets subclasses swap out handler and then that be seen by other things
 	}
-	
 }

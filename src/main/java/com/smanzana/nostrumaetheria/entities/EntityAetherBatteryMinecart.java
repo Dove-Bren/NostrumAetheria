@@ -3,8 +3,8 @@ package com.smanzana.nostrumaetheria.entities;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock;
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherPumpBlockEntity;
 import com.smanzana.nostrumaetheria.items.AetherBatteryMinecartItem;
+import com.smanzana.nostrumaetheria.tiles.AetherPumpBlockEntity;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityMinecart;

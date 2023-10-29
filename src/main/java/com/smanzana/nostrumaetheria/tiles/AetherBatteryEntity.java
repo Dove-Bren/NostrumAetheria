@@ -1,4 +1,4 @@
-package com.smanzana.nostrumaetheria.blocks.tiles;
+package com.smanzana.nostrumaetheria.tiles;
 
 import java.util.Collections;
 import java.util.Iterator;

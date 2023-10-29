@@ -3,7 +3,7 @@ package com.smanzana.nostrumaetheria.blocks;
 import java.util.Random;
 
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherPumpBlockEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherPumpBlockEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;

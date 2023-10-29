@@ -5,7 +5,7 @@ import java.util.Random;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherBathTileEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherBathTileEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;

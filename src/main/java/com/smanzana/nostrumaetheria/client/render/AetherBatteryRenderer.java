@@ -2,7 +2,7 @@ package com.smanzana.nostrumaetheria.client.render;
 
 import org.lwjgl.opengl.GL11;
 
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherBatteryEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
 
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;

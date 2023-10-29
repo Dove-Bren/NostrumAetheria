@@ -2,7 +2,7 @@ package com.smanzana.nostrumaetheria.client.render;
 
 import org.lwjgl.opengl.GL11;
 
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherBathTileEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherBathTileEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;

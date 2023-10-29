@@ -1,7 +1,7 @@
 package com.smanzana.nostrumaetheria.blocks;
 
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherBatteryEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;

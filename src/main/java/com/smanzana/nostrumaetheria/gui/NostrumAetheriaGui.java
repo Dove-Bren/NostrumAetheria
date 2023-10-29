@@ -1,11 +1,6 @@
 package com.smanzana.nostrumaetheria.gui;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherBoilerBlockEntity;
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherChargerBlockEntity;
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherFurnaceBlockEntity;
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherRepairerBlockEntity;
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherUnravelerBlockEntity;
 import com.smanzana.nostrumaetheria.gui.container.ActivePendantGui;
 import com.smanzana.nostrumaetheria.gui.container.AetherBoilerGui;
 import com.smanzana.nostrumaetheria.gui.container.AetherBoilerGui.AetherBoilerGuiContainer;
@@ -17,6 +12,11 @@ import com.smanzana.nostrumaetheria.gui.container.AetherRepairerGui;
 import com.smanzana.nostrumaetheria.gui.container.AetherRepairerGui.AetherRepairerGuiContainer;
 import com.smanzana.nostrumaetheria.gui.container.AetherUnravelerGui;
 import com.smanzana.nostrumaetheria.items.ActivePendant;
+import com.smanzana.nostrumaetheria.tiles.AetherBoilerBlockEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherChargerBlockEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherFurnaceBlockEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherRepairerBlockEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherUnravelerBlockEntity;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

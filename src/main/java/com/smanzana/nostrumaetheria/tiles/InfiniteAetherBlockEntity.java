@@ -1,4 +1,4 @@
-package com.smanzana.nostrumaetheria.blocks.tiles;
+package com.smanzana.nostrumaetheria.tiles;
 
 import net.minecraft.nbt.NBTTagCompound;
 

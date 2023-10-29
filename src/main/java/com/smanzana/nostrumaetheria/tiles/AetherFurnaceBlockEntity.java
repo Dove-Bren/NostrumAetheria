@@ -1,4 +1,4 @@
-package com.smanzana.nostrumaetheria.blocks.tiles;
+package com.smanzana.nostrumaetheria.tiles;
 
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock.Type;

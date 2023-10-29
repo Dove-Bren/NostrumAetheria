@@ -1,5 +1,7 @@
 package com.smanzana.nostrumaetheria.network.messages;
 
+import javax.xml.ws.handler.MessageContext;
+
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
 
 import io.netty.buffer.ByteBuf;
@@ -10,41 +12,32 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * Server is sending an update about the aether level of a tile entity
  * @author Skyler
  *
  */
-public class AetherTileEntityMessage implements IMessage {
+public class AetherTileEntityMessage {
 
-	public static class Handler implements IMessageHandler<AetherTileEntityMessage, IMessage> {
-
-		@Override
-		public IMessage onMessage(AetherTileEntityMessage message, MessageContext ctx) {
-			
-			int dim = message.tag.getInteger(NBT_DIM);
-			BlockPos pos = BlockPos.fromLong(message.tag.getLong(NBT_POS));
-			int aether = message.tag.getInteger(NBT_AETHER);
-			
-			Minecraft.getMinecraft().addScheduledTask(() -> {
-				if (Minecraft.getMinecraft().player.world.provider.getDimension() == dim) {
-					World world = Minecraft.getMinecraft().player.world;
-					if (!world.isBlockLoaded(pos)) {
-						return;
-					}
-					TileEntity te = world.getTileEntity(pos);
-					if (te != null && te instanceof AetherTileEntity) {
-						((AetherTileEntity) te).syncAether(aether);
-					}
-				}
-			});
-			
-			return null;
-		}
+	public static void handle(AetherTileEntityMessage message, MessageContext ctx) {
 		
+		int dim = message.tag.getInteger(NBT_DIM);
+		BlockPos pos = BlockPos.fromLong(message.tag.getLong(NBT_POS));
+		int aether = message.tag.getInteger(NBT_AETHER);
+		
+		Minecraft.getMinecraft().addScheduledTask(() -> {
+			if (Minecraft.getMinecraft().player.world.provider.getDimension() == dim) {
+				World world = Minecraft.getMinecraft().player.world;
+				if (!world.isBlockLoaded(pos)) {
+					return;
+				}
+				TileEntity te = world.getTileEntity(pos);
+				if (te != null && te instanceof AetherTileEntity) {
+					((AetherTileEntity) te).syncAether(aether);
+				}
+			}
+		});
 	}
 
 	private static final String NBT_DIM = "dim";

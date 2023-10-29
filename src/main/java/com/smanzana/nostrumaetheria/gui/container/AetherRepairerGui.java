@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherRepairerBlockEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherRepairerBlockEntity;
 import com.smanzana.nostrummagica.client.gui.container.AutoContainer;
 import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
 import com.smanzana.nostrummagica.utils.Inventories;

@@ -1,7 +1,7 @@
 package com.smanzana.nostrumaetheria.network.messages;
 
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherBoilerBlockEntity;
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherBoilerBlockEntity.BoilerBurnMode;
+import com.smanzana.nostrumaetheria.tiles.AetherBoilerBlockEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherBoilerBlockEntity.BoilerBurnMode;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;

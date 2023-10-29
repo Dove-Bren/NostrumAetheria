@@ -1,6 +1,6 @@
 package com.smanzana.nostrumaetheria.blocks;
 
-import com.smanzana.nostrumaetheria.blocks.tiles.InfiniteAetherBlockEntity;
+import com.smanzana.nostrumaetheria.tiles.InfiniteAetherBlockEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;

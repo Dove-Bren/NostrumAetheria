@@ -1,7 +1,7 @@
 package com.smanzana.nostrumaetheria.client.render;
 
-import com.smanzana.nostrumaetheria.blocks.tiles.AetherBatteryEntity;
 import com.smanzana.nostrumaetheria.entities.EntityAetherBatteryMinecart;
+import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.entity.RenderManager;
