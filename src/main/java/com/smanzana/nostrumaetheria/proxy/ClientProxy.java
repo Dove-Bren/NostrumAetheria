@@ -1,16 +1,6 @@
 package com.smanzana.nostrumaetheria.proxy;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
-import com.smanzana.nostrumaetheria.blocks.AetherBathBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherRelay;
-import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
-import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
-import com.smanzana.nostrumaetheria.blocks.InfiniteAetherBlock;
 import com.smanzana.nostrumaetheria.client.render.AetherBathRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherBatteryRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherRelayRenderer;
@@ -20,10 +10,6 @@ import com.smanzana.nostrumaetheria.client.render.TileEntityAetherInfuserRendere
 import com.smanzana.nostrumaetheria.client.render.TileEntityWispBlockRenderer;
 import com.smanzana.nostrumaetheria.entity.EntityAetherBatteryMinecart;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetherCloakItem;
-import com.smanzana.nostrumaetheria.items.ActivePendant;
-import com.smanzana.nostrumaetheria.items.AetherBatteryMinecartItem;
-import com.smanzana.nostrumaetheria.items.AetherGem;
-import com.smanzana.nostrumaetheria.items.PassivePendant;
 import com.smanzana.nostrumaetheria.tiles.AetherBathTileEntity;
 import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
 import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity;
@@ -32,17 +18,17 @@ import com.smanzana.nostrumaetheria.tiles.InfiniteAetherBlockEntity;
 import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.BasicState;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -54,6 +40,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class ClientProxy extends CommonProxy {
 	
@@ -84,67 +71,8 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void registerAllModels(ModelRegistryEvent event) {
-		registerModel(Item.getItemFromBlock(InfiniteAetherBlock.instance()),
-				0,
-				InfiniteAetherBlock.ID);
-		registerModel(Item.getItemFromBlock(AetherBatteryBlock.small()),
-				0,
-				AetherBatteryBlock.small().getID());
-		registerModel(Item.getItemFromBlock(AetherBatteryBlock.medium()),
-				0,
-				AetherBatteryBlock.medium().getID());
-		registerModel(Item.getItemFromBlock(AetherBatteryBlock.large()),
-				0,
-				AetherBatteryBlock.large().getID());
-		registerModel(Item.getItemFromBlock(AetherBatteryBlock.giant()),
-				0,
-				AetherBatteryBlock.giant().getID());
-		registerModel(Item.getItemFromBlock(AetherRelay.instance()),
-				0,
-				AetherRelay.ID);
-		for (AetherFurnaceBlock.Type type : AetherFurnaceBlock.Type.values()) {
-			registerModel(Item.getItemFromBlock(AetherFurnaceBlock.instance()),
-					type.ordinal(),
-					AetherFurnaceBlock.ID);
-		}
-		registerModel(Item.getItemFromBlock(AetherBoilerBlock.instance()),
-				0,
-				AetherBoilerBlock.ID);
-		registerModel(ActivePendant.instance(),
-				0,
-				ActivePendant.ID);
-		registerModel(PassivePendant.instance(),
-				0,
-				PassivePendant.ID);
-		registerModel(Item.getItemFromBlock(AetherBathBlock.instance()),
-				0,
-				AetherBathBlock.ID);
-		registerModel(AetherGem.instance(),
-				0,
-				AetherGem.ID);
-		registerModel(Item.getItemFromBlock(AetherChargerBlock.instance()),
-				0,
-				AetherChargerBlock.ID);
-		registerModel(Item.getItemFromBlock(AetherRepairerBlock.instance()),
-				0,
-				AetherRepairerBlock.ID);
-		registerModel(Item.getItemFromBlock(AetherUnravelerBlock.instance()),
-				0,
-				AetherUnravelerBlock.ID);
-		registerModel(AetherBatteryMinecartItem.instance(),
-				0,
-				AetherBatteryMinecartItem.ID);
-		registerModel(Item.getItemFromBlock(AetherPumpBlock.instance()),
-				0,
-				AetherPumpBlock.ID);
-		
 		registerEntityRenderers();
-		registerTileEntityRenderers();
-	}
-	
-	public static void registerModel(Item item, int meta, String modelName) {
-		ModelLoader.setCustomModelResourceLocation(item, meta,
-    			new ModelResourceLocation(NostrumAetheria.MODID + ":" + modelName, "inventory"));
+		//registerTileEntityRenderers();
 	}
 	
 	@SubscribeEvent
@@ -161,16 +89,35 @@ public class ClientProxy extends CommonProxy {
 		}
 	}
 	
+	@SubscribeEvent
+	public void stitchEventPre(TextureStitchEvent.Pre event) {
+		// Note: called multiple times for different texture atlases.
+		// Using what Botania does
+		if(event.getMap() != Minecraft.getInstance().getTextureMap()) {
+			return;
+		}
+		
+		event.addSprite(new ResourceLocation(
+				NostrumAetheria.MODID, "models/armor/aether_cloak_decor"));
+		event.addSprite(new ResourceLocation(
+				NostrumAetheria.MODID, "models/armor/aether_cloak_inside"));
+		event.addSprite(new ResourceLocation(
+				NostrumAetheria.MODID, "models/armor/aether_cloak_outside"));
+	}
+	
 	private void registerEntityRenderers() {
 		RenderingRegistry.registerEntityRenderingHandler(EntityAetherBatteryMinecart.class, new IRenderFactory<EntityAetherBatteryMinecart>() {
 			@Override
-			public Render<? super EntityAetherBatteryMinecart> createRenderFor(RenderManager manager) {
+			public EntityRenderer<? super EntityAetherBatteryMinecart> createRenderFor(EntityRendererManager manager) {
 				return new RenderAetherBatteryMinecart(manager);
 			}
 		});
 	}
 	
-	private void registerTileEntityRenderers() {
+	@SubscribeEvent
+	public void clientSetup(FMLClientSetupEvent event) {
+		OBJLoader.INSTANCE.addDomain(NostrumAetheria.MODID);
+		
 		TileEntityAetherDebugRenderer.registerFor(InfiniteAetherBlockEntity.class);
 		TileEntityAetherDebugRenderer.registerFor(AetherBatteryEntity.class);
 		ClientRegistry.bindTileEntitySpecialRenderer(AetherRelayEntity.class,
@@ -190,7 +137,8 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public PlayerEntity getPlayer() {
-		return Minecraft.getInstance().player;
+		Minecraft mc = Minecraft.getInstance();
+		return mc.player;
 	}
 	
 	@SubscribeEvent
