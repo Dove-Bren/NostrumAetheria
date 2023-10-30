@@ -10,7 +10,6 @@ import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IAutoContainerInventory;
@@ -49,7 +48,7 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	private int ticksExisted;
 	
 	public WispBlockTileEntity() {
-		super(AetheriaProxy.WispBlockTileEntityType, 0, MAX_AETHER);
+		super(AetheriaTileEntities.WispBlockEnt, 0, MAX_AETHER);
 		scroll = ItemStack.EMPTY;
 		reagent = ItemStack.EMPTY;
 		reagentPartial = 0f;

@@ -15,8 +15,8 @@ import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagLong;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -324,11 +324,11 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		NBTTagList list = new NBTTagList();
+		ListNBT list = new ListNBT();
 		for (BlockPos link : links) {
-			list.appendTag(new NBTTagLong(link.toLong()));
+			list.add(NBTUtil.writeBlockPos(link));
 		}
-		nbt.setTag(NBT_LINK, list);
+		nbt.put(NBT_LINK, list);
 		
 		return nbt;
 	}
@@ -340,10 +340,9 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 		links.clear();
 		linkCache.clear();
 		missingLinks.clear();
-		NBTTagList list = nbt.getTagList(NBT_LINK, NBT.TAG_LONG);
-		for (int i = 0; i < list.tagCount(); i++) {
-			NBTTagLong lTag = (NBTTagLong) list.get(i);
-			BlockPos pos = BlockPos.fromLong(lTag.getLong());
+		ListNBT list = nbt.getList(NBT_LINK, NBT.TAG_COMPOUND);
+		for (int i = 0; i < list.size(); i++) {
+			BlockPos pos = NBTUtil.readBlockPos(list.getCompound(i));
 			if (links.add(pos)) { // prevents dupes :)
 				missingLinks.add(pos);
 			}

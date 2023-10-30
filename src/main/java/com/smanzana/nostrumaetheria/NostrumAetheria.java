@@ -6,8 +6,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
-import com.smanzana.nostrumaetheria.blocks.InfiniteAetherBlock;
-import com.smanzana.nostrumaetheria.items.AetherGem;
+import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
+import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrumaetheria.proxy.AetheriaAPIProxy;
 import com.smanzana.nostrumaetheria.proxy.ClientProxy;
 import com.smanzana.nostrumaetheria.proxy.CommonProxy;
@@ -44,13 +44,13 @@ public class NostrumAetheria
 	    	@Override
 	    	@OnlyIn(Dist.CLIENT)
 	        public ItemStack createIcon(){
-	    		return new ItemStack(InfiniteAetherBlock.instance());
+	    		return new ItemStack(AetheriaBlocks.infiteAetherBlock);
 	        }
 	    };
 	    //InfineAetherBlock.instance().setCreativeTab(APIProxy.creativeTab);
 	    
     	proxy.preinit();
-    	APIProxy.ResearchTab = new NostrumResearch.NostrumResearchTab("aether", new ItemStack(AetherGem.instance()));
+    	APIProxy.ResearchTab = new NostrumResearch.NostrumResearchTab("aether", new ItemStack(AetheriaItems.aetherGem));
     }
     
     

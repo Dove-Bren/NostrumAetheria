@@ -10,13 +10,14 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrumaetheria.api.blocks.IAetherInfusableTileEntity;
+import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
 import com.smanzana.nostrumaetheria.api.item.IAetherInfuserLens;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.ITameableEntity;
-import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.utils.Inventories.ItemStackArrayWrapper;
 import com.smanzana.nostrummagica.utils.WorldUtil;
@@ -46,7 +47,7 @@ import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class AetherInfuserTileEntity extends AetherTickingTileEntity {
+public class AetherInfuserTileEntity extends AetherTickingTileEntity implements IAetherInfuserTileEntity {
 
 		private static final String NBT_CHARGE = "charge";
 		public static final int MAX_CHARGE = 5000;
@@ -69,7 +70,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 		private List<AetherInfuserTileEntity.EffectSpark> sparks;
 		
 		public AetherInfuserTileEntity() {
-			super(AetheriaProxy.AetherInfuserTileEntityType, 0, MAX_CHARGE);
+			super(AetheriaTileEntities.AetherInfuserEnt, 0, MAX_CHARGE);
 			this.setAutoSync(5);
 			this.compWrapper.configureInOut(true, false);
 			nearbyChargeables = new HashMap<>();
@@ -487,7 +488,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			if (hasLens()) {
 				ItemStack held = centerAltar.getItem();
 				return !held.isEmpty()
-						&& held.getItem() == AetheriaProxy.chargeAetherLens;
+						&& held.getItem() == AetheriaItems.chargeAetherLens;
 			}
 			
 			return false;
@@ -501,7 +502,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			if (hasLens()) {
 				ItemStack held = centerAltar.getItem();
 				return !held.isEmpty()
-						&& held.getItem() == AetheriaProxy.noSpawnAetherLens;
+						&& held.getItem() == AetheriaItems.noSpawnAetherLens;
 			}
 			
 			return false;
@@ -523,7 +524,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 			if (hasLens()) {
 				ItemStack held = centerAltar.getItem();
 				return !held.isEmpty()
-						&& held.getItem() == AetheriaProxy.spreadAetherLens;
+						&& held.getItem() == AetheriaItems.spreadAetherLens;
 			}
 			return false;
 		}

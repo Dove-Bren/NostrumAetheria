@@ -318,7 +318,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 		while (it.hasNext()) {
 			AetherFlowConnection conn = it.next();
 			if (conn.handler instanceof TileEntity) {
-				if (((TileEntity) conn.handler).isInvalid()) {
+				if (((TileEntity) conn.handler).isRemoved()) {
 					it.remove();
 					continue;
 				}
@@ -401,8 +401,8 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	public CompoundNBT writeToNBT(CompoundNBT compound) {
 		compound.putInt(NBT_AETHER, aether);
 		compound.putInt(NBT_MAX_AETHER, maxAether);
-		compound.setByte(NBT_SIDE_CONFIG, configToByte(sideConnections));
-		compound.setByte(NBT_INOUTBOUND_CONFIG, inoutConfigToByte(allowInboundAether, allowOutboundAether));
+		compound.putByte(NBT_SIDE_CONFIG, configToByte(sideConnections));
+		compound.putByte(NBT_INOUTBOUND_CONFIG, inoutConfigToByte(allowInboundAether, allowOutboundAether));
 		
 		return compound;
 	}
