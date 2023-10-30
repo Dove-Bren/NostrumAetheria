@@ -2,21 +2,19 @@ package com.smanzana.nostrumaetheria.client.render;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrumaetheria.tiles.AetherBathTileEntity;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 
-public class AetherBathRenderer extends TileEntitySpecialRenderer<AetherBathTileEntity> {
+public class AetherBathRenderer extends TileEntityRenderer<AetherBathTileEntity> {
 
 	public AetherBathRenderer() {
 		
@@ -27,12 +25,12 @@ public class AetherBathRenderer extends TileEntitySpecialRenderer<AetherBathTile
 		
 		GlStateManager.disableBlend();
 		GlStateManager.enableBlend();
-		GlStateManager.disableAlpha();
-		GlStateManager.enableAlpha();
+		GlStateManager.disableAlphaTest();
+		GlStateManager.enableAlphaTest();
 		GlStateManager.disableLighting();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.enableTexture2D();
-		GlStateManager.disableTexture2D();
+		//GlStateManager.enableTexture();
+		//GlStateManager.disableTexture();
 		GlStateManager.enableColorMaterial();
 		
 		Tessellator tessellator = Tessellator.getInstance();
@@ -50,7 +48,7 @@ public class AetherBathRenderer extends TileEntitySpecialRenderer<AetherBathTile
 	}
 	
 	@Override
-	public void render(AetherBathTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alphaIn) {
+	public void render(AetherBathTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 
 		int aether = te.getHandler().getAether(null);
 		if (aether > 0) {
@@ -69,47 +67,49 @@ public class AetherBathRenderer extends TileEntitySpecialRenderer<AetherBathTile
 				levelOffset = .9;
 			}
 			final double glowPeriod = 20 * 5;
-			final float glow = (float) Math.sin(Math.PI * 2 * ((double) te.getWorld().getTotalWorldTime() % glowPeriod) / glowPeriod);
+			final float glow = (float) Math.sin(Math.PI * 2 * ((double) te.getWorld().getGameTime() % glowPeriod) / glowPeriod);
 			final float alpha = .5f + (.025f * glow);
 			
 			final double wavePeriod = 20 * 8;
-			final float wave = (float) Math.sin(Math.PI * 2 * ((double) te.getWorld().getTotalWorldTime() % wavePeriod) / wavePeriod);
+			final float wave = (float) Math.sin(Math.PI * 2 * ((double) te.getWorld().getGameTime() % wavePeriod) / wavePeriod);
 			final float waveHeight = wave * .002f;
 			
 			//(te.getWorld().getTotalWorldTime() % 300) + partialTicks
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(x + .5, y + levelOffset + waveHeight, z + .5);
-			GlStateManager.color(.83f, .81f, .5f, alpha);
+			GlStateManager.translated(x + .5, y + levelOffset + waveHeight, z + .5);
+			GlStateManager.color4f(.83f, .81f, .5f, alpha);
 			renderPoolFilm(radius);
 			GlStateManager.popMatrix();
-			GlStateManager.enableTexture2D();
+			GlStateManager.enableTexture();
 		}
 		
 		ItemStack item = te.getItem();
 		if (item.isEmpty())
 			return;
 		
-		float rot = 2.0f * (Minecraft.getSystemTime() / 50);
+		final double rotPeriod = 90 * 20;
+		float rot = (float)((double)(te.getWorld().getGameTime() % rotPeriod) / rotPeriod) * 360f;
 		float scale = .75f;
-		float yoffset = (float) (.1f * (-.5f + Math.sin(((double) Minecraft.getSystemTime()) / 1000.0)));
+		float yoffset = (float) (.1f * (-.5f + Math.sin(((double) System.currentTimeMillis()) / 1000.0))); // Copied from Altar
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + .5, y + 1.25 + yoffset, z + .5);
-		GlStateManager.rotate(rot, 0, 1f, 0);
+		GlStateManager.translated(x + .5, y + 1.25 + yoffset, z + .5);
+		GlStateManager.rotatef(rot, 0, 1f, 0);
 		
-		GlStateManager.scale(scale, scale, scale);
+		GlStateManager.scalef(scale, scale, scale);
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.disableLighting();
-		GlStateManager.enableAlpha();
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-		GlStateManager.enableTexture2D();
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+		GlStateManager.enableAlphaTest();
+		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+		GlStateManager.enableTexture();
+		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 		
-		Minecraft.getInstance().getRenderItem()
-			.renderItem(item, TransformType.GROUND);
+		RenderFuncs.renderItemStandard(item);
+//		Minecraft.getInstance().getRenderItem()
+//			.renderItem(item, TransformType.GROUND);
 		GlStateManager.popMatrix();
-		GlStateManager.enableTexture2D();
+		GlStateManager.enableTexture();
 	}
 	
 }

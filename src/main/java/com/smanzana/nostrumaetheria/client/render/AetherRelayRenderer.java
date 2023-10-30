@@ -2,6 +2,9 @@ package com.smanzana.nostrumaetheria.client.render;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.component.AetherRelayComponent;
@@ -10,24 +13,21 @@ import com.smanzana.nostrummagica.utils.Curves;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
-public class AetherRelayRenderer extends TileEntitySpecialRenderer<AetherRelayEntity> {
+public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 
 	public AetherRelayRenderer() {
 		super();
 	}
 	
 	@Override
-	public void render(AetherRelayEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alphaIn) {
+	public void render(AetherRelayEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 		
 		// Link positions do not change often (especially at render-scale).
 		// Additionally, all points on the curve are unchanging.
@@ -38,7 +38,8 @@ public class AetherRelayRenderer extends TileEntitySpecialRenderer<AetherRelayEn
 			return;
 		}
 		
-		PlayerEntity player = Minecraft.getInstance().player;
+		final Minecraft mc = Minecraft.getInstance();
+		PlayerEntity player = mc.player;
 		boolean debug = player != null && (player.isCreative() || player.isSpectator());
 		
 		if (!debug) {
@@ -73,18 +74,18 @@ public class AetherRelayRenderer extends TileEntitySpecialRenderer<AetherRelayEn
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + .5, y + AetherRelay.height, z + .5);
+		GlStateManager.translated(x + .5, y + AetherRelay.height, z + .5);
 		GlStateManager.disableColorMaterial();
-		GlStateManager.enableTexture2D();
-		GlStateManager.disableTexture2D();
+		//GlStateManager.enableTexture2D();
+		//GlStateManager.disableTexture2D();
 		GlStateManager.disableLighting();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 		GlStateManager.disableBlend();
-		GlStateManager.disableAlpha();
+		GlStateManager.disableAlphaTest();
 		GlStateManager.enableBlend();
-		GlStateManager.enableAlpha();
-		GlStateManager.glLineWidth(3f);
-		GlStateManager.color(1f, 1f, 1f, 1f);
+		GlStateManager.enableAlphaTest();
+		GlStateManager.lineWidth(3f);
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		
 		for (BlockPos linked : relay.getLinkedPositions()) {
 		
@@ -111,7 +112,7 @@ public class AetherRelayRenderer extends TileEntitySpecialRenderer<AetherRelayEn
 			
 			buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
 			
-			final float pos = (float) ((((double) te.getWorld().getTotalWorldTime() + partialTicks) % period) / period);
+			final float pos = (float) ((((double) te.getWorld().getGameTime() + partialTicks) % period) / period);
 			final float dotI = pos * (intervals + 1);
 			
 			for (int i = 0; i <= intervals; i++) {
@@ -135,7 +136,7 @@ public class AetherRelayRenderer extends TileEntitySpecialRenderer<AetherRelayEn
 		}
 		
 		GlStateManager.enableColorMaterial();
-		GlStateManager.enableTexture2D();
+		//GlStateManager.enableTexture2D();
 		
 		GlStateManager.popMatrix();
 		

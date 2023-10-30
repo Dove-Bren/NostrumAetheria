@@ -2,10 +2,10 @@ package com.smanzana.nostrumaetheria.client.render;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
 
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-public class TileEntityAetherDebugRenderer<T extends AetherTileEntity> extends TileEntitySpecialRenderer<T> {
+public class TileEntityAetherDebugRenderer<T extends AetherTileEntity> extends TileEntityRenderer<T> {
 
 	public static <T extends AetherTileEntity> void registerFor(Class<T> clazz) {
 		ClientRegistry.bindTileEntitySpecialRenderer(clazz,
@@ -17,7 +17,7 @@ public class TileEntityAetherDebugRenderer<T extends AetherTileEntity> extends T
 	}
 	
 	@Override
-	public void render(AetherTileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alphaIn) {
+	public void render(AetherTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 
 //		final int aether = te.getHandler().getAether(null);
 //		final int maxAether = te.getHandler().getMaxAether(null);

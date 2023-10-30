@@ -3,13 +3,14 @@ package com.smanzana.nostrumaetheria.gui;
 import com.smanzana.nostrumaetheria.api.aether.stats.AetherStatInstance;
 
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
 
 /**
  * Screen for showing aether statistics.
  * @author Skyler
  *
  */
-public class AetherGraphScreen extends GuiScreen {
+public class AetherGraphScreen extends Screen {
 
 	public interface IAetherDataFetcher {
 		public void requestRefresh();
