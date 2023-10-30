@@ -1,8 +1,8 @@
 {
     "textures": {
-        "base": "nostrumaetheria:blocks/aether_relay",
-        "relay": "nostrumaetheria:blocks/aether_relay",
-        "particle": "nostrumaetheria:blocks/aether_relay"
+        "base": "nostrumaetheria:block/aether_relay",
+        "relay": "nostrumaetheria:block/aether_relay",
+        "particle": "nostrumaetheria:block/aether_relay"
     },
     "elements": [
         //Base

@@ -1,8 +1,8 @@
 {
     "parent": "block/orientable",
     "textures": {
-        "top": "nostrumaetheria:blocks/aether_boiler_top",
-        "side": "nostrumaetheria:blocks/aether_boiler_side",
-        "front": "nostrumaetheria:blocks/aether_boiler_front_off"
+        "top": "nostrumaetheria:block/aether_boiler_top",
+        "side": "nostrumaetheria:block/aether_boiler_side",
+        "front": "nostrumaetheria:block/aether_boiler_front_off"
     }
 }

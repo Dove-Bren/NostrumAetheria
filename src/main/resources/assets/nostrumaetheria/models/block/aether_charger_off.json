@@ -1,8 +1,8 @@
 {
     "parent": "block/orientable",
     "textures": {
-        "top": "nostrumaetheria:blocks/aether_charger_top",
-        "side": "nostrumaetheria:blocks/aether_charger_side",
-        "front": "nostrumaetheria:blocks/aether_charger_front_off"
+        "top": "nostrumaetheria:block/aether_charger_top",
+        "side": "nostrumaetheria:block/aether_charger_side",
+        "front": "nostrumaetheria:block/aether_charger_front_off"
     }
 }

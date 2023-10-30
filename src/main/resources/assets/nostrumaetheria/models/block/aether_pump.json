@@ -1,8 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"particle": "nostrumaetheria:blocks/aether_pump",
-		"side": "nostrumaetheria:blocks/aether_pump"
+		"particle": "nostrumaetheria:block/aether_pump",
+		"side": "nostrumaetheria:block/aether_pump"
 	},
 	"elements": [
 		{

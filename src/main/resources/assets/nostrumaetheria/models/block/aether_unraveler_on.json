@@ -1,8 +1,8 @@
 {
     "parent": "block/orientable",
     "textures": {
-        "top": "nostrumaetheria:blocks/aether_unraveler_top_on",
-        "side": "nostrumaetheria:blocks/aether_unraveler_side",
-        "front": "nostrumaetheria:blocks/aether_unraveler_side"
+        "top": "nostrumaetheria:block/aether_unraveler_top_on",
+        "side": "nostrumaetheria:block/aether_unraveler_side",
+        "front": "nostrumaetheria:block/aether_unraveler_side"
     }
 }

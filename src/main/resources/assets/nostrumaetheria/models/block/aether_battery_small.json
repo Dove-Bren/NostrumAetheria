@@ -1,7 +1,7 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "nostrumaetheria:blocks/aether_battery_small"
+        "all": "nostrumaetheria:block/aether_battery_small"
     }, "elements": [{
         "from": [ 0, 0, 0 ],
         "to": [ 16, 16, 16 ],

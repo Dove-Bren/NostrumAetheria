@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrumaetheria:items/pendant_passive"
+        "layer0": "nostrumaetheria:item/pendant_passive"
     }
 }

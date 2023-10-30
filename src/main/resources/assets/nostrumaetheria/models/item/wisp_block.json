@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrumaetheria:item/aether_gem"
+        "layer0": "nostrumaetheria:item/wisp_block"
     }
 }

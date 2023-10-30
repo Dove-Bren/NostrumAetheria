@@ -1,6 +1,6 @@
 {
     "parent": "nostrumaetheria:block/aether_boiler_block_off",
     "textures": {
-        "front": "nostrumaetheria:blocks/aether_boiler_front_on"
+        "front": "nostrumaetheria:block/aether_boiler_front_on"
     }
 }

@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "on=false": { "model": "nostrumaetheria:aether_furnace_off_medium" },
+        "on=true": { "model": "nostrumaetheria:aether_furnace_on_medium" }
+    }
+}

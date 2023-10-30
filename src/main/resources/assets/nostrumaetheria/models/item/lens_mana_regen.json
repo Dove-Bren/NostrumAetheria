@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrumaetheria:item/minecart_battery"
+        "layer0": "nostrumaetheria:item/lens_mana_regen"
     }
 }
