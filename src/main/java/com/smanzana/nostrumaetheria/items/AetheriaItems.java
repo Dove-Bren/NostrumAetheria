@@ -1,7 +1,7 @@
 package com.smanzana.nostrumaetheria.items;
 
+import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
@@ -20,18 +20,18 @@ public class AetheriaItems {
 	@ObjectHolder(PassivePendant.ID) public static PassivePendant passivePendant = null;
 	@ObjectHolder(AetherGem.ID) public static AetherGem aetherGem = null;
 	@ObjectHolder(AetherBatteryMinecartItem.ID) public static AetherBatteryMinecartItem aetherBatteryMinecart = null;
-	@ObjectHolder(NostrumAetherResourceItem.ID_GINSENG_FLOWER) public static Item ginsengFlower;
-	@ObjectHolder(NostrumAetherResourceItem.ID_MANDRAKE_FLOWER) public static Item mandrakeFlower;
-	@ObjectHolder(ItemAetherLens.ID_SPREAD) public static Item spreadAetherLens;
-	@ObjectHolder(ItemAetherLens.ID_CHARGE) public static Item chargeAetherLens;
-	@ObjectHolder(ItemAetherLens.ID_GROW) public static Item growAetherLens;
-	@ObjectHolder(ItemAetherLens.ID_SWIFTNESS) public static Item swiftnessAetherLens;
-	@ObjectHolder(ItemAetherLens.ID_ELEVATOR) public static Item elevatorAetherLens;
-	@ObjectHolder(ItemAetherLens.ID_HEAL) public static Item healAetherLens;
-	@ObjectHolder(ItemAetherLens.ID_BORE) public static Item boreAetherLens;
-	@ObjectHolder(ItemAetherLens.ID_BORE_REVERSED) public static Item reversedBoreAetherLens;
-	@ObjectHolder(ItemAetherLens.ID_MANA_REGEN) public static Item manaRegenAetherLens;
-	@ObjectHolder(ItemAetherLens.ID_NO_SPAWN) public static Item noSpawnAetherLens;
+	@ObjectHolder(NostrumAetherResourceItem.ID_GINSENG_FLOWER) public static NostrumAetherResourceItem ginsengFlower;
+	@ObjectHolder(NostrumAetherResourceItem.ID_MANDRAKE_FLOWER) public static NostrumAetherResourceItem mandrakeFlower;
+	@ObjectHolder(ItemAetherLens.ID_SPREAD) public static ItemAetherLens spreadAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_CHARGE) public static ItemAetherLens chargeAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_GROW) public static ItemAetherLens growAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_SWIFTNESS) public static ItemAetherLens swiftnessAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_ELEVATOR) public static ItemAetherLens elevatorAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_HEAL) public static ItemAetherLens healAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_BORE) public static ItemAetherLens boreAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_BORE_REVERSED) public static ItemAetherLens reversedBoreAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_MANA_REGEN) public static ItemAetherLens manaRegenAetherLens;
+	@ObjectHolder(ItemAetherLens.ID_NO_SPAWN) public static ItemAetherLens noSpawnAetherLens;
 	
 	public static Item.Properties PropBase() {
 		return new Item.Properties()

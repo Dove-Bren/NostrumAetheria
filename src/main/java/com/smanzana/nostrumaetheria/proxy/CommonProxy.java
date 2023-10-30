@@ -4,26 +4,18 @@ import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
-import com.smanzana.nostrumaetheria.items.AetherResourceType;
 import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrumaetheria.items.ItemAetherLens;
 import com.smanzana.nostrumaetheria.items.ItemAetherLens.LensType;
-import com.smanzana.nostrumaetheria.items.NostrumAetherResourceItem;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 import com.smanzana.nostrumaetheria.rituals.OutcomeCreateAetherInfuser;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.effects.NostrumPotions;
 import com.smanzana.nostrummagica.effects.NostrumPotions.PotionIngredient;
 import com.smanzana.nostrummagica.entity.EntityWisp;
-import com.smanzana.nostrummagica.items.AltarItem;
-import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.items.NostrumItems;
-import com.smanzana.nostrummagica.items.NostrumResourceItem;
-import com.smanzana.nostrummagica.items.PositionCrystal;
-import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
@@ -40,7 +32,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.potion.Potion;
-import net.minecraft.potion.Potions;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
@@ -87,7 +78,7 @@ public class CommonProxy {
 			.hiddenParent("aether_bath")
 			.hiddenParent("kani")
 			.lore((ILoreTagged) AetheriaItems.activePendant)
-			.lore(NostrumAetherResourceItem.instance())
+			.lore(AetheriaItems.mandrakeFlower)
 			.reference(AetheriaItems.passivePendant)
 			.reference("ritual::passive_pendant", "ritual.passive_pendant.name")
 		.build("passive_pendant", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, -1, true, new ItemStack(AetheriaItems.passivePendant));
@@ -96,71 +87,71 @@ public class CommonProxy {
 			.hiddenParent("active_pendant")
 			.lore((ILoreTagged) AetheriaItems.activePendant)
 			.reference("ritual::aether_furnace_small", "ritual.aether_furnace_small.name")
-		.build("aether_furnace", (NostrumResearchTab) APIProxy.ResearchTab, Size.GIANT, 0, 0, true, new ItemStack(AetheriaBlocks.Furnace));
+		.build("aether_furnace", (NostrumResearchTab) APIProxy.ResearchTab, Size.GIANT, 0, 0, true, new ItemStack(AetheriaBlocks.smallFurnace));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_furnace")
 			.hiddenParent("aether_boiler")
 			.reference("ritual::aether_furnace_medium", "ritual.aether_furnace_medium.name")
 			.reference("ritual::aether_furnace_large", "ritual.aether_furnace_large.name")
-		.build("aether_furnace_adv", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -1, 1, true, new ItemStack(AetheriaBlocks.Furnace, 1, 2));
+		.build("aether_furnace_adv", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -1, 1, true, new ItemStack(AetheriaBlocks.largeFurnace));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_furnace")
 			.lore((ILoreTagged) AetheriaItems.activePendant)
 			.reference("ritual::aether_bath", "ritual.aether_bath.name")
-		.build("aether_bath", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 2, 1, true, new ItemStack(APIProxy.AetherBathBlock));
+		.build("aether_bath", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 2, 1, true, new ItemStack(AetheriaBlocks.bath));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_bath")
 			.parent("aether_furnace")
 			.hiddenParent("aether_gem")
 			.reference("ritual::aether_charger", "ritual.aether_charger.name")
-		.build("aether_charger", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, 1, true, new ItemStack(APIProxy.AetherChargerBlock));
+		.build("aether_charger", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, 1, true, new ItemStack(AetheriaBlocks.charger));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_charger")
 			.hiddenParent("vani")
 			.reference("ritual::aether_repairer", "ritual.aether_repairer.name")
-		.build("aether_repairer", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, 2, true, new ItemStack(APIProxy.AetherRepairerBlock));
+		.build("aether_repairer", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, 2, true, new ItemStack(AetheriaBlocks.repairer));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_repairer")
 			.reference("ritual::aether_unraveler", "ritual.aether_unraveler.name")
-		.build("aether_unraveler", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, 3, true, new ItemStack(APIProxy.AetherUnravelerBlock));
+		.build("aether_unraveler", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, 3, true, new ItemStack(AetheriaBlocks.unraveler));
 		
 		//aether_unraveler
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_furnace")
 			.reference("ritual::aether_boiler", "ritual.aether_boiler.name")
-		.build("aether_boiler", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -2, 1, true, new ItemStack(APIProxy.AetherBoilerBlock));
+		.build("aether_boiler", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -2, 1, true, new ItemStack(AetheriaBlocks.boiler));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_bath")
 			.reference("ritual::aether_battery_small", "ritual.aether_battery_small.name")
 			.reference("ritual::aether_battery_medium", "ritual.aether_battery_medium.name")
-		.build("aether_battery", (NostrumResearchTab) APIProxy.ResearchTab, Size.LARGE, 2, 2, true, new ItemStack(APIProxy.AetherBatterySmallBlock));
+		.build("aether_battery", (NostrumResearchTab) APIProxy.ResearchTab, Size.LARGE, 2, 2, true, new ItemStack(AetheriaBlocks.smallBattery));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_battery")
 			.hiddenParent("kani")
 			.reference("ritual::aether_battery_large", "ritual.aether_battery_large.name")
 			.reference("ritual::aether_battery_giant", "ritual.aether_battery_giant.name")
-		.build("aether_battery_adv", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 4, 2, true, new ItemStack(APIProxy.AetherBatteryGiantBlock));
+		.build("aether_battery_adv", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 4, 2, true, new ItemStack(AetheriaBlocks.giantBattery));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_battery")
 			.hiddenParent("vani")
 			.reference("ritual::aether_gem", "ritual.aether_gem.name")
-		.build("aether_gem", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 3, 1, true, new ItemStack(APIProxy.AetherGemItem));
+		.build("aether_gem", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 3, 1, true, new ItemStack(AetheriaItems.aetherGem));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_battery")
 			.hiddenParent("geogems")
 			.hiddenParent("kani")
 			.reference("ritual::aether_relay", "ritual.aether_relay.name")
-		.build("aether_relay", (NostrumResearchTab) APIProxy.ResearchTab, Size.LARGE, 2, 3, true, new ItemStack(APIProxy.AetherRelay));
+		.build("aether_relay", (NostrumResearchTab) APIProxy.ResearchTab, Size.LARGE, 2, 3, true, new ItemStack(AetheriaBlocks.relay));
 		
 		// TODO if 'pipes' get added for short-range aether transport, consider making that a requirement for pumps & rails and stuff
 		// For example, pipes -> pumps -> rails with pumps as a separate thing?
@@ -169,14 +160,14 @@ public class CommonProxy {
 			.parent("aether_relay")
 			.reference("ritual::aether_battery_cart", "ritual.aether_battery_cart.name")
 			.reference("ritual::aether_pump", "ritual.aether_pump.name")
-		.build("aether_carts", (NostrumResearchTab) APIProxy.ResearchTab, Size.GIANT, 3, 3, true, new ItemStack(APIProxy.AetherBatteryMinecartItem));
+		.build("aether_carts", (NostrumResearchTab) APIProxy.ResearchTab, Size.GIANT, 3, 3, true, new ItemStack(AetheriaItems.aetherBatteryMinecart));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("kani")
 			.hiddenParent("aether_battery")
 			.lore(EntityWisp.LoreKey)
 			.reference("ritual::wisp_crystal", "ritual.wisp_crystal.name")
-		.build("wispblock", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -3, 2, true, new ItemStack(BlockWisp));
+		.build("wispblock", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -3, 2, true, new ItemStack(AetheriaBlocks.wispBlock));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("aether_battery")
@@ -189,7 +180,7 @@ public class CommonProxy {
 			.reference("ritual::make_lens_bore", "ritual.make_lens_bore.name")
 			.reference("ritual::make_lens_elevator", "ritual.make_lens_elevator.name")
 			.reference("ritual::make_lens_swiftness", "ritual.make_lens_swiftness.name")
-		.build("aether_infusers", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 0, 2, true, new ItemStack(BlockInfuser));
+		.build("aether_infusers", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 0, 2, true, new ItemStack(AetheriaBlocks.infuser));
     }
     
     private void registerRituals() {
@@ -198,8 +189,8 @@ public class CommonProxy {
 						new ItemStack(AetheriaItems.activePendant),
 						null,
 						new ReagentType[] {ReagentType.GINSENG, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
-						new ItemStack(ThanoPendant.instance(), 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), InfusedGemItem.instance().getGem(EMagicElement.FIRE, 1), new ItemStack(Blocks.LAPIS_BLOCK, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
+						Ingredient.fromItems(NostrumItems.thanoPendant),
+						new Ingredient[] {Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromTag(NostrumItemTags.Items.InfusedGemFire), Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_LAPIS), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
 						new RRequirementResearch("active_pendant"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaItems.activePendant))
 						)
@@ -210,8 +201,8 @@ public class CommonProxy {
 						new ItemStack(AetheriaItems.passivePendant),
 						null,
 						new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.SKY_ASH},
-						new ItemStack(AetheriaItems.activePendant, 1, OreDictionary.WILDCARD_VALUE),
-						new ItemStack[] {NostrumMagica.aetheria.getResourceItem(AetherResourceType.FLOWER_GINSENG, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), NostrumMagica.aetheria.getResourceItem(AetherResourceType.FLOWER_MANDRAKE, 1)},
+						Ingredient.fromItems(AetheriaItems.activePendant),
+						new Ingredient[]{Ingredient.fromItems(AetheriaItems.ginsengFlower), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromTag(NostrumItemTags.Items.SpriteCore), Ingredient.fromItems(AetheriaItems.mandrakeFlower)},
 						new RRequirementResearch("passive_pendant"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaItems.passivePendant))
 						)
@@ -219,193 +210,193 @@ public class CommonProxy {
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_furnace_small",
-						new ItemStack(AetheriaBlocks.Furnace),
+						new ItemStack(AetheriaBlocks.smallFurnace),
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH},
-						new ItemStack(Blocks.FURNACE),
-						new ItemStack[] {ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), new ItemStack(Blocks.OBSIDIAN, 1, OreDictionary.WILDCARD_VALUE), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1)},
+						Ingredient.fromItems(Blocks.FURNACE),
+						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust), Ingredient.fromTag(NostrumItemTags.Items.SpriteCore), Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust)},
 						new RRequirementResearch("aether_furnace"),
-						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.Furnace, 1, 0))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.smallFurnace))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_furnace_medium",
-						new ItemStack(AetheriaBlocks.Furnace, 1, 1),
+						new ItemStack(AetheriaBlocks.mediumFurnace),
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH},
-						new ItemStack(AetheriaBlocks.Furnace, 1, 0),
-						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), new ItemStack(Blocks.FURNACE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
+						Ingredient.fromItems(AetheriaBlocks.smallFurnace),
+						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust), Ingredient.fromItems(Items.FURNACE), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
 						new RRequirementResearch("aether_furnace_adv"),
-						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.Furnace, 1, 1))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.mediumFurnace))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_furnace_large",
-						new ItemStack(AetheriaBlocks.Furnace, 1, 2),
+						new ItemStack(AetheriaBlocks.largeFurnace),
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH},
-						new ItemStack(AetheriaBlocks.Furnace, 1, 1),
-						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), new ItemStack(Blocks.FURNACE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
+						Ingredient.fromItems(AetheriaBlocks.mediumFurnace),
+						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust), Ingredient.fromItems(Items.FURNACE), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
 						new RRequirementResearch("aether_furnace_adv"),
-						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.Furnace, 1, 2))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.largeFurnace))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_boiler",
-						new ItemStack(APIProxy.AetherBoilerBlock),
+						new ItemStack(AetheriaBlocks.boiler),
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.BLACK_PEARL},
-						new ItemStack(AetheriaBlocks.Furnace, 1, 0),
-						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), new ItemStack(Items.IRON_INGOT), new ItemStack(Items.CAULDRON), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
+						Ingredient.fromItems(AetheriaBlocks.smallFurnace),
+						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromTag(Tags.Items.INGOTS_IRON), Ingredient.fromItems(Items.CAULDRON), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
 						new RRequirementResearch("aether_boiler"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherBoilerBlock))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.boiler))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_bath",
-						new ItemStack(APIProxy.AetherBathBlock),
+						new ItemStack(AetheriaBlocks.bath),
 						null,
 						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.BLACK_PEARL},
-						new ItemStack(AltarItem.instance()),
-						new ItemStack[] {new ItemStack(Blocks.STONE, 1, OreDictionary.WILDCARD_VALUE), new ItemStack(Items.BUCKET), NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), new ItemStack(Blocks.STONE, 1, OreDictionary.WILDCARD_VALUE)},
+						Ingredient.fromItems(NostrumItems.altarItem),
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.STONE), Ingredient.fromItems(Items.BUCKET), Ingredient.fromTag(NostrumItemTags.Items.SpriteCore), Ingredient.fromTag(Tags.Items.STONE)},
 						new RRequirementResearch("aether_bath"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherBathBlock))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.bath))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_charger",
-						new ItemStack(APIProxy.AetherChargerBlock),
+						new ItemStack(AetheriaBlocks.charger),
 						EMagicElement.ICE,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT},
-						new ItemStack(APIProxy.AetherBathBlock),
-						new ItemStack[] {new ItemStack(Blocks.STONE, 1, OreDictionary.WILDCARD_VALUE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), new ItemStack(Items.CAULDRON), new ItemStack(Blocks.STONE, 1, OreDictionary.WILDCARD_VALUE)},
+						Ingredient.fromItems(AetheriaBlocks.bath),
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.STONE), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromItems(Items.CAULDRON), Ingredient.fromTag(Tags.Items.STONE)},
 						new RRequirementResearch("aether_charger"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherChargerBlock))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.charger))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_repairer",
-						new ItemStack(APIProxy.AetherRepairerBlock),
+						new ItemStack(AetheriaBlocks.repairer),
 						EMagicElement.EARTH,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.SKY_ASH, ReagentType.GRAVE_DUST},
-						new ItemStack(APIProxy.AetherChargerBlock),
-						new ItemStack[] {new ItemStack(Blocks.OBSIDIAN), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.OBSIDIAN)},
+						Ingredient.fromItems(AetheriaBlocks.charger),
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge), Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(Tags.Items.OBSIDIAN)},
 						new RRequirementResearch("aether_repairer"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherRepairerBlock))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.repairer))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_unraveler",
-						new ItemStack(APIProxy.AetherUnravelerBlock),
+						new ItemStack(AetheriaBlocks.unraveler),
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.GINSENG},
-						new ItemStack(APIProxy.AetherChargerBlock),
-						new ItemStack[] {new ItemStack(Blocks.OBSIDIAN), NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1), new ItemStack(Blocks.MAGMA), new ItemStack(Blocks.OBSIDIAN)},
+						Ingredient.fromItems(AetheriaBlocks.charger),
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge), Ingredient.fromItems(Items.MAGMA_BLOCK), Ingredient.fromTag(Tags.Items.OBSIDIAN)},
 						new RRequirementResearch("aether_unraveler"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherUnravelerBlock))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.unraveler))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_battery_small",
-						new ItemStack(APIProxy.AetherBatterySmallBlock),
+						new ItemStack(AetheriaBlocks.smallBattery),
 						null,
 						new ReagentType[] {ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.SPIDER_SILK, ReagentType.GINSENG},
-						new ItemStack(Blocks.GLASS),
-						new ItemStack[] {ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1)},
+						Ingredient.fromItems(Blocks.GLASS),
+						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromTag(NostrumItemTags.Items.SpriteCore), Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust)},
 						new RRequirementResearch("aether_battery"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherBatterySmallBlock))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.smallBattery))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_battery_medium",
-						new ItemStack(APIProxy.AetherBatteryMediumBlock),
+						new ItemStack(AetheriaBlocks.mediumBattery),
 						null,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM, ReagentType.SKY_ASH, ReagentType.GINSENG},
-						new ItemStack(APIProxy.AetherBatterySmallBlock),
-						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), new ItemStack(Blocks.GLASS), new ItemStack(Blocks.STONE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
+						Ingredient.fromItems(AetheriaBlocks.smallBattery),
+						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromTag(Tags.Items.GLASS), Ingredient.fromTag(Tags.Items.STONE), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
 						new RRequirementResearch("aether_battery"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherBatteryMediumBlock))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.mediumBattery))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_battery_large",
-						new ItemStack(APIProxy.AetherBatteryLargeBlock),
+						new ItemStack(AetheriaBlocks.largeBattery),
 						null,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM, ReagentType.SKY_ASH, ReagentType.GINSENG},
-						new ItemStack(APIProxy.AetherBatteryMediumBlock),
-						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1), new ItemStack(APIProxy.AetherBatteryMediumBlock), new ItemStack(Blocks.OBSIDIAN), NostrumResourceItem.getItem(ResourceType.CRYSTAL_SMALL, 1)},
+						Ingredient.fromItems(AetheriaBlocks.mediumBattery),
+						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromItems(AetheriaBlocks.mediumBattery), Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
 						new RRequirementResearch("aether_battery_adv"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherBatteryLargeBlock))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.largeBattery))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_battery_giant",
-						new ItemStack(APIProxy.AetherBatteryGiantBlock),
+						new ItemStack(AetheriaBlocks.giantBattery),
 						null,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM, ReagentType.SKY_ASH, ReagentType.GINSENG},
-						new ItemStack(APIProxy.AetherBatteryLargeBlock),
-						new ItemStack[] {NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(APIProxy.AetherBatteryLargeBlock), new ItemStack(Blocks.END_STONE), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1)},
+						Ingredient.fromItems(AetheriaBlocks.largeBattery),
+						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromItems(AetheriaBlocks.largeBattery), Ingredient.fromTag(Tags.Items.END_STONES), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium)},
 						new RRequirementResearch("aether_battery_adv"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherBatteryGiantBlock))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.giantBattery))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_gem",
-						new ItemStack(APIProxy.AetherGemItem),
+						new ItemStack(AetheriaItems.aetherGem),
 						null,
 						new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.GRAVE_DUST},
-						 NostrumResourceItem.getItem(ResourceType.CRYSTAL_LARGE, 1),
-						new ItemStack[] {new ItemStack(Items.ENDER_PEARL), NostrumResourceItem.getItem(ResourceType.SPRITE_CORE, 1), ReagentItem.instance().getReagent(ReagentType.MANI_DUST, 1), new ItemStack(Items.ENDER_PEARL)},
+						Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.ENDER_PEARLS), Ingredient.fromTag(NostrumItemTags.Items.SpriteCore), Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust), Ingredient.fromTag(Tags.Items.ENDER_PEARLS)},
 						new RRequirementResearch("aether_gem"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherGemItem))
+						new OutcomeSpawnItem(new ItemStack(AetheriaItems.aetherGem))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_relay",
-						new ItemStack(APIProxy.AetherRelay),
+						new ItemStack(AetheriaBlocks.relay),
 						EMagicElement.ENDER,
 						new ReagentType[] {ReagentType.SKY_ASH, ReagentType.CRYSTABLOOM, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
-						new ItemStack(Blocks.REDSTONE_TORCH),
-						new ItemStack[] {new ItemStack(Items.ENDER_PEARL), NostrumResourceItem.getItem(ResourceType.CRYSTAL_MEDIUM, 1), new ItemStack(PositionCrystal.instance()), new ItemStack(Items.REDSTONE)},
+						Ingredient.fromItems(Blocks.REDSTONE_TORCH),
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.ENDER_PEARLS), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromItems(NostrumItems.positionCrystal), Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE)},
 						new RRequirementResearch("aether_relay"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherRelay, 8))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.relay, 8))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_battery_cart",
-						new ItemStack(APIProxy.AetherBatteryMinecartItem),
+						new ItemStack(AetheriaItems.aetherBatteryMinecart),
 						null,
 						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.BLACK_PEARL},
-						new ItemStack(APIProxy.AetherBatteryMediumBlock),
-						new ItemStack[] {ItemStack.EMPTY, ItemStack.EMPTY, new ItemStack(Items.MINECART), ItemStack.EMPTY},
+						Ingredient.fromItems(AetheriaBlocks.mediumBattery),
+						new Ingredient[]{Ingredient.EMPTY, Ingredient.EMPTY, Ingredient.fromItems(Items.MINECART), Ingredient.EMPTY},
 						new RRequirementResearch("aether_carts"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherBatteryMinecartItem, 1))
+						new OutcomeSpawnItem(new ItemStack(AetheriaItems.aetherBatteryMinecart, 1))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("aether_pump",
-						new ItemStack(APIProxy.AetherPumpBlock),
+						new ItemStack(AetheriaBlocks.pump),
 						null,
 						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.BLACK_PEARL},
-						new ItemStack(Blocks.HOPPER),
-						new ItemStack[] {new ItemStack(Items.IRON_INGOT), new ItemStack(Items.GOLD_INGOT), new ItemStack(Items.CAULDRON), new ItemStack(Items.IRON_INGOT)},
+						Ingredient.fromItems(Blocks.HOPPER),
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.INGOTS_IRON), Ingredient.fromTag(Tags.Items.INGOTS_GOLD), Ingredient.fromItems(Items.CAULDRON), Ingredient.fromTag(Tags.Items.INGOTS_IRON)},
 						new RRequirementResearch("aether_carts"),
-						new OutcomeSpawnItem(new ItemStack(APIProxy.AetherPumpBlock, 1))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.pump, 1))
 						)
 				);
 		
@@ -430,32 +421,32 @@ public class CommonProxy {
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("wisp_crystal",
-						new ItemStack(BlockWisp),
+						new ItemStack(AetheriaBlocks.wispBlock),
 						null,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
 						Ingredient.fromItems(NostrumItems.altarItem),
 						new Ingredient[] {
 								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
-								Ingredient.fromItems(APIProxy.AetherBatterySmallBlock),
+								Ingredient.fromItems(AetheriaBlocks.smallBattery),
 								Ingredient.fromTag(Tags.Items.OBSIDIAN),
 								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
 								},
 						new RRequirementResearch("wispblock"),
-						new OutcomeSpawnItem(new ItemStack(BlockWisp))
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.wispBlock))
 						)
 				);
 		
 		RitualRegistry.instance().addRitual(
 				RitualRecipe.createTier3("construct_aether_infuser",
-						new ItemStack(BlockInfuser),
+						new ItemStack(AetheriaBlocks.infuser),
 						null,
 						new ReagentType[] {ReagentType.GINSENG, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
 						Ingredient.fromTag(Tags.Items.OBSIDIAN),
 						new Ingredient[] {
-								Ingredient.fromStacks(new ItemStack(APIProxy.AetherBatterySmallBlock)),
+								Ingredient.fromStacks(new ItemStack(AetheriaBlocks.smallBattery)),
 								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
-								Ingredient.fromStacks(new ItemStack(APIProxy.AetherBatterySmallBlock)),
-								Ingredient.fromStacks(new ItemStack(APIProxy.AetherBatterySmallBlock))},
+								Ingredient.fromStacks(new ItemStack(AetheriaBlocks.smallBattery)),
+								Ingredient.fromStacks(new ItemStack(AetheriaBlocks.smallBattery))},
 						new RRequirementResearch("aether_infusers"),
 						new OutcomeCreateAetherInfuser()
 						)
@@ -470,11 +461,11 @@ public class CommonProxy {
 	protected static final void registerPotionMixes() {
 		// Mana regen potion
 		BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN_STRONG.getType()),
-    			Ingredient.fromStacks(AetheriaItems.mandrakeFlower),
+    			Ingredient.fromItems(AetheriaItems.mandrakeFlower),
     			NostrumPotions.MakePotion(NostrumPotions.MANAREGEN_REALLY_STRONG.getType()));
 		
 		BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN_STRONG.getType()),
-    			Ingredient.fromStacks(AetheriaItems.ginsengFlower),
+    			Ingredient.fromItems(AetheriaItems.ginsengFlower),
     			NostrumPotions.MakePotion(NostrumPotions.MANAREGEN_STRONG_AND_LONG.getType()));
 	}
     
