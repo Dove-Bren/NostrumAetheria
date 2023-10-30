@@ -4,11 +4,11 @@ import java.util.Random;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
-import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrumaetheria.gui.container.AetherRepairerGui;
 import com.smanzana.nostrumaetheria.recipes.RepairerRecipeManager;
 import com.smanzana.nostrumaetheria.tiles.AetherRepairerBlockEntity;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -80,11 +80,8 @@ public class AetherRepairerBlock extends Block implements ILoreTagged {
 	
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote) {
-			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherRepairerID, worldIn, pos.getX(), pos.getY(), pos.getZ());
-			return true;
-		}
-		
+		AetherRepairerBlockEntity repairer = (AetherRepairerBlockEntity) worldIn.getTileEntity(pos);
+		NostrumMagica.instance.proxy.openContainer(player, AetherRepairerGui.AetherRepairerContainer.Make(repairer));
 		return true;
 	}
 	

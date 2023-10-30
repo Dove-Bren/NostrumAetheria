@@ -3,8 +3,9 @@ package com.smanzana.nostrumaetheria.blocks;
 import java.util.Random;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
-import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrumaetheria.gui.container.AetherFurnaceGui;
 import com.smanzana.nostrumaetheria.tiles.AetherFurnaceBlockEntity;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -126,11 +127,8 @@ public class AetherFurnaceBlock extends Block implements ILoreTagged {
 	
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote) {
-			//worldIn.notifyBlockUpdate(pos, worldIn.getBlockState(pos), worldIn.getBlockState(pos), 2);
-			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherFurnaceID, worldIn, pos.getX(), pos.getY(), pos.getZ());
-		}
-		
+		AetherFurnaceBlockEntity furnace = (AetherFurnaceBlockEntity) worldIn.getTileEntity(pos);
+		NostrumMagica.instance.proxy.openContainer(player, AetherFurnaceGui.AetherFurnaceContainer.Make(furnace));
 		return true;
 	}
 	

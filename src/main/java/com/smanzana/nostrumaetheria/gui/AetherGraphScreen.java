@@ -2,8 +2,8 @@ package com.smanzana.nostrumaetheria.gui;
 
 import com.smanzana.nostrumaetheria.api.aether.stats.AetherStatInstance;
 
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.text.StringTextComponent;
 
 /**
  * Screen for showing aether statistics.
@@ -21,6 +21,7 @@ public class AetherGraphScreen extends Screen {
 	private final IAetherDataFetcher fetcher;
 	
 	public AetherGraphScreen(IAetherDataFetcher fetcher) {
+		super(new StringTextComponent("Aether Graph"));
 		data = new AetherStatInstance();
 		this.fetcher = fetcher;
 	}
@@ -30,12 +31,12 @@ public class AetherGraphScreen extends Screen {
 	}
 	
 	@Override
-	public boolean doesGuiPauseGame() {
+	public boolean isPauseScreen() {
 		return false;
 	}
 	
 	@Override
-	public void updateScreen() {
+	public void tick() {
 		if (System.currentTimeMillis() - lastRefreshReq > (1000 * 1)) {
 			fetcher.requestRefresh();
 			lastRefreshReq = System.currentTimeMillis();
@@ -43,7 +44,7 @@ public class AetherGraphScreen extends Screen {
 	}
 	
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+	public void render(int mouseX, int mouseY, float partialTicks) {
 		
 	}
 	

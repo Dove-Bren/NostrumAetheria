@@ -8,8 +8,9 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
-import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrumaetheria.gui.container.AetherUnravelerGui;
 import com.smanzana.nostrumaetheria.tiles.AetherUnravelerBlockEntity;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -77,11 +78,8 @@ public class AetherUnravelerBlock extends Block implements ILoreTagged {
 	
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote) {
-			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherUnravelerID, worldIn, pos.getX(), pos.getY(), pos.getZ());
-			return true;
-		}
-		
+		AetherUnravelerBlockEntity unraveler = (AetherUnravelerBlockEntity) worldIn.getTileEntity(pos);
+		NostrumMagica.instance.proxy.openContainer(player, AetherUnravelerGui.AetherUnravelerContainer.Make(unraveler));
 		return true;
 	}
 	

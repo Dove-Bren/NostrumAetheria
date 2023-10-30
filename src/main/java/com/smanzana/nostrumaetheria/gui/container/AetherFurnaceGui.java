@@ -3,22 +3,26 @@ package com.smanzana.nostrumaetheria.gui.container;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.tiles.AetherFurnaceBlockEntity;
 import com.smanzana.nostrummagica.client.gui.container.AutoContainer;
 import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
+import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.Inventories;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class AetherFurnaceGui {
 	
@@ -44,34 +48,49 @@ public class AetherFurnaceGui {
 
 	public static class AetherFurnaceContainer extends AutoContainer {
 		
+		public static final String ID = "aether_furnace";
+		
 		protected AetherFurnaceBlockEntity chest;
 		
-		public AetherFurnaceContainer(IInventory playerInv, AetherFurnaceBlockEntity chest) {
-			super(chest);
+		public AetherFurnaceContainer(int windowId, PlayerInventory playerInv, AetherFurnaceBlockEntity chest) {
+			super(AetheriaContainers.Furnace, windowId, chest);
 			this.chest = chest;
 						
 			// Construct player inventory
 			for (int y = 0; y < 3; y++) {
 				for (int x = 0; x < 9; x++) {
-					this.addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, GUI_PLAYER_INV_HOFFSET + (x * 18), GUI_PLAYER_INV_VOFFSET + (y * 18)));
+					this.addSlot(new Slot(playerInv, x + y * 9 + 9, GUI_PLAYER_INV_HOFFSET + (x * 18), GUI_PLAYER_INV_VOFFSET + (y * 18)));
 				}
 			}
 			
 			// Construct player hotbar
 			for (int x = 0; x < 9; x++) {
-				this.addSlotToContainer(new Slot(playerInv, x, GUI_HOTBAR_INV_HOFFSET + x * 18, GUI_HOTBAR_INV_VOFFSET));
+				this.addSlot(new Slot(playerInv, x, GUI_HOTBAR_INV_HOFFSET + x * 18, GUI_HOTBAR_INV_VOFFSET));
 			}
 			
 			int total = chest.getSizeInventory();
 			for (int i = 0; i < total; i++) {
 				int x = i - ((total - 3) / 2);
 				
-				this.addSlotToContainer(new Slot(chest, i, GUI_TOP_INV_HOFFSET + x * GUI_INV_CELL_LENGTH, GUI_TOP_INV_VOFFSET) {
+				this.addSlot(new Slot(chest, i, GUI_TOP_INV_HOFFSET + x * GUI_INV_CELL_LENGTH, GUI_TOP_INV_VOFFSET) {
 					public boolean isItemValid(@Nonnull ItemStack stack) {
 				        return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
 				    }
 				});
 			}
+		}
+		
+		@OnlyIn(Dist.CLIENT)
+		public static final AetherFurnaceContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+			return new AetherFurnaceContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
+		}
+		
+		public static IPackedContainerProvider Make(AetherFurnaceBlockEntity te) {
+			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
+				return new AetherFurnaceContainer(windowId, playerInv, te);
+			}, (buffer) -> {
+				ContainerUtil.PackTE(buffer, te);
+			});
 		}
 		
 		@Override
@@ -118,12 +137,12 @@ public class AetherFurnaceGui {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class AetherFurnaceGuiContainer extends AutoGuiContainer {
+	public static class AetherFurnaceGuiContainer extends AutoGuiContainer<AetherFurnaceContainer> {
 
 		private AetherFurnaceContainer container;
 		
-		public AetherFurnaceGuiContainer(AetherFurnaceContainer container) {
-			super(container);
+		public AetherFurnaceGuiContainer(AetherFurnaceContainer container, PlayerInventory playerInv, ITextComponent name) {
+			super(container, playerInv, name);
 			this.container = container;
 			
 			this.xSize = GUI_TEXT_WIDTH;
@@ -131,8 +150,8 @@ public class AetherFurnaceGui {
 		}
 		
 		@Override
-		public void initGui() {
-			super.initGui();
+		public void init() {
+			super.init();
 		}
 		
 		@Override
@@ -141,9 +160,9 @@ public class AetherFurnaceGui {
 			int verticalMargin = (height - ySize) / 2;
 			int fireX = 45;
 			
-			GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			
-			switch (container.chest.getType()) {
+			switch (container.chest.getFurnceType()) {
 			case LARGE:
 				mc.getTextureManager().bindTexture(TEXT_LARGE);
 				fireX = (GUI_TOP_INV_HOFFSET - 9);
@@ -158,21 +177,21 @@ public class AetherFurnaceGui {
 				break;
 			}
 			
-			Gui.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
 			
 			float progress = container.chest.getBurnProgress();
 			if (progress > 0) {
 				//System.out.println("progress: " + progress);
 				int y = (int) (14f * (1f - progress));
-				Gui.drawModalRectWithCustomSizedTexture(horizontalMargin + GUI_TOP_INV_HOFFSET - fireX, verticalMargin + GUI_TOP_INV_VOFFSET + 2 + y,
+				RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin + GUI_TOP_INV_HOFFSET - fireX, verticalMargin + GUI_TOP_INV_VOFFSET + 2 + y,
 						176, y,
 						GUI_FIRE_FIRE_WIDTH, GUI_FIRE_FIRE_HEIGHT - y, 256, 256);
-				Gui.drawModalRectWithCustomSizedTexture(horizontalMargin + GUI_TOP_INV_HOFFSET + (GUI_INV_CELL_LENGTH * 3) + -1 + (fireX - GUI_FIRE_FIRE_WIDTH), verticalMargin + GUI_TOP_INV_VOFFSET + 2 + y,
+				RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin + GUI_TOP_INV_HOFFSET + (GUI_INV_CELL_LENGTH * 3) + -1 + (fireX - GUI_FIRE_FIRE_WIDTH), verticalMargin + GUI_TOP_INV_VOFFSET + 2 + y,
 						176, y,
 						GUI_FIRE_FIRE_WIDTH, GUI_FIRE_FIRE_HEIGHT - y, 256, 256);
 			}
 			
-			GlStateManager.color(1f, 1f, 1f, 1f);
+			GlStateManager.color4f(1f, 1f, 1f, 1f);
 			
 			IAetherHandler furnaceHandler = container.chest.getHandler();
 			float myAether = 0f;
@@ -182,7 +201,7 @@ public class AetherFurnaceGui {
 			}
 			
 			if (myAether > 0) {
-				Gui.drawRect(horizontalMargin + GUI_TOP_BAR_HOFFSET, verticalMargin + GUI_TOP_BAR_VOFFSET,
+				RenderFuncs.drawRect(horizontalMargin + GUI_TOP_BAR_HOFFSET, verticalMargin + GUI_TOP_BAR_VOFFSET,
 						horizontalMargin + GUI_TOP_BAR_HOFFSET + (int) (GUI_TOP_BAR_WIDTH * myAether), verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT,
 						0xA0909000);
 			}
@@ -197,7 +216,7 @@ public class AetherFurnaceGui {
 			if (furnaceHandler != null) {
 				if (mouseX >= horizontalMargin + GUI_TOP_BAR_HOFFSET && mouseX <= horizontalMargin + GUI_TOP_BAR_HOFFSET + GUI_TOP_BAR_WIDTH
 						&& mouseY >= verticalMargin + GUI_TOP_BAR_VOFFSET && mouseY <= verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT) {
-					drawHoveringText(Lists.newArrayList(String.format("%.2f / %.2f", furnaceHandler.getAether(null) * .01f, furnaceHandler.getMaxAether(null) * .01f)),
+					renderTooltip(Lists.newArrayList(String.format("%.2f / %.2f", furnaceHandler.getAether(null) * .01f, furnaceHandler.getMaxAether(null) * .01f)),
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}

@@ -4,22 +4,28 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.items.ActivePendant;
+import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.Inventories;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ActivePendantGui {
 	
@@ -35,11 +41,14 @@ public class ActivePendantGui {
 
 	public static class ActivePendantContainer extends Container {
 		
+		public static final String ID = "active_pendant";
+		
 		protected final ItemStack pendant;
 		protected final IInventory pendantInvWrapper;
 		protected boolean valid = true;
 		
-		public ActivePendantContainer(IInventory playerInv, ItemStack pendant) {
+		public ActivePendantContainer(int windowId, PlayerInventory playerInv, ItemStack pendant) {
+			super(AetheriaContainers.ActivePendant, windowId);
 			this.pendant = pendant;
 			// Preemptively make sure an ID has been generated
 			ActivePendant.lyonGetID(pendant);
@@ -60,7 +69,7 @@ public class ActivePendantGui {
 			// Construct player inventory
 			for (int y = 0; y < 3; y++) {
 				for (int x = 0; x < 9; x++) {
-					this.addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, GUI_PLAYER_INV_HOFFSET + (x * 18), GUI_PLAYER_INV_VOFFSET + (y * 18)) {
+					this.addSlot(new Slot(playerInv, x + y * 9 + 9, GUI_PLAYER_INV_HOFFSET + (x * 18), GUI_PLAYER_INV_VOFFSET + (y * 18)) {
 						@Override
 						public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
 							if (!stack.isEmpty() && stack.getItem() instanceof ActivePendant) {
@@ -77,7 +86,7 @@ public class ActivePendantGui {
 			
 			// Construct player hotbar
 			for (int x = 0; x < 9; x++) {
-				this.addSlotToContainer(new Slot(playerInv, x, GUI_HOTBAR_INV_HOFFSET + x * 18, GUI_HOTBAR_INV_VOFFSET) {
+				this.addSlot(new Slot(playerInv, x, GUI_HOTBAR_INV_HOFFSET + x * 18, GUI_HOTBAR_INV_VOFFSET) {
 					@Override
 					public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
 						if (!stack.isEmpty() && stack.getItem() instanceof ActivePendant) {
@@ -91,11 +100,32 @@ public class ActivePendantGui {
 				});
 			}
 			
-			this.addSlotToContainer(new Slot(pendantInvWrapper, 0, GUI_PENDANT_INV_HOFFSET, GUI_PENDANT_INV_VOFFSET) {
+			this.addSlot(new Slot(pendantInvWrapper, 0, GUI_PENDANT_INV_HOFFSET, GUI_PENDANT_INV_VOFFSET) {
 				@Override
 				public boolean isItemValid(@Nonnull ItemStack stack) {
 					return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
 				}
+			});
+		}
+		
+		public static final ActivePendantContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+			final int slot = buffer.readVarInt();
+			ItemStack stack = playerInv.getStackInSlot(slot);
+			if (stack.isEmpty() || !(stack.getItem() instanceof ActivePendant)) {
+				stack = new ItemStack(AetheriaItems.activePendant);
+			}
+			return new ActivePendantContainer(windowId, playerInv, stack);
+		}
+		
+		public static final IPackedContainerProvider Make(int slot) {
+			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
+				ItemStack stack = playerInv.getStackInSlot(slot);
+				if (stack.isEmpty() || !(stack.getItem() instanceof ActivePendant)) {
+					stack = new ItemStack(AetheriaItems.activePendant);
+				}
+				return new ActivePendantContainer(windowId, playerInv, stack);
+			}, (buffer) -> {
+				buffer.writeVarInt(slot);
 			});
 		}
 		
@@ -148,12 +178,12 @@ public class ActivePendantGui {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class ActivePendantGuiContainer extends AutoGuiContainer {
+	public static class ActivePendantGuiContainer extends AutoGuiContainer<ActivePendantContainer> {
 
 		//private ActivePendantContainer container;
 		
-		public ActivePendantGuiContainer(ActivePendantContainer container) {
-			super(container);
+		public ActivePendantGuiContainer(ActivePendantContainer container, PlayerInventory playerInv, ITextComponent name) {
+			super(container, playerInv, name);
 			//this.container = container;
 			
 			this.xSize = GUI_TEXT_WIDTH;
@@ -161,8 +191,8 @@ public class ActivePendantGui {
 		}
 		
 		@Override
-		public void initGui() {
-			super.initGui();
+		public void init() {
+			super.init();
 		}
 		
 		@Override
@@ -170,10 +200,10 @@ public class ActivePendantGui {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color(1.0F,  1.0F, 1.0F, 1.0F);
+			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			Gui.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
 			
 		}
 		

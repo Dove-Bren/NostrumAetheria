@@ -7,14 +7,15 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrumaetheria.NostrumAetheria;
-import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrumaetheria.gui.container.ActivePendantGui;
 import com.smanzana.nostrumaetheria.gui.container.ActivePendantGui.ActivePendantContainer;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
+import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -301,8 +302,13 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.activePendantID, worldIn,
-				(int) playerIn.posX, (int) playerIn.posY, (int) playerIn.posZ);
+		int pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, Hand.MAIN_HAND);
+		ItemStack inHand = playerIn.getHeldItemMainhand();
+		if (inHand.isEmpty()) {
+			inHand = playerIn.getHeldItemOffhand();
+			pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, Hand.OFF_HAND);
+		}
+		NostrumMagica.instance.proxy.openContainer(playerIn, ActivePendantGui.ActivePendantContainer.Make(pos));
 		
 		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getHeldItem(hand));
 	}

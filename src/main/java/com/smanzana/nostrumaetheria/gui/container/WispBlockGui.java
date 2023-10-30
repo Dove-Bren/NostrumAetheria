@@ -8,7 +8,6 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 import com.smanzana.nostrummagica.client.gui.container.AutoContainer;
 import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
-import com.smanzana.nostrummagica.client.gui.container.NostrumContainers;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -66,7 +65,7 @@ public class WispBlockGui {
 		protected Slot reagentSlot;
 		
 		public WispBlockContainer(int windowId, PlayerInventory playerInv, WispBlockTileEntity table) {
-			super(NostrumContainers.WispBlock, windowId, table);
+			super(AetheriaContainers.WispBlock, windowId, table);
 			this.player = playerInv.player;
 			this.pos = table.getPos();
 			this.table = table;

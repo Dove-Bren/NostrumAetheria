@@ -2,9 +2,9 @@ package com.smanzana.nostrumaetheria.blocks;
 
 import java.util.Random;
 
-import com.smanzana.nostrumaetheria.NostrumAetheria;
-import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrumaetheria.gui.container.AetherBoilerGui;
 import com.smanzana.nostrumaetheria.tiles.AetherBoilerBlockEntity;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -67,12 +67,9 @@ public class AetherBoilerBlock extends Block implements ILoreTagged {
 	
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote) {
-			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherBoilerID, worldIn, pos.getX(), pos.getY(), pos.getZ());
-			return true;
-		}
-		
-		return false;
+		AetherBoilerBlockEntity boiler = (AetherBoilerBlockEntity) worldIn.getTileEntity(pos);
+		NostrumMagica.instance.proxy.openContainer(player, AetherBoilerGui.AetherBoilerContainer.Make(boiler));
+		return true;
 	}
 	
 	@Override
@@ -92,7 +89,6 @@ public class AetherBoilerBlock extends Block implements ILoreTagged {
 				.with(FACING, context.getPlacementHorizontalFacing().getOpposite());
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {

@@ -2,9 +2,9 @@ package com.smanzana.nostrumaetheria.blocks;
 
 import java.util.Random;
 
-import com.smanzana.nostrumaetheria.NostrumAetheria;
-import com.smanzana.nostrumaetheria.gui.NostrumAetheriaGui;
+import com.smanzana.nostrumaetheria.gui.container.AetherChargerGui;
 import com.smanzana.nostrumaetheria.tiles.AetherChargerBlockEntity;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -68,11 +68,8 @@ public class AetherChargerBlock extends Block implements ILoreTagged {
 	
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote) {
-			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherChargerID, worldIn, pos.getX(), pos.getY(), pos.getZ());
-			return true;
-		}
-		
+		AetherChargerBlockEntity charger = (AetherChargerBlockEntity) worldIn.getTileEntity(pos);
+		NostrumMagica.instance.proxy.openContainer(player, AetherChargerGui.AetherChargerContainer.Make(charger));
 		return true;
 	}
 	
