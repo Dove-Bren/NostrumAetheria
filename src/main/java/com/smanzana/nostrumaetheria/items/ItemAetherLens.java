@@ -2,6 +2,7 @@ package com.smanzana.nostrumaetheria.items;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -65,30 +66,31 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	public static final String ID_NO_SPAWN = ID_PREFIX + "no_spawn";
 	
 	public static enum LensType {
-		SPREAD(ID_SPREAD, true, 1, 0, Ingredient.fromTag(Tags.Items.GEMS_DIAMOND)),
-		CHARGE(ID_CHARGE, true, 1, 0, Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)),
-		GROW(ID_GROW, false, 20, 10, Ingredient.fromItems(Items.BONE_BLOCK)),
-		SWIFTNESS(ID_SWIFTNESS, false, 1, 0, new NostrumPotions.PotionIngredient(Potions.SWIFTNESS)), // aether taken per entity
-		ELEVATOR(ID_ELEVATOR, false, 1, 0, Ingredient.fromItems(Blocks.DISPENSER)), // aether taken per entity
-		HEAL(ID_HEAL, false, 5, 0, new NostrumPotions.PotionIngredient(Potions.HEALING)), // aether taken per entity
-		BORE(ID_BORE, false, 20, 50, Ingredient.fromItems(Items.DIAMOND_PICKAXE)),
-		BORE_REVERSED(ID_BORE_REVERSED, false, 20, 50, Ingredient.EMPTY),
-		MANA_REGEN(ID_MANA_REGEN, false, 20, 0, new NostrumPotions.PotionIngredient(NostrumPotions.MANAREGEN.getType())),
-		NO_SPAWN(ID_NO_SPAWN, true, 1, 0, Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_EMERALD)),
+		SPREAD(ID_SPREAD, true, 1, 0, () -> Ingredient.fromTag(Tags.Items.GEMS_DIAMOND)),
+		CHARGE(ID_CHARGE, true, 1, 0, () -> Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)),
+		GROW(ID_GROW, false, 20, 10, () -> Ingredient.fromItems(Items.BONE_BLOCK)),
+		SWIFTNESS(ID_SWIFTNESS, false, 1, 0, () -> new NostrumPotions.PotionIngredient(Potions.SWIFTNESS)), // aether taken per entity
+		ELEVATOR(ID_ELEVATOR, false, 1, 0, () -> Ingredient.fromItems(Blocks.DISPENSER)), // aether taken per entity
+		HEAL(ID_HEAL, false, 5, 0, () -> new NostrumPotions.PotionIngredient(Potions.HEALING)), // aether taken per entity
+		BORE(ID_BORE, false, 20, 50, () -> Ingredient.fromItems(Items.DIAMOND_PICKAXE)),
+		BORE_REVERSED(ID_BORE_REVERSED, false, 20, 50, () -> Ingredient.EMPTY),
+		MANA_REGEN(ID_MANA_REGEN, false, 20, 0, () -> new NostrumPotions.PotionIngredient(NostrumPotions.MANAREGEN.getType())),
+		NO_SPAWN(ID_NO_SPAWN, true, 1, 0, () -> Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_EMERALD)),
 		;
 		
 		private final String unlocName; // unlocalized name fragment
 		private final boolean isMaster; // whether this lense requires an original aether infuser
 		private final int aetherPerTick; // Aether we require to work each work tick
 		private final int interval;
-		private final Ingredient ingredient;
+		private final Supplier<Ingredient> ingredientSupplier;
+		private Ingredient ingredientCache = null;
 		
-		private LensType(String unlocName, boolean isMaster, int tickInterval, int aetherPerTick, Ingredient ingredient) {
+		private LensType(String unlocName, boolean isMaster, int tickInterval, int aetherPerTick, Supplier<Ingredient> ingredientSupplier) {
 			this.unlocName = unlocName;
 			this.isMaster = isMaster;
 			this.aetherPerTick = aetherPerTick;
 			this.interval = tickInterval;
-			this.ingredient = ingredient;
+			this.ingredientSupplier = ingredientSupplier;
 		}
 		
 		public String getUnlocSuffix() {
@@ -107,8 +109,15 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 			return this.aetherPerTick;
 		}
 		
+		private Ingredient getIngredientInternal() {
+			if (this.ingredientCache == null) {
+				this.ingredientCache = this.ingredientSupplier.get();
+			}
+			return this.ingredientCache;
+		}
+		
 		public Ingredient getIngredient() {
-			return this.ingredient;
+			return this.getIngredientInternal();
 		}
 	}
 	

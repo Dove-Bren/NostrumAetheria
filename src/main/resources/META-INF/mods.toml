@@ -23,3 +23,10 @@ Magical energy add-on for Nostrum Magica
 	versionRange="[FORGE-1.14.4-1.0.6.1,)"
 	ordering="AFTER"
 	side="BOTH"
+
+[[dependencies.nostrumaetheria]]
+	modId="nostrummagica"
+	mandatory=true
+	versionRange="[1.14.4-1.10.0,)"
+	ordering="AFTER"
+	side="BOTH"

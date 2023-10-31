@@ -6,18 +6,19 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
-import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.utils.ContainerUtil.IAutoContainerInventory;
+import com.smanzana.nostrumaetheria.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.NonNullList;
+import net.minecraftforge.common.util.Constants.NBT;
 
-public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTickingTileEntity implements IInventory, IAutoContainerInventory {
+public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTickingTileEntity implements IInventory, IAutoContainerInventoryWrapper {
 
 	private static final String NBT_INVENTORY_SLOTS = "slots";
 	private static final String NBT_INVENTORY = "inventory";
@@ -54,11 +55,11 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	 * allowEmpty allows there to be empty slots as long as all are unique.
 	 */
 	protected boolean allReagentsValid(ItemStack reagent, boolean allowEmpty) {
-		Set<ReagentItem> seen = new HashSet<>();
+		Set<Item> seen = new HashSet<>();
 		
 		
-		if (reagent != null) {
-			seen.add((ReagentItem) reagent.getItem());
+		if (reagent != null && !reagent.isEmpty()) {
+			seen.add(reagent.getItem());
 		}
 		
 		boolean success = true;
@@ -73,7 +74,7 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 				continue;
 			}
 			
-			if (!seen.add((ReagentItem) stack.getItem())) {
+			if (!seen.add(stack.getItem())) {
 				success = false;
 				break;
 			}
@@ -192,7 +193,7 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		}
 		initInventory(slotCount);
 		
-		Inventories.deserializeInventory(this, nbt.getCompound(NBT_INVENTORY));
+		Inventories.deserializeInventory(this, nbt.getList(NBT_INVENTORY, NBT.TAG_COMPOUND));
 		this.aetherCarry = nbt.getFloat(NBT_AETHER_CARRY);
 		this.aetherPerTick = nbt.getFloat(NBT_AETHER_PER);
 		this.burnTicksMax = nbt.getInt(NBT_TICKS_MAX);
@@ -330,4 +331,5 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		
 		return true;
 	}
+	
 }

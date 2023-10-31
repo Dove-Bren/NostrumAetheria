@@ -6,8 +6,8 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
+import com.smanzana.nostrumaetheria.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrumaetheria.recipes.RepairerRecipeManager;
-import com.smanzana.nostrummagica.utils.ContainerUtil.IAutoContainerInventory;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
@@ -17,7 +17,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory, IAutoContainerInventory {
+public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory, IAutoContainerInventoryWrapper {
 	
 	private boolean on;
 	private boolean aetherTick;

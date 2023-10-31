@@ -9,8 +9,8 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
+import com.smanzana.nostrumaetheria.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrumaetheria.recipes.UnravelerRecipeManager;
-import com.smanzana.nostrummagica.utils.ContainerUtil.IAutoContainerInventory;
 
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory, IAutoContainerInventory {
+public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory, IAutoContainerInventoryWrapper {
 	
 	private boolean on;
 	private boolean aetherTick;

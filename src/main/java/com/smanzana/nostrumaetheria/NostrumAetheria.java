@@ -22,6 +22,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(NostrumAetheria.MODID)
 public class NostrumAetheria
@@ -36,7 +37,7 @@ public class NostrumAetheria
     public NostrumAetheria() {
     	instance = this;
     	
-    	DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
+    	proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
     	
     	APIProxy.handler = new AetheriaAPIProxy();
     	
@@ -48,6 +49,7 @@ public class NostrumAetheria
 	        }
 	    };
 	    //InfineAetherBlock.instance().setCreativeTab(APIProxy.creativeTab);
+		FMLJavaModLoadingContext.get().getModEventBus().register(this);
 	    
     	proxy.preinit();
     	APIProxy.ResearchTab = new NostrumResearch.NostrumResearchTab("aether", new ItemStack(AetheriaItems.aetherGem));

@@ -5,13 +5,13 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
-import com.smanzana.nostrummagica.utils.ContainerUtil.IAutoContainerInventory;
+import com.smanzana.nostrumaetheria.gui.container.IAutoContainerInventoryWrapper;
 
 import net.minecraft.block.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class AetherChargerBlockEntity extends AetherBathTileEntity implements IAutoContainerInventory {
+public class AetherChargerBlockEntity extends AetherBathTileEntity implements IAutoContainerInventoryWrapper {
 	
 	private boolean on;
 	private boolean aetherTick;

@@ -35,6 +35,8 @@ public class AetherBoilerModeChangeMessage {
 				player.world.notifyBlockUpdate(message.pos, state, state, 2);
 			}
 		});
+		
+		ctx.get().setPacketHandled(true);
 	}
 	
 	private final BlockPos pos;

@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nostrumaetheria:infinite_aether_block" }
+        "": { "model": "nostrumaetheria:block/infinite_aether_block" }
     }
 }

@@ -86,6 +86,11 @@ public class AetherRepairerBlock extends Block implements ILoreTagged {
 	}
 	
 	@Override
+	public boolean hasTileEntity(BlockState state) {
+		return true;
+	}
+	
+	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new AetherRepairerBlockEntity();
 	}

@@ -17,7 +17,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.integration.curios.items.INostrumCurio;
-import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.items.ICapeProvider;
 import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -204,7 +203,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	};
 	
 	public AetherCloakItem() {
-		super(NostrumCurios.PropCurio());
+		super(AetheriaCurios.PropCurio());
 		
 		MinecraftForge.EVENT_BUS.register(this);
 	}

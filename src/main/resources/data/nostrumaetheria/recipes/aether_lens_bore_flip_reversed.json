@@ -1,12 +1,11 @@
 {
   "type": "minecraft:crafting_shapeless",
   "result": {
-    "item": "nostrummagica:aether_lens_item",
-    "data": 7
+    "item": "nostrumaetheria:lens_bore_reversed"
   },
   "ingredients": [
     {
-      "item": "#AETHER_LENS_BORE"
+      "item": "nostrumaetheria:lens_bore"
     }
   ]
 }

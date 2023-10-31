@@ -1,8 +1,6 @@
 {
     "variants": {
-        "": { "model": "nostrumaetheria:block/infuser_multiblk" },
         "master=false": { "model": "nostrumaetheria:block/infuser_multiblk" },
-        "master=true": { "model": "nostrumaetheria:block/infuser_multiblk" },
-        "inventory": { "model": "nostrumaetheria:block/infuser_multiblk" }
+        "master=true": { "model": "nostrumaetheria:block/infuser_multiblk" }
     }
 }

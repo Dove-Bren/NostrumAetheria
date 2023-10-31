@@ -1,15 +1,15 @@
 {
-  "type": "nostrummagica:aether_cloak_color",
+  "type": "nostrumaetheria:aether_cloak_color",
   "key": "color_inside",
   "display": {
-	  "item": "nostrummagica:aether_cloak",
+	  "item": "nostrumaetheria:aether_cloak",
 	  "nbt": {
 		  "color_inside": 15
 	  }
   },
   "ingredients": [
     {
-      "item": "nostrummagica:aether_cloak"
+      "item": "nostrumaetheria:aether_cloak"
     },
     {
       "tag": "forge:dyes"

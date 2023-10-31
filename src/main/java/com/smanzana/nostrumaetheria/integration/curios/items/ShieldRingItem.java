@@ -3,7 +3,6 @@ package com.smanzana.nostrumaetheria.integration.curios.items;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurio;
-import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 
 import net.minecraft.entity.LivingEntity;
@@ -19,7 +18,7 @@ public class ShieldRingItem extends NostrumCurio {
 	private final double shieldAmt;
 	
 	public ShieldRingItem(double shieldAmt, String descKey) {
-		super(NostrumCurios.PropCurio(), descKey);
+		super(AetheriaCurios.PropCurio(), descKey);
 		this.shieldAmt = shieldAmt;
 	}
 

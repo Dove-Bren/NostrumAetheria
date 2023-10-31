@@ -3,7 +3,6 @@ package com.smanzana.nostrumaetheria.integration.curios.items;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurio;
-import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.Entity;
@@ -22,7 +21,7 @@ public class EludeCloakItem extends NostrumCurio {
 	public static final String ID = "elude_cloak";
 	
 	public EludeCloakItem() {
-		super(NostrumCurios.PropCurio(), ID);
+		super(AetheriaCurios.PropCurio(), ID);
 		
 		MinecraftForge.EVENT_BUS.register(this);
 	}

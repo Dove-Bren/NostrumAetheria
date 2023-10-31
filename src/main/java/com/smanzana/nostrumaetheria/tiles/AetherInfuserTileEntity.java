@@ -663,7 +663,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 		
 		@SubscribeEvent
 		public void onChunkLoad(ChunkEvent.Load event) {
-			if (event.getWorld().isRemote()) {
+			if (event.getWorld() == null || event.getWorld().isRemote()) {
 				return;
 			}
 			

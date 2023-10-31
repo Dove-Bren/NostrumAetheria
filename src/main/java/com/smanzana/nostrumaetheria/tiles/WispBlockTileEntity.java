@@ -7,12 +7,12 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
+import com.smanzana.nostrumaetheria.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.utils.ContainerUtil.IAutoContainerInventory;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,7 +21,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class WispBlockTileEntity extends AetherTickingTileEntity implements IAutoContainerInventory {
+public class WispBlockTileEntity extends AetherTickingTileEntity implements IAutoContainerInventoryWrapper {
 
 	private static final String NBT_INVENTORY = "inventory";
 	private static final String NBT_PARTIAL = "partial";

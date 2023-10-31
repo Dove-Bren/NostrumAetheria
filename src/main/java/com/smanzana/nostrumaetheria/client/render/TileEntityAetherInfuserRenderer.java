@@ -11,6 +11,7 @@ import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity;
 import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity.EffectSpark;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
@@ -56,6 +57,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		
 		
 		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240); TODO this?
+		RenderFuncs.disableLightmap();
 		
 		// outside
 		GlStateManager.pushMatrix();
@@ -168,23 +170,25 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		//GlStateManager.rotatef((float)rotX, 1, 0, 0);
 		//GlStateManager.scalef(scale, scale, scale);
 		
-		buffer.pos(offsetX - (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ - (rZ * radius) - (rXY * radius))
-			.tex(0, 0).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
-		buffer.pos(offsetX - (rX * radius) + (rYZ * radius), offsetY + (rXZ * radius), offsetZ - (rZ * radius) + (rXY * radius))
-			.tex(0, 1).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
-		buffer.pos(offsetX + (rX * radius) + (rYZ * radius), offsetY + (rXZ * radius), offsetZ + (rZ * radius) + (rXY * radius))
-			.tex(1, 1).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
-		buffer.pos(offsetX + (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ + (rZ * radius) - (rXY * radius))
-			.tex(1, 0).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
+		RenderFuncs.renderSpaceQuadFacingCamera(buffer, renderInfo, offsetX, offsetY, offsetZ, radius, red, green, blue, alphaOuter);
 		
-		buffer.pos(offsetX - (rX * smallRadius) - (rYZ * smallRadius), offsetY - (rXZ * smallRadius), offsetZ - (rZ * smallRadius) - (rXY * smallRadius))
-			.tex(0, 0).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
-		buffer.pos(offsetX - (rX * smallRadius) + (rYZ * smallRadius), offsetY + (rXZ * smallRadius), offsetZ - (rZ * smallRadius) + (rXY * smallRadius))
-			.tex(0, 1).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
-		buffer.pos(offsetX + (rX * smallRadius) + (rYZ * smallRadius), offsetY + (rXZ * smallRadius), offsetZ + (rZ * smallRadius) + (rXY * smallRadius))
-			.tex(1, 1).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
-		buffer.pos(offsetX + (rX * smallRadius) - (rYZ * smallRadius), offsetY - (rXZ * smallRadius), offsetZ + (rZ * smallRadius) - (rXY * smallRadius))
-			.tex(1, 0).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
+//		buffer.pos(offsetX - (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ - (rZ * radius) - (rXY * radius))
+//			.tex(0, 0).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
+//		buffer.pos(offsetX - (rX * radius) + (rYZ * radius), offsetY + (rXZ * radius), offsetZ - (rZ * radius) + (rXY * radius))
+//			.tex(0, 1).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
+//		buffer.pos(offsetX + (rX * radius) + (rYZ * radius), offsetY + (rXZ * radius), offsetZ + (rZ * radius) + (rXY * radius))
+//			.tex(1, 1).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
+//		buffer.pos(offsetX + (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ + (rZ * radius) - (rXY * radius))
+//			.tex(1, 0).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
+//		
+//		buffer.pos(offsetX - (rX * smallRadius) - (rYZ * smallRadius), offsetY - (rXZ * smallRadius), offsetZ - (rZ * smallRadius) - (rXY * smallRadius))
+//			.tex(0, 0).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
+//		buffer.pos(offsetX - (rX * smallRadius) + (rYZ * smallRadius), offsetY + (rXZ * smallRadius), offsetZ - (rZ * smallRadius) + (rXY * smallRadius))
+//			.tex(0, 1).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
+//		buffer.pos(offsetX + (rX * smallRadius) + (rYZ * smallRadius), offsetY + (rXZ * smallRadius), offsetZ + (rZ * smallRadius) + (rXY * smallRadius))
+//			.tex(1, 1).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
+//		buffer.pos(offsetX + (rX * smallRadius) - (rYZ * smallRadius), offsetY - (rXZ * smallRadius), offsetZ + (rZ * smallRadius) - (rXY * smallRadius))
+//			.tex(1, 0).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
 		
 //		buffer.pos(-.25, .25, 0.01).tex(0, 0).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
 //		buffer.pos(-.25, -.25, 0.01).tex(0, 1).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
@@ -206,7 +210,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		
 		// Calculate opacity for orb. Probably should add glow.
 		// 0f to .4f
-		final float maxOrbOpacity = .075f;
+		final float maxOrbOpacity = .15f;
 		final float orbOpacity = maxOrbOpacity * (.75f + .25f * (float)Math.sin(t * 2 * Math.PI)) * te.getChargePerc();
 		Minecraft mc = Minecraft.getInstance();
 		Vec3d trueCamPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();

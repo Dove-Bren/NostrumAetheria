@@ -1,15 +1,15 @@
 {
-  "type": "nostrummagica:aether_cloak_toggle",
+  "type": "nostrumaetheria:aether_cloak_toggle",
   "key": "show_runes",
   "display": {
-	  "item": "nostrummagica:aether_cloak",
+	  "item": "nostrumaetheria:aether_cloak",
 	  "nbt": {
 		  "display_runes": true
 	  }
   },
   "ingredients": [
     {
-      "item": "nostrummagica:aether_cloak"
+      "item": "nostrumaetheria:aether_cloak"
     },
     {
       "tag": "forge:gems/quartz"

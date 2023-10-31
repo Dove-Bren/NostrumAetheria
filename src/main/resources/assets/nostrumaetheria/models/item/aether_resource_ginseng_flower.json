@@ -1,0 +1,6 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "nostrumaetheria:item/ginseng_flower"
+    }
+}

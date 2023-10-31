@@ -37,13 +37,17 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class CommonProxy {
 	
+	public CommonProxy() {
+		MinecraftForge.EVENT_BUS.register(this);
+		FMLJavaModLoadingContext.get().getModEventBus().register(this);
+	}
+	
 	public void preinit() {
 		NetworkHandler.getInstance();
-		
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	public void init() {

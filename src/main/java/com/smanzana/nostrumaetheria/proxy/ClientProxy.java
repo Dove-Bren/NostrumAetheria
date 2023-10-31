@@ -47,14 +47,13 @@ public class ClientProxy extends CommonProxy {
 	//protected OverlayRenderer overlayRenderer;
 
 	public ClientProxy() {
-		MinecraftForge.EVENT_BUS.register(this);
+		super();
 	}
 	
 	@Override
 	public void preinit() {
 		super.preinit();
-		
-		OBJLoader.INSTANCE.addDomain(NostrumAetheria.MODID);
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	@Override
@@ -87,6 +86,8 @@ public class ClientProxy extends CommonProxy {
 				event.getModelRegistry().put(loc, bakedModel);
 			}
 		}
+		
+		// 
 	}
 	
 	@SubscribeEvent

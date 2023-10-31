@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.AbstractFurnaceTileEntity;
 import net.minecraft.tileentity.FurnaceTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -64,8 +65,12 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	protected void fuelNearbyFurnace() {
 		FurnaceTileEntity furnace = getNearbyFurnace();
 		if (furnace != null) {
-			ObfuscationReflectionHelper.setPrivateValue(FurnaceTileEntity.class, furnace, 20, "field_145956_a");// "burnTime");
-			this.world.setBlockState(this.pos, this.world.getBlockState(this.pos).with(AbstractFurnaceBlock.LIT, Boolean.valueOf(true)), 3);
+			try {
+				ObfuscationReflectionHelper.setPrivateValue(AbstractFurnaceTileEntity.class, furnace, 20, "field_214018_j");// "burnTime");
+			} catch (Exception e) {
+				
+			}
+			this.world.setBlockState(this.pos.up(), this.world.getBlockState(this.pos.up()).with(AbstractFurnaceBlock.LIT, Boolean.valueOf(true)), 3);
 		}
 	}
 	
@@ -75,20 +80,26 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	 * @return
 	 */
 	protected static final boolean FurnaceHasWork(@Nullable FurnaceTileEntity furnace) {
-		if (Furnace_CanSmeltMethod == null) {
-			Furnace_CanSmeltMethod = ObfuscationReflectionHelper.findMethod(furnace.getClass(), "func_145948_k", boolean.class, IRecipe.class); // "canSmelt"
-			if (Furnace_CanSmeltMethod != null) {
-				Furnace_CanSmeltMethod.setAccessible(true);
+		if (furnace != null && furnace instanceof AbstractFurnaceTileEntity) {
+			if (Furnace_CanSmeltMethod == null) {
+				try {
+				Furnace_CanSmeltMethod = ObfuscationReflectionHelper.findMethod(AbstractFurnaceTileEntity.class, "func_214008_b", IRecipe.class); // "canSmelt"
+				if (Furnace_CanSmeltMethod != null) {
+					Furnace_CanSmeltMethod.setAccessible(true);
+				}
+				} catch (Exception e) {
+					Furnace_CanSmeltMethod = null;
+				}
 			}
-		}
-		
-		if (furnace != null && Furnace_CanSmeltMethod != null) {
-			try {
-				IRecipe<?> irecipe = furnace.getWorld().getRecipeManager().getRecipe(IRecipeType.SMELTING, furnace, furnace.getWorld()).orElse(null);
-				return (boolean) Furnace_CanSmeltMethod.invoke(furnace, irecipe);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return false;
+			
+			if (Furnace_CanSmeltMethod != null) {
+				try {
+					IRecipe<?> irecipe = furnace.getWorld().getRecipeManager().getRecipe(IRecipeType.SMELTING, furnace, furnace.getWorld()).orElse(null);
+					return (boolean) Furnace_CanSmeltMethod.invoke(furnace, irecipe);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
 			}
 		}
 		

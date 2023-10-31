@@ -35,6 +35,8 @@ public class AetherTileEntityMessage {
 				}
 			}
 		});
+		
+		ctx.get().setPacketHandled(true);
 	}
 	
 	private final DimensionType dimension;

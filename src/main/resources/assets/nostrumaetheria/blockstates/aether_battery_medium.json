@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nostrumaetheria:aether_battery_medium" }
+        "": { "model": "nostrumaetheria:block/aether_battery_medium" }
     }
 }

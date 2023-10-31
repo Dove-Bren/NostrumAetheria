@@ -2,8 +2,8 @@
     "forge_marker": 1,
     "variants": {
         "on": {
-            "true": { "model": "nostrumaetheria:aether_unraveler_on" },
-            "false": { "model": "nostrumaetheria:aether_unraveler_off" }
+            "true": { "model": "nostrumaetheria:block/aether_unraveler_on" },
+            "false": { "model": "nostrumaetheria:block/aether_unraveler_off" }
         }
     }
 }

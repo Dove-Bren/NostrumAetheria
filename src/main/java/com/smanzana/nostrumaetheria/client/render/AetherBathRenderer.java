@@ -29,8 +29,8 @@ public class AetherBathRenderer extends TileEntityRenderer<AetherBathTileEntity>
 		GlStateManager.enableAlphaTest();
 		GlStateManager.disableLighting();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		//GlStateManager.enableTexture();
-		//GlStateManager.disableTexture();
+		GlStateManager.enableTexture();
+		GlStateManager.disableTexture();
 		GlStateManager.enableColorMaterial();
 		
 		Tessellator tessellator = Tessellator.getInstance();
