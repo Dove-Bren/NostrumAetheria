@@ -21,7 +21,6 @@ import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherInfuserTileEntity> {
@@ -146,11 +145,11 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		
 		final Minecraft mc = Minecraft.getInstance();
 		final ActiveRenderInfo renderInfo = mc.gameRenderer.getActiveRenderInfo();
-		final float rX = MathHelper.cos(renderInfo.getYaw() * ((float)Math.PI / 180F));
-		final float rXZ = rX * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
-		final float rZ = MathHelper.cos(renderInfo.getPitch() * ((float)Math.PI / 180F));
-		final float rYZ = MathHelper.sin(renderInfo.getYaw() * ((float)Math.PI / 180F));
-		final float rXY = -rYZ * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
+//		final float rX = MathHelper.cos(renderInfo.getYaw() * ((float)Math.PI / 180F));
+//		final float rXZ = rX * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
+//		final float rZ = MathHelper.cos(renderInfo.getPitch() * ((float)Math.PI / 180F));
+//		final float rYZ = MathHelper.sin(renderInfo.getYaw() * ((float)Math.PI / 180F));
+//		final float rXY = -rYZ * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
 		
 		// Size
 		final float scale = .2f * spark.yawStart;
@@ -171,6 +170,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		//GlStateManager.scalef(scale, scale, scale);
 		
 		RenderFuncs.renderSpaceQuadFacingCamera(buffer, renderInfo, offsetX, offsetY, offsetZ, radius, red, green, blue, alphaOuter);
+		RenderFuncs.renderSpaceQuadFacingCamera(buffer, renderInfo, offsetX, offsetY, offsetZ, smallRadius, red, green, blue, alphaInner);
 		
 //		buffer.pos(offsetX - (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ - (rZ * radius) - (rXY * radius))
 //			.tex(0, 0).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();

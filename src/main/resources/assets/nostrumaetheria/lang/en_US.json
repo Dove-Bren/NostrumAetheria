@@ -54,6 +54,14 @@
     "item.nostrumaetheria.lens_no_spawn": "Anti-Spawn Lens",
     "item.nostrumaetheria.lens_no_spawn.desc": "Prevents mob spawning in a large area around the lens",
 
+    "item.aether_cloak.runed": "Runed",
+    "item.aether_cloak.wings": "Display Wings",
+    "item.aether_cloak.trimmed": "Trimmed Design",
+    "item.aether_cloak.color.outside": "Outside Dyed %s",
+    "item.aether_cloak.color.inside": "Inside Dyed %s",
+    "item.aether_cloak.color.runes": "Rune Color %s",
+    "item.aether_cloak.spender": "Aether Caster",
+
     "item.lens.master": "Master Lens",
 
     "item.info.lyon.desc": "Charged up by slowly consuming reagents. Provides reagent-free casts.",

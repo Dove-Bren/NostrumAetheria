@@ -24,6 +24,7 @@ public class InfiniteAetherBlock extends Block {
 				.hardnessAndResistance(3.0f, 10.0f)
 				.sound(SoundType.STONE)
 				.harvestTool(ToolType.AXE)
+				.noDrops()
 				);
 	}
 	

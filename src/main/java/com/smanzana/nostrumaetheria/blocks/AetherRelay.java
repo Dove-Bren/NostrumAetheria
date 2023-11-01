@@ -131,7 +131,7 @@ public class AetherRelay extends Block implements ILoreTagged {
 
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(FACING, context.getFace().getOpposite());
+		return this.getDefaultState().with(FACING, context.getFace());
 	}
 	
 	@Override
