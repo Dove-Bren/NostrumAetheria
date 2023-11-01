@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
@@ -20,6 +21,7 @@ import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -30,6 +32,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -37,6 +40,7 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.potion.Potions;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -50,6 +54,9 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserLens {
 
@@ -336,6 +343,49 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		return cost;
 	}
 	
+	protected @Nonnull List<ItemStack> pushToNearbyInventories(@Nonnull List<ItemStack> items, ServerWorld world, BlockPos center) {
+		if (items.isEmpty()) {
+			return items;
+		}
+		
+		// We'll look in the 4 neighbors for inventory handlers and try to empty our list
+		for (Direction dir : Direction.Plane.HORIZONTAL) {
+			final BlockPos pos = center.offset(dir);
+			final @Nullable TileEntity te = world.getTileEntity(pos);
+			
+			if (te != null) {
+				LazyOptional<IItemHandler> cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite());
+				if (cap.isPresent()) {
+					List<ItemStack> toInsert = items;
+					items = new ArrayList<>(toInsert.size());
+					
+					for (ItemStack insert : toInsert) {
+						ItemStack leftover = Inventories.addItem(cap.orElse(null), insert);
+						if (leftover != null && !leftover.isEmpty()) {
+							items.add(leftover);
+						}
+					}
+				} else if (te instanceof IInventory) {
+					List<ItemStack> toInsert = items;
+					items = new ArrayList<>(toInsert.size());
+					
+					for (ItemStack insert : toInsert) {
+						ItemStack leftover = Inventories.addItem((IInventory) te, insert);
+						if (leftover != null && !leftover.isEmpty()) {
+							items.add(leftover);
+						}
+					}
+				}
+			}
+			
+			if (items.isEmpty()) {
+				break;
+			}
+		}
+		
+		return items;
+	}
+	
 	protected boolean doBoreInternal(ServerWorld world, BlockPos center, int maxAether, boolean down) {
 		MutableBlockPos cursor = new MutableBlockPos(
 				down ? center.down().down() : center.up().up().up()
@@ -369,6 +419,10 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 			AetherInfuserTileEntity.DoChargeEffect(world, pos, 1, 0xFF664400);
 		}
 		
+		// Try to push drops into nearby inventories first
+		drops = pushToNearbyInventories(drops, world, center);
+		
+		// Then drop any that remain
 		for (ItemStack stack : drops) {
 			// put drops right above bore altar
 			world.addEntity(new ItemEntity(world, center.getX() + .5, center.getY() + 1.2, center.getZ() + .5, stack));
