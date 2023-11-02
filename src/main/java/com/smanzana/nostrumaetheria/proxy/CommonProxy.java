@@ -10,10 +10,10 @@ import com.smanzana.nostrumaetheria.items.ItemAetherLens.LensType;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 import com.smanzana.nostrumaetheria.rituals.OutcomeCreateAetherInfuser;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effects.NostrumPotions;
 import com.smanzana.nostrummagica.effects.NostrumPotions.PotionIngredient;
 import com.smanzana.nostrummagica.entity.EntityWisp;
-import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -194,7 +194,7 @@ public class CommonProxy {
 						null,
 						new ReagentType[] {ReagentType.GINSENG, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
 						Ingredient.fromItems(NostrumItems.thanoPendant),
-						new Ingredient[] {Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromTag(NostrumItemTags.Items.InfusedGemFire), Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_LAPIS), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
+						new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(NostrumTags.Items.InfusedGemFire), Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_LAPIS), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
 						new RRequirementResearch("active_pendant"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaItems.activePendant))
 						)
@@ -206,7 +206,7 @@ public class CommonProxy {
 						null,
 						new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.SKY_ASH},
 						Ingredient.fromItems(AetheriaItems.activePendant),
-						new Ingredient[]{Ingredient.fromItems(AetheriaItems.ginsengFlower), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromTag(NostrumItemTags.Items.SpriteCore), Ingredient.fromItems(AetheriaItems.mandrakeFlower)},
+						new Ingredient[]{Ingredient.fromItems(AetheriaItems.ginsengFlower), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.SpriteCore), Ingredient.fromItems(AetheriaItems.mandrakeFlower)},
 						new RRequirementResearch("passive_pendant"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaItems.passivePendant))
 						)
@@ -218,7 +218,7 @@ public class CommonProxy {
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH},
 						Ingredient.fromItems(Blocks.FURNACE),
-						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust), Ingredient.fromTag(NostrumItemTags.Items.SpriteCore), Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust)},
+						new Ingredient[]{Ingredient.fromTag(NostrumTags.Items.ReagentManiDust), Ingredient.fromTag(NostrumTags.Items.SpriteCore), Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(NostrumTags.Items.ReagentManiDust)},
 						new RRequirementResearch("aether_furnace"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.smallFurnace))
 						)
@@ -230,7 +230,7 @@ public class CommonProxy {
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH},
 						Ingredient.fromItems(AetheriaBlocks.smallFurnace),
-						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust), Ingredient.fromItems(Items.FURNACE), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
+						new Ingredient[]{Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(NostrumTags.Items.ReagentManiDust), Ingredient.fromItems(Items.FURNACE), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
 						new RRequirementResearch("aether_furnace_adv"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.mediumFurnace))
 						)
@@ -242,7 +242,7 @@ public class CommonProxy {
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH},
 						Ingredient.fromItems(AetheriaBlocks.mediumFurnace),
-						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust), Ingredient.fromItems(Items.FURNACE), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
+						new Ingredient[]{Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(NostrumTags.Items.ReagentManiDust), Ingredient.fromItems(Items.FURNACE), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
 						new RRequirementResearch("aether_furnace_adv"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.largeFurnace))
 						)
@@ -254,7 +254,7 @@ public class CommonProxy {
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.BLACK_PEARL},
 						Ingredient.fromItems(AetheriaBlocks.smallFurnace),
-						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromTag(Tags.Items.INGOTS_IRON), Ingredient.fromItems(Items.CAULDRON), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
+						new Ingredient[]{Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(Tags.Items.INGOTS_IRON), Ingredient.fromItems(Items.CAULDRON), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
 						new RRequirementResearch("aether_boiler"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.boiler))
 						)
@@ -266,7 +266,7 @@ public class CommonProxy {
 						null,
 						new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.BLACK_PEARL},
 						Ingredient.fromItems(NostrumItems.altarItem),
-						new Ingredient[]{Ingredient.fromTag(Tags.Items.STONE), Ingredient.fromItems(Items.BUCKET), Ingredient.fromTag(NostrumItemTags.Items.SpriteCore), Ingredient.fromTag(Tags.Items.STONE)},
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.STONE), Ingredient.fromItems(Items.BUCKET), Ingredient.fromTag(NostrumTags.Items.SpriteCore), Ingredient.fromTag(Tags.Items.STONE)},
 						new RRequirementResearch("aether_bath"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.bath))
 						)
@@ -278,7 +278,7 @@ public class CommonProxy {
 						EMagicElement.ICE,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT},
 						Ingredient.fromItems(AetheriaBlocks.bath),
-						new Ingredient[]{Ingredient.fromTag(Tags.Items.STONE), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromItems(Items.CAULDRON), Ingredient.fromTag(Tags.Items.STONE)},
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.STONE), Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromItems(Items.CAULDRON), Ingredient.fromTag(Tags.Items.STONE)},
 						new RRequirementResearch("aether_charger"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.charger))
 						)
@@ -290,7 +290,7 @@ public class CommonProxy {
 						EMagicElement.EARTH,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.SKY_ASH, ReagentType.GRAVE_DUST},
 						Ingredient.fromItems(AetheriaBlocks.charger),
-						new Ingredient[]{Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge), Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(Tags.Items.OBSIDIAN)},
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(NostrumTags.Items.CrystalLarge), Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(Tags.Items.OBSIDIAN)},
 						new RRequirementResearch("aether_repairer"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.repairer))
 						)
@@ -302,7 +302,7 @@ public class CommonProxy {
 						EMagicElement.FIRE,
 						new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.GINSENG},
 						Ingredient.fromItems(AetheriaBlocks.charger),
-						new Ingredient[]{Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge), Ingredient.fromItems(Items.MAGMA_BLOCK), Ingredient.fromTag(Tags.Items.OBSIDIAN)},
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(NostrumTags.Items.CrystalLarge), Ingredient.fromItems(Items.MAGMA_BLOCK), Ingredient.fromTag(Tags.Items.OBSIDIAN)},
 						new RRequirementResearch("aether_unraveler"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.unraveler))
 						)
@@ -314,7 +314,7 @@ public class CommonProxy {
 						null,
 						new ReagentType[] {ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.SPIDER_SILK, ReagentType.GINSENG},
 						Ingredient.fromItems(Blocks.GLASS),
-						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromTag(NostrumItemTags.Items.SpriteCore), Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust)},
+						new Ingredient[]{Ingredient.fromTag(NostrumTags.Items.ReagentManiDust), Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(NostrumTags.Items.SpriteCore), Ingredient.fromTag(NostrumTags.Items.ReagentManiDust)},
 						new RRequirementResearch("aether_battery"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.smallBattery))
 						)
@@ -326,7 +326,7 @@ public class CommonProxy {
 						null,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM, ReagentType.SKY_ASH, ReagentType.GINSENG},
 						Ingredient.fromItems(AetheriaBlocks.smallBattery),
-						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromTag(Tags.Items.GLASS), Ingredient.fromTag(Tags.Items.STONE), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
+						new Ingredient[]{Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(Tags.Items.GLASS), Ingredient.fromTag(Tags.Items.STONE), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
 						new RRequirementResearch("aether_battery"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.mediumBattery))
 						)
@@ -338,7 +338,7 @@ public class CommonProxy {
 						null,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM, ReagentType.SKY_ASH, ReagentType.GINSENG},
 						Ingredient.fromItems(AetheriaBlocks.mediumBattery),
-						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.fromItems(AetheriaBlocks.mediumBattery), Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
+						new Ingredient[]{Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromItems(AetheriaBlocks.mediumBattery), Ingredient.fromTag(Tags.Items.OBSIDIAN), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
 						new RRequirementResearch("aether_battery_adv"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.largeBattery))
 						)
@@ -350,7 +350,7 @@ public class CommonProxy {
 						null,
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM, ReagentType.SKY_ASH, ReagentType.GINSENG},
 						Ingredient.fromItems(AetheriaBlocks.largeBattery),
-						new Ingredient[]{Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromItems(AetheriaBlocks.largeBattery), Ingredient.fromTag(Tags.Items.END_STONES), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium)},
+						new Ingredient[]{Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromItems(AetheriaBlocks.largeBattery), Ingredient.fromTag(Tags.Items.END_STONES), Ingredient.fromTag(NostrumTags.Items.CrystalMedium)},
 						new RRequirementResearch("aether_battery_adv"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.giantBattery))
 						)
@@ -361,8 +361,8 @@ public class CommonProxy {
 						new ItemStack(AetheriaItems.aetherGem),
 						null,
 						new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.GRAVE_DUST},
-						Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge),
-						new Ingredient[]{Ingredient.fromTag(Tags.Items.ENDER_PEARLS), Ingredient.fromTag(NostrumItemTags.Items.SpriteCore), Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust), Ingredient.fromTag(Tags.Items.ENDER_PEARLS)},
+						Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.ENDER_PEARLS), Ingredient.fromTag(NostrumTags.Items.SpriteCore), Ingredient.fromTag(NostrumTags.Items.ReagentManiDust), Ingredient.fromTag(Tags.Items.ENDER_PEARLS)},
 						new RRequirementResearch("aether_gem"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaItems.aetherGem))
 						)
@@ -374,7 +374,7 @@ public class CommonProxy {
 						EMagicElement.ENDER,
 						new ReagentType[] {ReagentType.SKY_ASH, ReagentType.CRYSTABLOOM, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
 						Ingredient.fromItems(Blocks.REDSTONE_TORCH),
-						new Ingredient[]{Ingredient.fromTag(Tags.Items.ENDER_PEARLS), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromItems(NostrumItems.positionCrystal), Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE)},
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.ENDER_PEARLS), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromItems(NostrumItems.positionCrystal), Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE)},
 						new RRequirementResearch("aether_relay"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.relay, 8))
 						)
@@ -416,7 +416,7 @@ public class CommonProxy {
 						null,
 						new ReagentType[] {ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
 						Ingredient.fromTag(Tags.Items.GLASS_PANES),
-						new Ingredient[] {Ingredient.EMPTY, ingredient, Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredient.EMPTY},
+						new Ingredient[] {Ingredient.EMPTY, ingredient, Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.EMPTY},
 						new RRequirementResearch("aether_infusers"),
 						new OutcomeSpawnItem(new ItemStack(ItemAetherLens.GetLens(type)))
 				)
@@ -430,10 +430,10 @@ public class CommonProxy {
 						new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
 						Ingredient.fromItems(NostrumItems.altarItem),
 						new Ingredient[] {
-								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
 								Ingredient.fromItems(AetheriaBlocks.smallBattery),
 								Ingredient.fromTag(Tags.Items.OBSIDIAN),
-								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
 								},
 						new RRequirementResearch("wispblock"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.wispBlock))
@@ -448,7 +448,7 @@ public class CommonProxy {
 						Ingredient.fromTag(Tags.Items.OBSIDIAN),
 						new Ingredient[] {
 								Ingredient.fromStacks(new ItemStack(AetheriaBlocks.smallBattery)),
-								Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium),
+								Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
 								Ingredient.fromStacks(new ItemStack(AetheriaBlocks.smallBattery)),
 								Ingredient.fromStacks(new ItemStack(AetheriaBlocks.smallBattery))},
 						new RRequirementResearch("aether_infusers"),

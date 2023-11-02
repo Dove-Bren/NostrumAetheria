@@ -13,11 +13,11 @@ import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effects.NostrumPotions;
 import com.smanzana.nostrummagica.entity.IMagicEntity;
 import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
-import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.utils.Entities;
@@ -74,7 +74,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	
 	public static enum LensType {
 		SPREAD(ID_SPREAD, true, 1, 0, () -> Ingredient.fromTag(Tags.Items.GEMS_DIAMOND)),
-		CHARGE(ID_CHARGE, true, 1, 0, () -> Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)),
+		CHARGE(ID_CHARGE, true, 1, 0, () -> Ingredient.fromTag(NostrumTags.Items.CrystalSmall)),
 		GROW(ID_GROW, false, 20, 10, () -> Ingredient.fromItems(Items.BONE_BLOCK)),
 		SWIFTNESS(ID_SWIFTNESS, false, 1, 0, () -> new NostrumPotions.PotionIngredient(Potions.SWIFTNESS)), // aether taken per entity
 		ELEVATOR(ID_ELEVATOR, false, 1, 0, () -> Ingredient.fromItems(Blocks.DISPENSER)), // aether taken per entity
