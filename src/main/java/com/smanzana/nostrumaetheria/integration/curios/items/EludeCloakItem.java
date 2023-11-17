@@ -1,5 +1,6 @@
 package com.smanzana.nostrumaetheria.integration.curios.items;
 
+import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurio;
@@ -12,22 +13,21 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
+@Mod.EventBusSubscriber(modid = NostrumAetheria.MODID)
 public class EludeCloakItem extends NostrumCurio {
 
 	public static final String ID = "elude_cloak";
 	
 	public EludeCloakItem() {
 		super(AetheriaCurios.PropCurio(), ID);
-		
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	@SubscribeEvent
-	public void onAttack(LivingAttackEvent event) {
+	public static void onAttack(LivingAttackEvent event) {
 		if (event.isCanceled()) {
 			return;
 		}

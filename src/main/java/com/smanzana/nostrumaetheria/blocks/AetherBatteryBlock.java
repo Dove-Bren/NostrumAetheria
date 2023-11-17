@@ -35,12 +35,6 @@ public class AetherBatteryBlock extends Block implements ILoreTagged {
 		}
 	}
 	
-	protected static final String ID_PREFIX = "aether_battery_";
-	public static final String ID_SMALL = ID_PREFIX + "small";
-	public static final String ID_MEDIUM = ID_PREFIX + "medium";
-	public static final String ID_LARGE = ID_PREFIX + "large";
-	public static final String ID_GIANT = ID_PREFIX + "giant";
-	
 	private final Size size;
 	
 	public AetherBatteryBlock(Size size) {

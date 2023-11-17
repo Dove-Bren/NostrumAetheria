@@ -38,7 +38,6 @@ public class AetherBoilerBlock extends Block implements ILoreTagged {
 	
 	public static final BooleanProperty ON = BooleanProperty.create("on");
 	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
-	public static final String ID = "aether_boiler_block";
 	
 	public AetherBoilerBlock() {
 		super(Block.Properties.create(Material.ROCK)

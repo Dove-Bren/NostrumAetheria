@@ -74,7 +74,6 @@ public class AetherChargerGui {
 			});
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static final AetherChargerContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			return new AetherChargerContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}

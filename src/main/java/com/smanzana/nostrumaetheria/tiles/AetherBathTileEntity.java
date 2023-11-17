@@ -5,14 +5,18 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.Validate;
 
+import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
+import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.rituals.RitualRegistry;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
@@ -235,6 +239,18 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 					}
 				}
 			}
+		} else {
+			int unused; // remove
+			//NostrumAetheria.logger.debug("There are " + NostrumTags.Items.CrystalLarge.getAllElements().size());
+			
+//			for (RitualRecipe ritual : RitualRegistry.instance().getRegisteredRituals()) {
+//				Ingredient center = ritual.getCenterItem();
+//				if (center != null && center != Ingredient.EMPTY) {
+//					if (ritual.getTitleKey().contains("vani")) {
+//						//NostrumAetheria.logger.debug("Found ritual " + ritual.getTitleKey() + " with center item: " + (center.hasNoMatchingItems() ? "EMPTY" : center.getMatchingStacks().length + ""));
+//					}
+//				}
+//			}
 		}
 		
 		super.tick();

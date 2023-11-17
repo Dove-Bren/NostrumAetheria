@@ -94,7 +94,6 @@ public class AetherBoilerGui {
 			});
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static final AetherBoilerContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			return new AetherBoilerContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}

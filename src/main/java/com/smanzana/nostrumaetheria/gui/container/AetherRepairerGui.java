@@ -70,7 +70,6 @@ public class AetherRepairerGui {
 			});
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static final AetherRepairerContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			return new AetherRepairerContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}

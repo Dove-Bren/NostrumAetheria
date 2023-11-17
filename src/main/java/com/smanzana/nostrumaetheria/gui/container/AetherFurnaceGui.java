@@ -80,7 +80,6 @@ public class AetherFurnaceGui {
 			}
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static final AetherFurnaceContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			return new AetherFurnaceContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}

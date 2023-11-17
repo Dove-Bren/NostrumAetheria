@@ -17,8 +17,6 @@ import net.minecraftforge.common.ToolType;
 
 public class InfiniteAetherBlock extends Block {
 	
-	public static final String ID = "infinite_aether_block";
-	
 	public InfiniteAetherBlock() {
 		super(Block.Properties.create(Material.ROCK)
 				.hardnessAndResistance(3.0f, 10.0f)

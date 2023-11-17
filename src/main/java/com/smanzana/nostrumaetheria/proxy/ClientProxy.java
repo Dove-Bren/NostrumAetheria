@@ -9,6 +9,14 @@ import com.smanzana.nostrumaetheria.client.render.TileEntityAetherDebugRenderer;
 import com.smanzana.nostrumaetheria.client.render.TileEntityAetherInfuserRenderer;
 import com.smanzana.nostrumaetheria.client.render.TileEntityWispBlockRenderer;
 import com.smanzana.nostrumaetheria.entity.EntityAetherBatteryMinecart;
+import com.smanzana.nostrumaetheria.gui.container.ActivePendantGui;
+import com.smanzana.nostrumaetheria.gui.container.AetherBoilerGui;
+import com.smanzana.nostrumaetheria.gui.container.AetherChargerGui;
+import com.smanzana.nostrumaetheria.gui.container.AetherFurnaceGui;
+import com.smanzana.nostrumaetheria.gui.container.AetherRepairerGui;
+import com.smanzana.nostrumaetheria.gui.container.AetherUnravelerGui;
+import com.smanzana.nostrumaetheria.gui.container.AetheriaContainers;
+import com.smanzana.nostrumaetheria.gui.container.WispBlockGui;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrumaetheria.tiles.AetherBathTileEntity;
 import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
@@ -18,6 +26,7 @@ import com.smanzana.nostrumaetheria.tiles.InfiniteAetherBlockEntity;
 import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.model.IBakedModel;
@@ -76,7 +85,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void onModelBake(ModelBakeEvent event) {
-		for (ModelResourceLocation loc : AetherCloakItem.AllCapeModels) {
+		for (ModelResourceLocation loc : AetherCloakItem.AetherCloakModels.AllCapeModels) {
 			ResourceLocation modelLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + ".obj");
 			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(modelLoc, "Failed to get obj model for " + modelLoc);
 			
@@ -129,6 +138,14 @@ public class ClientProxy extends CommonProxy {
 				new AetherBathRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(AetherInfuserTileEntity.class, new TileEntityAetherInfuserRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(WispBlockTileEntity.class, new TileEntityWispBlockRenderer());
+		
+		ScreenManager.registerFactory(AetheriaContainers.ActivePendant, ActivePendantGui.ActivePendantGuiContainer::new);
+		ScreenManager.registerFactory(AetheriaContainers.Boiler, AetherBoilerGui.AetherBoilerGuiContainer::new);
+		ScreenManager.registerFactory(AetheriaContainers.Charger, AetherChargerGui.AetherChargerGuiContainer::new);
+		ScreenManager.registerFactory(AetheriaContainers.Furnace, AetherFurnaceGui.AetherFurnaceGuiContainer::new);
+		ScreenManager.registerFactory(AetheriaContainers.Repairer, AetherRepairerGui.AetherRepairerGuiContainer::new);
+		ScreenManager.registerFactory(AetheriaContainers.Unraveler, AetherUnravelerGui.AetherUnravelerGuiContainer::new);
+		ScreenManager.registerFactory(AetheriaContainers.WispBlock, WispBlockGui.WispBlockGuiContainer::new);
 	}
 
 	@Override

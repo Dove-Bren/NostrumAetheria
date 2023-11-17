@@ -47,7 +47,6 @@ import net.minecraftforge.common.ToolType;
 public class AetherUnravelerBlock extends Block implements ILoreTagged {
 	
 	public static final BooleanProperty ON = BooleanProperty.create("on");
-	public static final String ID = "aether_unraveler";
 	
 	public static void initDefaultRecipes() {
 		APIProxy.addUnravelerRecipe(new ScrollUnravelerRecipe());

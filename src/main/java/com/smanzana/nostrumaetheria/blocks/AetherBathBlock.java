@@ -30,7 +30,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class AetherBathBlock extends Block implements ILoreTagged {
 	
-	public static final String ID = "aether_bath";
 	protected static final VoxelShape ALTAR_AABB = Block.makeCuboidShape(3.2D, 0.0D, 3.2D, 12.8D, 14.4D, 12.8D);
 	
 	public AetherBathBlock() {

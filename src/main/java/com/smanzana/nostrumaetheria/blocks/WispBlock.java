@@ -27,7 +27,6 @@ import net.minecraft.world.World;
 
 public class WispBlock extends Block {
 	
-	public static final String ID = "wisp_block";
 	protected static final VoxelShape SELECT_AABB = Block.makeCuboidShape(3.2, 14.4, 3.2, 12.8, 20.8, 12.8);
 	protected static final VoxelShape COLLIDE_AABB = Block.makeCuboidShape(3.2, 0, 3.2, 12.8, 20.8, 12.8);
 	

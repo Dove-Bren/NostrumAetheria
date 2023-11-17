@@ -15,10 +15,6 @@ import net.minecraft.item.ItemStack;
  */
 public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAetherBurnable {
 
-	private static final String ID_PREFIX = "aether_resource_";
-	public static final String ID_GINSENG_FLOWER = ID_PREFIX + "ginseng_flower";
-	public static final String ID_MANDRAKE_FLOWER = ID_PREFIX + "mandrake_flower";
-	
 	private final int burnTicks;
 	private final int aetherYield;
 	

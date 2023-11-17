@@ -70,11 +70,6 @@ public class AetherFurnaceBlock extends Block implements ILoreTagged {
 	
 	public static final BooleanProperty ON = BooleanProperty.create("on");
 	
-	protected static final String ID_PREFIX = "aether_furnace_";
-	protected static final String ID_SMALL = ID_PREFIX + "small";
-	protected static final String ID_MEDIUM = ID_PREFIX + "medium";
-	protected static final String ID_LARGE = ID_PREFIX + "large";
-	
 	private final Type furnaceType;
 	
 	public AetherFurnaceBlock(Type type) {

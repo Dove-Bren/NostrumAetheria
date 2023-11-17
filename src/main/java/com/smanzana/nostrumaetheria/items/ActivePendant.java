@@ -41,7 +41,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 
-	public static final String ID = "pendant_active";
 	private static final String NBT_PENDANT_REAGENTS = "reagent_stack";
 	private static final String NBT_PENDANT_POINTS = "points"; // Reagents burnt, including fractional part for current. NOT charges.
 	private static final String NBT_PENDANT_ID = "pid";

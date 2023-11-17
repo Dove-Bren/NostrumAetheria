@@ -21,7 +21,6 @@ import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
-import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -38,6 +37,7 @@ import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class CommonProxy {
 	
@@ -51,7 +51,7 @@ public class CommonProxy {
 	}
 	
 	public void init() {
-    	this.registerRituals();
+    	//this.registerRituals();
     	
     	NostrumMagica.instance.registerResearchReloadHook((i) -> {
     		registerResearch();
@@ -187,20 +187,25 @@ public class CommonProxy {
 		.build("aether_infusers", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 0, 2, true, new ItemStack(AetheriaBlocks.infuser));
     }
     
-    private void registerRituals() {
-    	RitualRegistry.instance().addRitual(
+    @SubscribeEvent
+    public void registerRituals(RegistryEvent.Register<RitualRecipe> event) {
+    	final IForgeRegistry<RitualRecipe> registry = event.getRegistry();
+    	
+    	registry.register(
 				RitualRecipe.createTier3("active_pendant",
 						new ItemStack(AetheriaItems.activePendant),
 						null,
 						new ReagentType[] {ReagentType.GINSENG, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
 						Ingredient.fromItems(NostrumItems.thanoPendant),
-						new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(NostrumTags.Items.InfusedGemFire), Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_LAPIS), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
+						new Ingredient[] {
+								Ingredient.fromTag(NostrumTags.Items.CrystalSmall),
+								Ingredient.fromTag(NostrumTags.Items.InfusedGemFire), Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_LAPIS), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
 						new RRequirementResearch("active_pendant"),
 						new OutcomeSpawnItem(new ItemStack(AetheriaItems.activePendant))
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("passive_pendant",
 						new ItemStack(AetheriaItems.passivePendant),
 						null,
@@ -212,7 +217,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_furnace_small",
 						new ItemStack(AetheriaBlocks.smallFurnace),
 						EMagicElement.FIRE,
@@ -224,7 +229,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_furnace_medium",
 						new ItemStack(AetheriaBlocks.mediumFurnace),
 						EMagicElement.FIRE,
@@ -236,7 +241,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_furnace_large",
 						new ItemStack(AetheriaBlocks.largeFurnace),
 						EMagicElement.FIRE,
@@ -248,7 +253,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_boiler",
 						new ItemStack(AetheriaBlocks.boiler),
 						EMagicElement.FIRE,
@@ -260,7 +265,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_bath",
 						new ItemStack(AetheriaBlocks.bath),
 						null,
@@ -272,7 +277,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_charger",
 						new ItemStack(AetheriaBlocks.charger),
 						EMagicElement.ICE,
@@ -284,7 +289,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_repairer",
 						new ItemStack(AetheriaBlocks.repairer),
 						EMagicElement.EARTH,
@@ -296,7 +301,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_unraveler",
 						new ItemStack(AetheriaBlocks.unraveler),
 						EMagicElement.FIRE,
@@ -308,7 +313,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_battery_small",
 						new ItemStack(AetheriaBlocks.smallBattery),
 						null,
@@ -320,7 +325,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_battery_medium",
 						new ItemStack(AetheriaBlocks.mediumBattery),
 						null,
@@ -332,7 +337,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_battery_large",
 						new ItemStack(AetheriaBlocks.largeBattery),
 						null,
@@ -344,7 +349,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_battery_giant",
 						new ItemStack(AetheriaBlocks.giantBattery),
 						null,
@@ -356,7 +361,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_gem",
 						new ItemStack(AetheriaItems.aetherGem),
 						null,
@@ -368,7 +373,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_relay",
 						new ItemStack(AetheriaBlocks.relay),
 						EMagicElement.ENDER,
@@ -380,7 +385,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_battery_cart",
 						new ItemStack(AetheriaItems.aetherBatteryMinecart),
 						null,
@@ -392,7 +397,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("aether_pump",
 						new ItemStack(AetheriaBlocks.pump),
 						null,
@@ -410,7 +415,7 @@ public class CommonProxy {
 				continue;
 			}
 			
-			RitualRegistry.instance().addRitual(
+			registry.register(
 				RitualRecipe.createTier3("make_lens_" + type.getUnlocSuffix(),
 						new ItemStack(ItemAetherLens.GetLens(type)),
 						null,
@@ -423,7 +428,7 @@ public class CommonProxy {
 			);
 		}
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("wisp_crystal",
 						new ItemStack(AetheriaBlocks.wispBlock),
 						null,
@@ -440,7 +445,7 @@ public class CommonProxy {
 						)
 				);
 		
-		RitualRegistry.instance().addRitual(
+		registry.register(
 				RitualRecipe.createTier3("construct_aether_infuser",
 						new ItemStack(AetheriaBlocks.infuser),
 						null,

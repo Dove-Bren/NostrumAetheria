@@ -47,7 +47,6 @@ import net.minecraftforge.common.ToolType;
 public class AetherRepairerBlock extends Block implements ILoreTagged {
 	
 	public static final BooleanProperty ON = BooleanProperty.create("on");
-	public static final String ID = "aether_repairer";
 	
 	public static void initDefaultRecipes() {
 		RepairerRecipeManager.instance().addRecipe(new ArmorRepairRecipe());

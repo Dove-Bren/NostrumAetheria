@@ -75,7 +75,6 @@ public class AetherUnravelerGui {
 			});
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static final AetherUnravelerContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			return new AetherUnravelerContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}

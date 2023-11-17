@@ -190,7 +190,6 @@ public class WispBlockGui {
 			
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static final WispBlockContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			return new WispBlockContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}

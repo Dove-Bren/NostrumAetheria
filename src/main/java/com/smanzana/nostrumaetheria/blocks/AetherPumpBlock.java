@@ -32,7 +32,6 @@ import net.minecraftforge.common.ToolType;
 public class AetherPumpBlock extends Block implements ILoreTagged {
 	
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
-	public static final String ID = "aether_pump";
 	
 	private static final double BBWIDTH = 4.0/16.0;
 	protected static final VoxelShape PUMP_AABBS[] = new VoxelShape[] {

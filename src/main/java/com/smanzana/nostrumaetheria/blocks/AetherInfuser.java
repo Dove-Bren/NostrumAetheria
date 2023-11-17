@@ -20,8 +20,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class AetherInfuser extends Block {
 	
-	public static final String ID = "infuser_multiblk";
-	
 	private static final BooleanProperty MASTER = BooleanProperty.create("master");
 	
 	public AetherInfuser() {

@@ -24,7 +24,6 @@ import net.minecraft.world.World;
  */
 public class AetherBatteryMinecartItem extends Item {
 
-	public static final String ID = "aether_battery_cart_item";
 	
 	
 	public AetherBatteryMinecartItem() {

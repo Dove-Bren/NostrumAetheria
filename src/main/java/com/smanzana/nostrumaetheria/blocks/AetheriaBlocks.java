@@ -1,6 +1,7 @@
 package com.smanzana.nostrumaetheria.blocks;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
+import com.smanzana.nostrumaetheria.api.proxy.AetheriaIDs;
 import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
@@ -19,23 +20,23 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(NostrumAetheria.MODID)
 public class AetheriaBlocks {
 	
-	@ObjectHolder(InfiniteAetherBlock.ID) public static InfiniteAetherBlock infiteAetherBlock;
-	@ObjectHolder(AetherBatteryBlock.ID_SMALL) public static AetherBatteryBlock smallBattery;
-	@ObjectHolder(AetherBatteryBlock.ID_MEDIUM) public static AetherBatteryBlock mediumBattery;
-	@ObjectHolder(AetherBatteryBlock.ID_LARGE) public static AetherBatteryBlock largeBattery;
-	@ObjectHolder(AetherBatteryBlock.ID_GIANT) public static AetherBatteryBlock giantBattery;
-	@ObjectHolder(AetherRelay.ID) public static AetherRelay relay;
-	@ObjectHolder(AetherFurnaceBlock.ID_SMALL) public static AetherFurnaceBlock smallFurnace;
-	@ObjectHolder(AetherFurnaceBlock.ID_MEDIUM) public static AetherFurnaceBlock mediumFurnace;
-	@ObjectHolder(AetherFurnaceBlock.ID_LARGE) public static AetherFurnaceBlock largeFurnace;
-	@ObjectHolder(AetherBoilerBlock.ID) public static AetherBoilerBlock boiler;
-	@ObjectHolder(AetherBathBlock.ID) public static AetherBathBlock bath;
-	@ObjectHolder(AetherChargerBlock.ID) public static AetherChargerBlock charger;
-	@ObjectHolder(AetherRepairerBlock.ID) public static AetherRepairerBlock repairer;
-	@ObjectHolder(AetherUnravelerBlock.ID) public static AetherUnravelerBlock unraveler;
-	@ObjectHolder(AetherPumpBlock.ID) public static AetherPumpBlock pump;
-	@ObjectHolder(WispBlock.ID) public static Block wispBlock;
-	@ObjectHolder(AetherInfuser.ID) public static Block infuser;
+	@ObjectHolder(AetheriaIDs.INFINITE_AETHER_BLOCK) public static InfiniteAetherBlock infiteAetherBlock;
+	@ObjectHolder(AetheriaIDs.SMALL_BATTERY) public static AetherBatteryBlock smallBattery;
+	@ObjectHolder(AetheriaIDs.MEDIUM_BATTERY) public static AetherBatteryBlock mediumBattery;
+	@ObjectHolder(AetheriaIDs.LARGE_BATTERY) public static AetherBatteryBlock largeBattery;
+	@ObjectHolder(AetheriaIDs.GIANT_BARRY) public static AetherBatteryBlock giantBattery;
+	@ObjectHolder(AetheriaIDs.RELAY) public static AetherRelay relay;
+	@ObjectHolder(AetheriaIDs.SMALL_FURNACE) public static AetherFurnaceBlock smallFurnace;
+	@ObjectHolder(AetheriaIDs.MEDIUM_FURNACE) public static AetherFurnaceBlock mediumFurnace;
+	@ObjectHolder(AetheriaIDs.LARGE_FURNACE) public static AetherFurnaceBlock largeFurnace;
+	@ObjectHolder(AetheriaIDs.BOILER) public static AetherBoilerBlock boiler;
+	@ObjectHolder(AetheriaIDs.BATH) public static AetherBathBlock bath;
+	@ObjectHolder(AetheriaIDs.CHARGER) public static AetherChargerBlock charger;
+	@ObjectHolder(AetheriaIDs.REPAIRER) public static AetherRepairerBlock repairer;
+	@ObjectHolder(AetheriaIDs.UNRAVELER) public static AetherUnravelerBlock unraveler;
+	@ObjectHolder(AetheriaIDs.PUMP) public static AetherPumpBlock pump;
+	@ObjectHolder(AetheriaIDs.WISP_BLOCK) public static Block wispBlock;
+	@ObjectHolder(AetheriaIDs.AETHER_INFUSER) public static Block infuser;
 
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -83,22 +84,22 @@ public class AetheriaBlocks {
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
 		final IForgeRegistry<Block> registry = event.getRegistry();
 		
-    	registerBlock(new InfiniteAetherBlock(), InfiniteAetherBlock.ID, registry);
-    	registerBlock(new AetherBatteryBlock(AetherBatteryBlock.Size.SMALL), AetherBatteryBlock.ID_SMALL, registry);
-    	registerBlock(new AetherBatteryBlock(AetherBatteryBlock.Size.MEDIUM), AetherBatteryBlock.ID_MEDIUM, registry);
-    	registerBlock(new AetherBatteryBlock(AetherBatteryBlock.Size.LARGE), AetherBatteryBlock.ID_LARGE, registry);
-    	registerBlock(new AetherBatteryBlock(AetherBatteryBlock.Size.GIANT), AetherBatteryBlock.ID_GIANT, registry);
-    	registerBlock(new AetherRelay(), AetherRelay.ID, registry);
-    	registerBlock(new AetherFurnaceBlock(AetherFurnaceBlock.Type.SMALL), AetherFurnaceBlock.ID_SMALL, registry);
-    	registerBlock(new AetherFurnaceBlock(AetherFurnaceBlock.Type.MEDIUM), AetherFurnaceBlock.ID_MEDIUM, registry);
-    	registerBlock(new AetherFurnaceBlock(AetherFurnaceBlock.Type.LARGE), AetherFurnaceBlock.ID_LARGE, registry);
-    	registerBlock(new AetherBoilerBlock(), AetherBoilerBlock.ID, registry);
-    	registerBlock(new AetherBathBlock(), AetherBathBlock.ID, registry);
-    	registerBlock(new AetherChargerBlock(), AetherChargerBlock.ID, registry);
-    	registerBlock(new AetherRepairerBlock(), AetherRepairerBlock.ID, registry);
-    	registerBlock(new AetherUnravelerBlock(), AetherUnravelerBlock.ID, registry);
-    	registerBlock(new AetherPumpBlock(), AetherPumpBlock.ID, registry);
-    	registerBlock(new WispBlock(), WispBlock.ID, registry);
-    	registerBlock(new AetherInfuser(), AetherInfuser.ID, registry);
+    	registerBlock(new InfiniteAetherBlock(), AetheriaIDs.INFINITE_AETHER_BLOCK, registry);
+    	registerBlock(new AetherBatteryBlock(AetherBatteryBlock.Size.SMALL), AetheriaIDs.SMALL_BATTERY, registry);
+    	registerBlock(new AetherBatteryBlock(AetherBatteryBlock.Size.MEDIUM), AetheriaIDs.MEDIUM_BATTERY, registry);
+    	registerBlock(new AetherBatteryBlock(AetherBatteryBlock.Size.LARGE), AetheriaIDs.LARGE_BATTERY, registry);
+    	registerBlock(new AetherBatteryBlock(AetherBatteryBlock.Size.GIANT), AetheriaIDs.GIANT_BARRY, registry);
+    	registerBlock(new AetherRelay(), AetheriaIDs.RELAY, registry);
+    	registerBlock(new AetherFurnaceBlock(AetherFurnaceBlock.Type.SMALL), AetheriaIDs.SMALL_FURNACE, registry);
+    	registerBlock(new AetherFurnaceBlock(AetherFurnaceBlock.Type.MEDIUM), AetheriaIDs.MEDIUM_FURNACE, registry);
+    	registerBlock(new AetherFurnaceBlock(AetherFurnaceBlock.Type.LARGE), AetheriaIDs.LARGE_FURNACE, registry);
+    	registerBlock(new AetherBoilerBlock(), AetheriaIDs.BOILER, registry);
+    	registerBlock(new AetherBathBlock(), AetheriaIDs.BATH, registry);
+    	registerBlock(new AetherChargerBlock(), AetheriaIDs.CHARGER, registry);
+    	registerBlock(new AetherRepairerBlock(), AetheriaIDs.REPAIRER, registry);
+    	registerBlock(new AetherUnravelerBlock(), AetheriaIDs.UNRAVELER, registry);
+    	registerBlock(new AetherPumpBlock(), AetheriaIDs.PUMP, registry);
+    	registerBlock(new WispBlock(), AetheriaIDs.WISP_BLOCK, registry);
+    	registerBlock(new AetherInfuser(), AetheriaIDs.AETHER_INFUSER, registry);
 	}
 }

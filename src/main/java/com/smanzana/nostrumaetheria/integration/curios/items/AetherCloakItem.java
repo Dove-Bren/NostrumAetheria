@@ -44,9 +44,10 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
+@Mod.EventBusSubscriber(modid = NostrumAetheria.MODID)
 public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreTagged, ISpellArmor, ICapeProvider {
 	
 	public static interface UpgradeToggleFunc {
@@ -164,48 +165,8 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	public static final DyeColor COLOR_DEFAULT_INSIDE = DyeColor.GRAY;
 	public static final DyeColor COLOR_DEFAULT_RUNES = DyeColor.WHITE;
 
-	private static final ModelResourceLocation CapeModelTrimmedOutside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_outside"));
-	private static final ModelResourceLocation CapeModelTrimmedInside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_inside"));
-	private static final ModelResourceLocation CapeModelTrimmedDecor = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_decor"));
-	private static final ModelResourceLocation CapeModelFullOutside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_outside"));
-	private static final ModelResourceLocation CapeModelFullInside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_inside"));
-	private static final ModelResourceLocation CapeModelFullDecor = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_decor"));
-	
-	private static final ModelResourceLocation[] CapeModelsTrimmed = new ModelResourceLocation[] {
-		CapeModelTrimmedInside,
-		CapeModelTrimmedOutside,
-	};
-
-	private static final ModelResourceLocation[] CapeModelsTrimmedDecor = new ModelResourceLocation[] {
-		CapeModelTrimmedInside,
-		CapeModelTrimmedOutside,
-		CapeModelTrimmedDecor,
-	};
-	
-	private static final ModelResourceLocation[] CapeModelsFull = new ModelResourceLocation[] {
-		CapeModelFullInside,
-		CapeModelFullOutside,
-	};
-	
-	private static final ModelResourceLocation[] CapeModelsFullDecor = new ModelResourceLocation[] {
-		CapeModelFullInside,
-		CapeModelFullOutside,
-		CapeModelFullDecor,
-	};
-	
-	public static final ModelResourceLocation[] AllCapeModels = new ModelResourceLocation[] {
-			CapeModelTrimmedOutside,
-			CapeModelTrimmedInside,
-			CapeModelTrimmedDecor,
-			CapeModelFullOutside,
-			CapeModelFullInside,
-			CapeModelFullDecor,
-	};
-	
 	public AetherCloakItem() {
 		super(AetheriaCurios.PropCurio());
-		
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 //    @Override
@@ -424,7 +385,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	@SubscribeEvent
-	public void onAetherDraw(LivingAetherDrawEvent event) {
+	public static void onAetherDraw(LivingAetherDrawEvent event) {
 		// Aether cloak contributes aether after inventory items if it has any
 		if (event.phase == Phase.BEFORE_LATE) {
 			if (event.getAmtRemaining() > 0 && event.getEntity() instanceof PlayerEntity) {
@@ -434,17 +395,18 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 				if (inv != null) {
 					for (int i = 0; i < inv.getSizeInventory(); i++) {
 						ItemStack stack = inv.getStackInSlot(i);
-						if (stack.isEmpty() || stack.getItem() != this)
+						if (stack.isEmpty() || !(stack.getItem() instanceof AetherCloakItem))
 							continue;
 						
+						AetherCloakItem cloak = (AetherCloakItem) stack.getItem();
 						CompoundNBT nbt = stack.getTag();
 						if (nbt != null) {
-							final int taken = this.deductAether(stack, event.getAmtRemaining());
+							final int taken = cloak.deductAether(stack, event.getAmtRemaining());
 							
 							event.contributeAmt(taken);
 							
 							if (taken > 0) {
-								growFromAether(stack, -taken);
+								cloak.growFromAether(stack, -taken);
 							}
 							
 							if (event.isFinished()) {
@@ -643,15 +605,15 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 		final boolean runes = getDisplayRunes(stack);
 		if (trimmed) {
 			if (runes) {
-				return CapeModelsTrimmedDecor;
+				return AetherCloakModels.CapeModelsTrimmedDecor;
 			} else {
-				return CapeModelsTrimmed;
+				return AetherCloakModels.CapeModelsTrimmed;
 			}
 		} else {
 			if (runes) {
-				return CapeModelsFullDecor;
+				return AetherCloakModels.CapeModelsFullDecor;
 			} else {
-				return CapeModelsFull;
+				return AetherCloakModels.CapeModelsFull;
 			}
 		}
 	}
@@ -712,6 +674,47 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	public void doRender(ItemStack stack, LivingEntity player, float limbSwing, float limbSwingAmount,
 			float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		;
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	public static class AetherCloakModels {
+		private static final ModelResourceLocation CapeModelTrimmedOutside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_outside"));
+		private static final ModelResourceLocation CapeModelTrimmedInside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_inside"));
+		private static final ModelResourceLocation CapeModelTrimmedDecor = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_decor"));
+		private static final ModelResourceLocation CapeModelFullOutside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_outside"));
+		private static final ModelResourceLocation CapeModelFullInside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_inside"));
+		private static final ModelResourceLocation CapeModelFullDecor = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_decor"));
+		
+		private static final ModelResourceLocation[] CapeModelsTrimmed = new ModelResourceLocation[] {
+			CapeModelTrimmedInside,
+			CapeModelTrimmedOutside,
+		};
+
+		private static final ModelResourceLocation[] CapeModelsTrimmedDecor = new ModelResourceLocation[] {
+			CapeModelTrimmedInside,
+			CapeModelTrimmedOutside,
+			CapeModelTrimmedDecor,
+		};
+		
+		private static final ModelResourceLocation[] CapeModelsFull = new ModelResourceLocation[] {
+			CapeModelFullInside,
+			CapeModelFullOutside,
+		};
+		
+		private static final ModelResourceLocation[] CapeModelsFullDecor = new ModelResourceLocation[] {
+			CapeModelFullInside,
+			CapeModelFullOutside,
+			CapeModelFullDecor,
+		};
+		
+		public static final ModelResourceLocation[] AllCapeModels = new ModelResourceLocation[] {
+				CapeModelTrimmedOutside,
+				CapeModelTrimmedInside,
+				CapeModelTrimmedDecor,
+				CapeModelFullOutside,
+				CapeModelFullInside,
+				CapeModelFullDecor,
+		};
 	}
 
 }

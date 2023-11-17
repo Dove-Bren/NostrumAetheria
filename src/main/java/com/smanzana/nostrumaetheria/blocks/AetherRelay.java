@@ -36,7 +36,6 @@ import net.minecraftforge.common.ToolType;
 public class AetherRelay extends Block implements ILoreTagged {
 	
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
-	public static final String ID = "aether_relay";
 	
 	public static final double height = 0.575 * 16;
 	public static final double width = 0.125 * 16;

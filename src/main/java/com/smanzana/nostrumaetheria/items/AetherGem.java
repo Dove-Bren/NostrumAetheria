@@ -26,7 +26,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class AetherGem extends AetherItem implements ILoreTagged {
 
-	public static final String ID = "aether_gem";
 	private static final int MAX_AETHER = 1000;
 	
 	public AetherGem() {

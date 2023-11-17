@@ -30,7 +30,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArmor {
 
-	public static final String ID = "pendant_passive";
 	private static final int AETHER_PER_CHARGE = 500;
 	private static final int MAX_CHARGES = 3;
 	

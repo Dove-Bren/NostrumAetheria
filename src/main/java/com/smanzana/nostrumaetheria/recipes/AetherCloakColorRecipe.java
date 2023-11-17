@@ -146,7 +146,7 @@ public class AetherCloakColorRecipe extends AetherCloakModificationRecipe {
 		@Override
 		public AetherCloakColorRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
 			// I think I can just piggy back off of shaped recipe serializer
-			ResourceLocation fakeRecipeId = new ResourceLocation(recipeId.getNamespace(), recipeId.getPath() + "#FAKE");
+			ResourceLocation fakeRecipeId = new ResourceLocation(recipeId.getNamespace(), recipeId.getPath() + ".fake");
 			ShapelessRecipe base = IRecipeSerializer.CRAFTING_SHAPELESS.read(fakeRecipeId, buffer);
 			
 			// Also read toggle func key

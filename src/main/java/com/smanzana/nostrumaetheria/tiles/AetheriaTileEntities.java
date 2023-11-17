@@ -1,9 +1,8 @@
 package com.smanzana.nostrumaetheria.tiles;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
-import com.smanzana.nostrumaetheria.blocks.AetherInfuser;
+import com.smanzana.nostrumaetheria.api.proxy.AetheriaIDs;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
-import com.smanzana.nostrumaetheria.blocks.WispBlock;
 
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.event.RegistryEvent;
@@ -26,8 +25,8 @@ public class AetheriaTileEntities {
 	private static final String ID_REPAIRER = "aether_repairer_te";
 	private static final String ID_UNRAVELER = "aether_unraveler_te";	
 	private static final String ID_INFINITE = "infinite_aether_block_te";
-	private static final String ID_WISPBLOCK = WispBlock.ID + "_entity";
-	private static final String ID_INFUSER = AetherInfuser.ID + "_entity";
+	private static final String ID_WISPBLOCK = AetheriaIDs.WISP_BLOCK + "_entity";
+	private static final String ID_INFUSER = AetheriaIDs.AETHER_INFUSER + "_entity";
 
 	@ObjectHolder(ID_BATH) public static TileEntityType<AetherBathTileEntity> Bath;
 	@ObjectHolder(ID_BATTERY) public static TileEntityType<AetherBatteryEntity> Battery;
