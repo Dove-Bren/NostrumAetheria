@@ -77,6 +77,11 @@ public class AetherChargerBlock extends Block implements ILoreTagged {
 		return new AetherChargerBlockEntity();
 	}
 	
+	@Override
+	public boolean hasTileEntity(BlockState state) {
+		return true;
+	}
+	
 	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
 		TileEntity tileentity = worldIn.getTileEntity(pos);
 		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);

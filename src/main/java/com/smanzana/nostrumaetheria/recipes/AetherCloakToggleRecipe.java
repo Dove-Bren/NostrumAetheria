@@ -102,7 +102,7 @@ public final class AetherCloakToggleRecipe extends AetherCloakModificationRecipe
 			ShapelessRecipe base = IRecipeSerializer.CRAFTING_SHAPELESS.read(fakeRecipeId, buffer);
 			
 			// Also read toggle func key
-			String toggleKey = buffer.readString();
+			String toggleKey = buffer.readString(32767);
 			ToggleUpgrades upgrade = null;
 			try {
 				upgrade = ToggleUpgrades.valueOf(toggleKey.toUpperCase());

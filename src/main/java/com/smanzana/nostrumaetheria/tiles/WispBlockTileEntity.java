@@ -7,10 +7,11 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
+import com.smanzana.nostrumaetheria.entity.AetheriaEntityTypes;
+import com.smanzana.nostrumaetheria.entity.SentinelWispEntity;
 import com.smanzana.nostrumaetheria.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
-import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.utils.Inventories;
@@ -141,7 +142,7 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 		} while (!world.isAirBlock(spawnPos) && attempts-- >= 0);
 		
 		if (world.isAirBlock(spawnPos)) {
-			EntityWisp wisp = new EntityWisp(NostrumEntityTypes.wisp, this.world, this.pos);
+			EntityWisp wisp = new SentinelWispEntity(AetheriaEntityTypes.sentinelWisp, this.world, this.pos);
 			wisp.setPosition(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
 			this.wisps.add(wisp);
 			this.world.addEntity(wisp);

@@ -150,7 +150,7 @@ public class AetherCloakColorRecipe extends AetherCloakModificationRecipe {
 			ShapelessRecipe base = IRecipeSerializer.CRAFTING_SHAPELESS.read(fakeRecipeId, buffer);
 			
 			// Also read toggle func key
-			String upgradeKey = buffer.readString();
+			String upgradeKey = buffer.readString(32767);
 			ColorUpgrades upgrade = null;
 			try {
 				upgrade = ColorUpgrades.valueOf(upgradeKey.toUpperCase());

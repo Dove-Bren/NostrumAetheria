@@ -33,7 +33,7 @@ public class AetherPumpBlock extends Block implements ILoreTagged {
 	
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
 	
-	private static final double BBWIDTH = 4.0/16.0;
+	private static final double BBWIDTH = 4.0;
 	protected static final VoxelShape PUMP_AABBS[] = new VoxelShape[] {
 			Block.makeCuboidShape(8 - BBWIDTH, 0, 8 - BBWIDTH, 8 + BBWIDTH, 16, 8 + BBWIDTH), //down
 			Block.makeCuboidShape(8 - BBWIDTH, 0, 8 - BBWIDTH, 8 + BBWIDTH, 16, 8 + BBWIDTH), //up

@@ -10,6 +10,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.minecart.MinecartEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -20,6 +21,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 public class EntityAetherBatteryMinecart extends MinecartEntity {
 	
@@ -159,5 +161,11 @@ public class EntityAetherBatteryMinecart extends MinecartEntity {
 	
 	public int getMaxAether() {
 		return AetheriaBlocks.mediumBattery.getMaxAether();
+	}
+
+	@Override
+	public IPacket<?> createSpawnPacket() {
+		// Have to override and use forge to use with non-living Entity types even though parent defines
+		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 }
