@@ -6,6 +6,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.component.AetherHandlerComponent;
 import com.smanzana.nostrumaetheria.tiles.AetherRelayEntity;
@@ -41,6 +42,7 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 		final Minecraft mc = Minecraft.getInstance();
 		PlayerEntity player = mc.player;
 		boolean debug = player != null && (player.isCreative() || player.isSpectator());
+		debug = debug || APIProxy.hasAetherVision(player);
 		
 		if (!debug) {
 			return; // Now we have particles

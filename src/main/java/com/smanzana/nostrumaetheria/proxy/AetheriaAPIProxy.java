@@ -13,6 +13,7 @@ import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.event.LivingAetherDrawEvent;
 import com.smanzana.nostrumaetheria.api.event.LivingAetherDrawEvent.Phase;
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
+import com.smanzana.nostrumaetheria.api.item.IAetherVisionProvider;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
@@ -26,6 +27,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -161,6 +163,32 @@ public class AetheriaAPIProxy extends APIProxy {
 	@Override
 	protected PlayerEntity handleGetClientPlayer() {
 		return NostrumAetheria.proxy.getPlayer();
+	}
+
+	@Override
+	protected boolean handleHasAetherVision(PlayerEntity player) {
+		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
+			ItemStack stack = player.getItemStackFromSlot(slot);
+			if (!stack.isEmpty() && stack.getItem() instanceof IAetherVisionProvider) {
+				if (((IAetherVisionProvider) stack.getItem()).shouldProvideAetherVision(stack, player, slot)) {
+					return true;
+				}
+			}
+		}
+		
+		@Nullable IInventory curioInv = NostrumAetheria.curios.getCurios(player);
+		if (curioInv != null) {
+			for (int i = 0; i < curioInv.getSizeInventory(); i++) {
+				ItemStack stack = curioInv.getStackInSlot(i);
+				if (!stack.isEmpty() && stack.getItem() instanceof IAetherVisionProvider) {
+					if (((IAetherVisionProvider) stack.getItem()).shouldProvideAetherVision(stack, player, null)) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
 	}
 	
 }

@@ -20,6 +20,7 @@ public class AetheriaIDs {
 	public static final String LENS_BORE_REVERSED = "lens_bore_reversed";
 	public static final String LENS_MANA_REGEN = "lens_mana_regen";
 	public static final String LENS_NO_SPAWN = "lens_no_spawn";
+	public static final String AETHER_SIGHT_TOOL = "aether_sight_item";
 	
 	
 	

@@ -29,6 +29,7 @@
     "item.nostrumaetheria.elude_cloak.desc": "Uses aether to automatically dodge attacks",
     "item.nostrumaetheria.aether_cloak": "Aether Cloak",
     "item.nostrumaetheria.aether_cloak.desc": "Stores up large amounts of Aether|%2$s+25%% Mana Regen%1$s",
+	"item.nostrumaetheria.aether_sight_item": "Aether Sight Glass",
 
     "item.nostrumaetheria.aether_resource_ginseng_flower": "Ginseng Flower",
     "item.nostrumaetheria.aether_resource_mandrake_flower": "Mandrake Bloom",

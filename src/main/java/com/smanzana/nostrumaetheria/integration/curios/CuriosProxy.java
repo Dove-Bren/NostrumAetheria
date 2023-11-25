@@ -16,7 +16,6 @@ import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
-import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeModifyCenterItemGeneric;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
@@ -33,10 +32,12 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.IForgeRegistry;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 
@@ -66,7 +67,7 @@ public class CuriosProxy {
 	public void init() {
 		MinecraftForge.EVENT_BUS.register(this);
 		registerCurioQuests();
-		registerCurioRituals();
+//		registerCurioRituals();
 		registerCurioResearch();
 		registerLore();
 	}
@@ -75,7 +76,9 @@ public class CuriosProxy {
 		
 	}
 	
-	private void registerCurioRituals() {
+	@SubscribeEvent
+	public void registerCurioRituals(RegistryEvent.Register<RitualRecipe> event) {
+		final IForgeRegistry<RitualRecipe> registry = event.getRegistry();
 		RitualRecipe recipe;
 		
 		// Try to use silver, but use iron if no silver is in the modpack
@@ -91,7 +94,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(SelfTrigger.instance())), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
 				new RRequirementResearch("shield_rings"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.ringShieldSmall)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("shield_ring_large",
 				new ItemStack(AetheriaCurios.ringShieldLarge),
@@ -101,7 +104,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), silver, Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
 				new RRequirementResearch("shield_rings"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.ringShieldLarge)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("elude_cape_small",
 				new ItemStack(AetheriaCurios.eludeCape),
@@ -111,7 +114,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(DamagedTrigger.instance())), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
 				new RRequirementResearch("elude_capes"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.eludeCape)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("aether_cloak",
 				new ItemStack(AetheriaCurios.aetherCloak),
@@ -121,7 +124,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromItems(AetheriaItems.aetherGem), Ingredient.fromItems(AetheriaCurios.eludeCape), Ingredient.fromTag(NostrumTags.Items.CrystalLarge), Ingredient.fromItems(AetheriaItems.aetherGem)},
 				new RRequirementResearch("aether_cloaks"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.aetherCloak)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		ItemStack casterCloak = new ItemStack(AetheriaCurios.aetherCloak);
 		AetheriaCurios.aetherCloak.setAetherCaster(casterCloak, true);
@@ -137,7 +140,7 @@ public class CuriosProxy {
 						((AetherCloakItem) item.getItem()).setAetherCaster(item, true);
 					}
 				}, Lists.newArrayList("Allows using aether from the cloak in place of reagents")));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 	}
 	
 	private void registerCurioResearch() {

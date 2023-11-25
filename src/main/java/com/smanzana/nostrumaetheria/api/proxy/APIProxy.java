@@ -146,6 +146,13 @@ public abstract class APIProxy {
 		return null;
 	}
 	
+	public static boolean hasAetherVision(PlayerEntity player) {
+		if (handler != null) {
+			return handler.handleHasAetherVision(player);
+		}
+		return false;
+	}
+	
 	protected abstract boolean handleIsEnabled();
 	protected abstract IAetherHandlerComponent handleCreateHandlerComponent(@Nullable DimensionType dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether);
 	protected abstract void handleSyncTEAether(AetherTileEntity te);
@@ -155,4 +162,5 @@ public abstract class APIProxy {
 	protected abstract void handleAddRepairerRecipe(IAetherRepairerRecipe recipe);
 	protected abstract void handleAddUnravelerRecipe(IAetherUnravelerRecipe recipe);
 	protected abstract PlayerEntity handleGetClientPlayer();
+	protected abstract boolean handleHasAetherVision(PlayerEntity player);
 }

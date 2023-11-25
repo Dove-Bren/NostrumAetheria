@@ -33,6 +33,7 @@ public class AetheriaItems {
 	@ObjectHolder(AetheriaIDs.LENS_BORE_REVERSED) public static ItemAetherLens reversedBoreAetherLens;
 	@ObjectHolder(AetheriaIDs.LENS_MANA_REGEN) public static ItemAetherLens manaRegenAetherLens;
 	@ObjectHolder(AetheriaIDs.LENS_NO_SPAWN) public static ItemAetherLens noSpawnAetherLens;
+	@ObjectHolder(AetheriaIDs.AETHER_SIGHT_TOOL) public static AetherSightTool aetherSightTool;
 	
 	public static Item.Properties PropBase() {
 		return new Item.Properties()
@@ -78,6 +79,7 @@ public class AetheriaItems {
     	register(registry, new ItemAetherLens(ItemAetherLens.LensType.BORE_REVERSED, PropBase()).setRegistryName(AetheriaIDs.LENS_BORE_REVERSED));
     	register(registry, new ItemAetherLens(ItemAetherLens.LensType.MANA_REGEN, PropBase()).setRegistryName(AetheriaIDs.LENS_MANA_REGEN));
     	register(registry, new ItemAetherLens(ItemAetherLens.LensType.NO_SPAWN, PropBase()).setRegistryName(AetheriaIDs.LENS_NO_SPAWN));
+    	register(registry, new AetherSightTool().setRegistryName(AetheriaIDs.AETHER_SIGHT_TOOL));
 	}
 	
 }
