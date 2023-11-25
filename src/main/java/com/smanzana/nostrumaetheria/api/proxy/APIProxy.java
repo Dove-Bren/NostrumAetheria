@@ -16,6 +16,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 public abstract class APIProxy {
 	
@@ -98,8 +99,12 @@ public abstract class APIProxy {
 	}
 	
 	public static IAetherHandlerComponent createHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
+		return createHandlerComponent(null, null, listener, defaultAether, defaultMaxAether);
+	}
+	
+	public static IAetherHandlerComponent createHandlerComponent(DimensionType dimension, BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
 		if (handler != null) {
-			return handler.handleCreateHandlerComponent(listener, defaultAether, defaultMaxAether);
+			return handler.handleCreateHandlerComponent(dimension, pos, listener, defaultAether, defaultMaxAether);
 		}
 		
 		// Could consider returning a shell here? Would that be easier?
@@ -142,7 +147,7 @@ public abstract class APIProxy {
 	}
 	
 	protected abstract boolean handleIsEnabled();
-	protected abstract IAetherHandlerComponent handleCreateHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether);
+	protected abstract IAetherHandlerComponent handleCreateHandlerComponent(@Nullable DimensionType dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether);
 	protected abstract void handleSyncTEAether(AetherTileEntity te);
 	protected abstract boolean handleIsBlockLoaded(World world, BlockPos pos);
 	protected abstract int handleDrawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nonnull ItemStack ignore);

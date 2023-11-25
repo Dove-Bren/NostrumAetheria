@@ -3,11 +3,14 @@ package com.smanzana.nostrumaetheria.api.component;
 import com.smanzana.nostrumaetheria.api.aether.AetherFlowMechanics.AetherIterateContext;
 import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
+import com.smanzana.nostrumaetheria.api.aether.IWorldAetherHandler;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
-public interface IAetherHandlerComponent extends IAetherHandler, IAetherFlowHandler {
+public interface IAetherHandlerComponent extends IWorldAetherHandler, IAetherFlowHandler {
 	
 	public void setAutoFill(boolean fill, int maxPerTick);
 	
@@ -99,4 +102,6 @@ public interface IAetherHandlerComponent extends IAetherHandler, IAetherFlowHand
 	public void readFromNBT(CompoundNBT compound);
 	
 	public void setAether(int aether);
+
+	public void setPosition(World world, BlockPos pos);
 }

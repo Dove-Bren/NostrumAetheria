@@ -7,8 +7,8 @@ import net.minecraft.util.Direction;
 public interface IAetherFlowHandler extends IAetherHandler {
 	
 	public static final class AetherFlowConnection {
-		public IAetherHandler handler;
-		public Direction face;
+		public final IAetherHandler handler;
+		public final Direction face;
 		
 		public AetherFlowConnection(IAetherHandler handler, Direction connectionFace) {
 			this.handler = handler;

@@ -7,7 +7,7 @@ import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
-import com.smanzana.nostrumaetheria.component.AetherRelayComponent;
+import com.smanzana.nostrumaetheria.component.AetherHandlerComponent;
 import com.smanzana.nostrumaetheria.tiles.AetherRelayEntity;
 import com.smanzana.nostrummagica.utils.Curves;
 
@@ -34,7 +34,7 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 		// I could cache the HECK out of this... but is it worth it? Its just a bunch of math!
 		
 		IAetherHandler handler = te.getHandler();
-		if (handler == null || !(handler instanceof AetherRelayComponent)) {
+		if (handler == null || !(handler instanceof AetherHandlerComponent)) {
 			return;
 		}
 		
@@ -46,7 +46,21 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 			return; // Now we have particles
 		}
 		
-		AetherRelayComponent relay = (AetherRelayComponent) handler;
+		AetherHandlerComponent relay = (AetherHandlerComponent) handler;
+		
+		{
+			final String str = relay.getAether(null) + "/" + relay.getMaxAether(null);
+			GlStateManager.pushMatrix();
+			GlStateManager.translated(x + .5, y, z + .5);
+			GlStateManager.scalef(.0625f, .0625f, .0625f);
+			GlStateManager.rotatef(-90, 0, 1, 0);
+			GlStateManager.translated(-mc.fontRenderer.getStringWidth(str)/2, AetherRelay.height + 8, 0);
+			GlStateManager.scalef(1f, -1f, 1f);
+			
+			mc.fontRenderer.drawString(str, 0, 0, 0xFFFFFFFF);
+			
+			GlStateManager.popMatrix();
+		}
 
 		final Vec3d origin = Vec3d.ZERO;
 		final int intervals = 50;
@@ -74,10 +88,10 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
 		GlStateManager.pushMatrix();
-		GlStateManager.translated(x + .5, y + AetherRelay.height, z + .5);
+		GlStateManager.translated(x + .5, y + (AetherRelay.height/16f), z + .5);
 		GlStateManager.disableColorMaterial();
-		//GlStateManager.enableTexture2D();
-		//GlStateManager.disableTexture2D();
+		GlStateManager.enableTexture();
+		GlStateManager.disableTexture();
 		GlStateManager.disableLighting();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 		GlStateManager.disableBlend();
@@ -87,7 +101,7 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 		GlStateManager.lineWidth(3f);
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		
-		for (BlockPos linked : relay.getLinkedPositions()) {
+		for (BlockPos linked : te.getLinkLocations()) {
 		
 			// TODO have some capability system to turn this on or off
 			
@@ -136,7 +150,7 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 		}
 		
 		GlStateManager.enableColorMaterial();
-		//GlStateManager.enableTexture2D();
+		GlStateManager.enableTexture();
 		
 		GlStateManager.popMatrix();
 		

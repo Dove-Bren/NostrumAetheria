@@ -2,11 +2,12 @@ package com.smanzana.nostrumaetheria.blocks;
 
 import java.util.Random;
 
-import com.smanzana.nostrumaetheria.component.AetherRelayComponent;
 import com.smanzana.nostrumaetheria.tiles.AetherRelayEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -15,12 +16,15 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -35,7 +39,32 @@ import net.minecraftforge.common.ToolType;
 
 public class AetherRelay extends Block implements ILoreTagged {
 	
+	public static enum RelayMode implements IStringSerializable {
+		INOUT,
+		IN,
+		OUT,
+		;
+
+		@Override
+		public String getName() {
+			return this.name().toLowerCase();
+		}
+		
+		public RelayMode next() {
+			switch (this) {
+			case IN:
+				return RelayMode.OUT;
+			case INOUT:
+				return RelayMode.IN;
+			case OUT:
+			default:
+				return RelayMode.INOUT;
+			}
+		}
+	}
+	
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
+	public static final EnumProperty<RelayMode> RELAY_MODE = EnumProperty.<RelayMode>create("mode", RelayMode.class);
 	
 	public static final double height = 0.575 * 16;
 	public static final double width = 0.125 * 16;
@@ -59,12 +88,12 @@ public class AetherRelay extends Block implements ILoreTagged {
 				
 				);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP));
+		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP).with(RELAY_MODE, RelayMode.INOUT));
 	}
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(FACING);
+		builder.add(FACING, RELAY_MODE);
 	}
 	
 //	@Override
@@ -137,15 +166,39 @@ public class AetherRelay extends Block implements ILoreTagged {
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
 		if (!worldIn.isRemote) {
-			// r equest an update
-			worldIn.notifyBlockUpdate(pos, worldIn.getBlockState(pos), worldIn.getBlockState(pos), 2);
+//			// request an update
+//			worldIn.notifyBlockUpdate(pos, worldIn.getBlockState(pos), worldIn.getBlockState(pos), 2);
+//			
+//			TileEntity ent = worldIn.getTileEntity(pos);
+//			if (ent != null && ent instanceof AetherRelayEntity) {
+//				AetherRelayEntity relay = (AetherRelayEntity) ent;
+//				System.out.println(relay.getHandler() == null ? "Missing relay handler" : "has relay handler with " + ((AetherRelayComponent)relay.getHandler()).getLinkedPositions().size());
+//			}
+//			return true;
 			
-			TileEntity ent = worldIn.getTileEntity(pos);
-			if (ent != null && ent instanceof AetherRelayEntity) {
-				AetherRelayEntity relay = (AetherRelayEntity) ent;
-				System.out.println(relay.getHandler() == null ? "Missing relay handler" : "has relay handler with " + ((AetherRelayComponent)relay.getHandler()).getLinkedPositions().size());
+			// If using a geogem, link to its position.
+			// If no hand, switch modes
+			ItemStack heldItem = player.getHeldItem(handIn);
+			if (heldItem.isEmpty()) {
+				TileEntity te = worldIn.getTileEntity(pos);
+				if (te != null) {
+					AetherRelayEntity ent = (AetherRelayEntity) te;
+					ent.setMode(state.get(RELAY_MODE).next());
+					NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+				}
+				return true;
+			} else if (heldItem.getItem() instanceof PositionCrystal) {
+				BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
+				if (heldPos != null && PositionCrystal.getDimension(heldItem) == worldIn.getDimension().getType().getId()) {
+					TileEntity te = worldIn.getTileEntity(pos);
+					if (te != null) {
+						AetherRelayEntity ent = (AetherRelayEntity) te;
+						ent.addLink(heldPos);
+						NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+					}
+				}
+				return true;
 			}
-			return true;
 		}
 		
 		return false;
@@ -158,7 +211,7 @@ public class AetherRelay extends Block implements ILoreTagged {
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return new AetherRelayEntity(state.get(FACING));
+		return new AetherRelayEntity(state.get(FACING), state.get(RELAY_MODE));
 	}
 	
 	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
@@ -179,8 +232,8 @@ public class AetherRelay extends Block implements ILoreTagged {
 		if (ent == null || !(ent instanceof AetherRelayEntity))
 			return;
 		
-		AetherRelayEntity relay = (AetherRelayEntity) ent;
-		((AetherRelayComponent)relay.getHandler()).unlinkAll();
+		//AetherRelayEntity relay = (AetherRelayEntity) ent;
+		//((AetherRelayComponent)relay.getHandler()).unlinkAll();
 	}
 	
 	@Override

@@ -1,20 +1,30 @@
 package com.smanzana.nostrumaetheria.component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.aether.AetherFlowMechanics;
 import com.smanzana.nostrumaetheria.api.aether.AetherFlowMechanics.AetherIterateContext;
+import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
+import com.smanzana.nostrumaetheria.api.aether.IWorldAetherHandler;
+import com.smanzana.nostrumaetheria.api.aether.stats.AetherTickIOEntry;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
-import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 public class AetherHandlerComponent implements IAetherHandlerComponent {
 	
@@ -22,6 +32,8 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	private static final String NBT_MAX_AETHER = "max_aether";
 	private static final String NBT_SIDE_CONFIG = "side_config";
 	private static final String NBT_INOUTBOUND_CONFIG = "inout_config";
+	private static final String NBT_DIM = "dimension";
+	private static final String NBT_POS = "position";
 	
 	private int maxAether;
 	private int aether;
@@ -33,6 +45,8 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	protected boolean allowInboundAether;
 	// "" but for outbound aether
 	protected boolean allowOutboundAether;
+	protected @Nullable DimensionType dimension;
+	protected @Nullable BlockPos pos;
 	// Connections set via code instead of from parent (usually distant blocks, like relays)
 	private Set<AetherFlowConnection> remoteConnections;
 	private int maxAetherFill;
@@ -43,12 +57,15 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	protected int ticksExisted;
 	protected boolean receivedAetherThisTick; // internal
 	protected boolean gaveAetherThisTick; // internal
+	protected final Map<BlockPos, AetherTickIOEntry> aetherTickIOData; // Note: values must be released
 	protected boolean aetherActiveTick; // useful for checking if active after super.tick()
 	protected int aetherLastTick;
 	
-	public AetherHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
+	public AetherHandlerComponent(@Nullable DimensionType dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
 		maxAether = defaultMaxAether;
 		aether = defaultAether;
+		this.dimension = dimension;
+		this.pos = pos;
 		sideConnections = new boolean[Direction.values().length + 1]; // +1 for NULL
 		remoteConnections = new HashSet<>();
 		fixAether();
@@ -63,10 +80,11 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 			throw new IllegalArgumentException("listener cannot be null");
 		}
 		this.listener = listener;
+		this.aetherTickIOData = new HashMap<>();
 	}
 	
 	public AetherHandlerComponent(IAetherComponentListener listener) {
-		this(listener, 0, 0);
+		this(null, null, listener, 0, 0);
 	}
 	
 	public void setAutoFill(boolean fill, int maxPerTick) {
@@ -279,10 +297,21 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 			int amt = Math.min(maxDiff, missing);
 			for (AetherFlowConnection connection : getConnections()) {
 				int drawn = AetherFlowMechanics.drawFromHandler(this, connection.handler, connection.face, amt, false);
-				addAether(null, drawn);
-				amt -= drawn;
-				if (amt <= 0) {
-					break;
+				
+				if (drawn != 0) {
+					addAether(null, drawn, true);
+					amt -= drawn;
+					
+					if (connection.handler instanceof IWorldAetherHandler) {
+						final BlockPos otherPos = ((IWorldAetherHandler) connection.handler).getPosition();
+						if (otherPos != null) {
+							addTickIO(otherPos, drawn, 0);
+						}
+					}
+					
+					if (amt <= 0) {
+						break;
+					}
 				}
 			}
 			
@@ -298,7 +327,18 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 			int start = Math.min(aether, maxDiff); 
 			int amt = start;
 			for (AetherFlowConnection connection : getConnections()) {
+				final int connStart = amt;
 				amt = connection.handler.addAether(connection.face, amt);
+				
+				if (amt != connStart) {
+					if (connection.handler instanceof IWorldAetherHandler) {
+						final BlockPos otherPos = ((IWorldAetherHandler) connection.handler).getPosition();
+						if (otherPos != null) {
+							addTickIO(otherPos, 0, connStart - amt);
+						}
+					}
+				}
+				
 				if (amt <= 0) {
 					break;
 				}
@@ -359,6 +399,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 		aetherLastTick = this.getAether(null);
 		receivedAetherThisTick = false;
 		gaveAetherThisTick = false;
+		clearTickIOMap();
 	}
 	
 	/**
@@ -403,6 +444,10 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 		compound.putInt(NBT_MAX_AETHER, maxAether);
 		compound.putByte(NBT_SIDE_CONFIG, configToByte(sideConnections));
 		compound.putByte(NBT_INOUTBOUND_CONFIG, inoutConfigToByte(allowInboundAether, allowOutboundAether));
+		if (dimension != null && pos != null) {
+			compound.putInt(NBT_DIM, dimension.getId());
+			compound.put(NBT_POS, NBTUtil.writeBlockPos(pos));
+		}
 		
 		return compound;
 	}
@@ -412,11 +457,61 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 		this.maxAether = compound.getInt(NBT_MAX_AETHER);
 		configFromByte(sideConnections, compound.getByte(NBT_SIDE_CONFIG));
 		inoutConfigFromByte(this, compound.getByte(NBT_INOUTBOUND_CONFIG));
+		if (compound.contains(NBT_DIM) && compound.contains(NBT_POS)) {
+			this.dimension = DimensionType.getById(compound.getInt(NBT_DIM));
+		}
+		
+		
 		fixAether();
 	}
 	
 	public void setAether(int aether) {
 		this.aether = aether;
 		//this.aetherLastTick = aether; // let this generate diffs so that the client is interesting to look at
+	}
+
+	@Override
+	public DimensionType getDimension() {
+		return this.dimension;
+	}
+
+	@Override
+	public BlockPos getPosition() {
+		return this.pos;
+	}
+	
+	protected void clearTickIOMap() {
+		for (AetherTickIOEntry entry : aetherTickIOData.values()) {
+			entry.release();
+		}
+		
+		aetherTickIOData.clear();
+	}
+	
+	protected void addTickIO(BlockPos pos, int input, int output) {
+		if (aetherTickIOData.containsKey(pos)) {
+			AetherTickIOEntry entry = aetherTickIOData.get(pos);
+			input += entry.getInput();
+			output += entry.getOutput();
+			entry.release();
+		}
+		
+		aetherTickIOData.put(pos, AetherTickIOEntry.reserve(input, output));
+	}
+	
+	/**
+	 * Warning: expires at the end of the tick, so don't save the entry
+	 * @param pos
+	 * @return
+	 */
+	public AetherTickIOEntry getIOStatsFor(BlockPos pos) {
+		return aetherTickIOData.get(pos);
+	}
+	
+	@Override
+	public void setPosition(World world, BlockPos pos) {
+		this.dimension = world == null ? null : world.getDimension().getType();
+		this.pos = pos;
+		//this.dirty();
 	}
 }

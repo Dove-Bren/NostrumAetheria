@@ -14,6 +14,11 @@
             "south": { "x": 90, "y": 180 },
             "north": { "x": 90},
             "west": { "x": 90, "y": 270}
-        }
+        },
+		"mode": {
+			"in": { "model": "nostrumaetheria:block/crystal_relay_in.obj" },
+			"out": { "model": "nostrumaetheria:block/crystal_relay_out.obj" },
+			"inout": { "model": "nostrumaetheria:block/crystal_relay_inout.obj" }
+		}
     }
 }

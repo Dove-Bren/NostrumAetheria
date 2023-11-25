@@ -1,46 +1,57 @@
 package com.smanzana.nostrumaetheria.tiles;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrumaetheria.api.component.OptionalAetherHandlerComponent;
-import com.smanzana.nostrumaetheria.component.AetherRelayComponent;
-import com.smanzana.nostrumaetheria.component.AetherRelayComponent.AetherRelayListener;
+import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
+import com.smanzana.nostrumaetheria.api.aether.IWorldAetherHandler;
+import com.smanzana.nostrumaetheria.api.aether.stats.AetherTickIOEntry;
+import com.smanzana.nostrumaetheria.blocks.AetherRelay;
+import com.smanzana.nostrumaetheria.blocks.AetherRelay.RelayMode;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants.NBT;
 
-public class AetherRelayEntity extends NativeAetherTickingTileEntity implements AetherRelayListener {
+public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 
 		private static final String NBT_SIDE = "relay_side";
+		private static final String NBT_LINKS = "links";
+		private static final String NBT_MODE = "mode";
 		
-		protected @Nullable AetherRelayComponent relayHandler;
+		private static final int AETHER_BUFFER_AMT = 100;
+		
 		private Direction side;
+		private RelayMode mode;
+		private final List<BlockPos> links;
 		
 		private int idleTicks;
 		
 		public AetherRelayEntity() {
-			this(Direction.UP);
+			this(Direction.UP, RelayMode.INOUT);
 		}
 		
-		public AetherRelayEntity(Direction facing) {
-			super(AetheriaTileEntities.Relay, 0, 0);
+		public AetherRelayEntity(Direction facing, RelayMode mode) {
+			super(AetheriaTileEntities.Relay, 0, AETHER_BUFFER_AMT);
 			
 			side = facing;
-			this.relayHandler = new AetherRelayComponent(this, facing);
-			this.handler = relayHandler;
-			this.compWrapper = new OptionalAetherHandlerComponent(relayHandler);
+			this.mode = mode;
+			links = new ArrayList<>();
 			idleTicks = NostrumMagica.rand.nextInt(40) + 10;
+			
+			
 		}
 		
 //		@Override
@@ -52,22 +63,79 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 //			return relayHandler;
 //		}
 		
+		public List<BlockPos> getLinkLocations() {
+			return this.links;
+		}
+		
+		public void addLink(BlockPos pos) {
+			if (!links.contains(pos)) {
+				links.add(pos);
+				this.dirty();
+				
+				// And attach the other side, too
+				if (world != null && world.getTileEntity(pos) != null && world.getTileEntity(pos) instanceof AetherRelayEntity) {
+					((AetherRelayEntity) world.getTileEntity(pos)).addLink(this.pos);
+				}
+			}
+		}
+		
+		public void clearLinks() {
+			links.clear();
+			this.handler.clearConnections();
+			this.dirty();
+		}
+		
+		public void setMode(RelayMode mode) {
+			switch (mode) {
+			case IN:
+				this.handler.configureInOut(true, false);
+				break;
+			case INOUT:
+				this.handler.configureInOut(true, true);
+				break;
+			case OUT:
+				this.handler.configureInOut(false, true);
+				break;
+			}
+			
+			this.mode = mode;
+			setBlockStateFromMode(mode);
+			this.dirty();
+		}
+		
+		protected void setBlockStateFromMode(RelayMode mode) {
+			this.world.setBlockState(pos, this.getBlockState().with(AetherRelay.RELAY_MODE, mode), 3);
+		}
+		
+		protected List<IAetherHandler> getLinkHandlers(@Nullable List<IAetherHandler> list) {
+			if (list == null) {
+				list = new ArrayList<>();
+			}
+			for (BlockPos pos : this.getLinkLocations()) {
+				IAetherHandler handler = IAetherHandler.GetHandlerAt(world, pos, null);
+				if (handler != null) {
+					list.add(handler);
+				}
+			}
+			return list;
+		}
+		
 		@Override
 		public void validate() {
 			super.validate();
 			
-			if (this.world != null) {
-				relayHandler.setPosition(world, pos.toImmutable());
-			}
+//			if (this.world != null) {
+//				relayHandler.setPosition(world, pos.toImmutable());
+//			}
 		}
 		
 		@Override
 		public void setWorld(World world) {
 			super.setWorld(world);
 			
-			if (this.pos != null && !this.pos.equals(BlockPos.ZERO)) {
-				relayHandler.setPosition(world, pos.toImmutable());
-			}
+//			if (this.pos != null && !this.pos.equals(BlockPos.ZERO)) {
+//				relayHandler.setPosition(world, pos.toImmutable());
+//			}
 			// if this is too early for side, let's save it :(
 			
 //			if (!isInvalid()) {
@@ -101,24 +169,24 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 		public void updateContainingBlockInfo() {
 			super.updateContainingBlockInfo();
 			
-			if (relayHandler != null && !relayHandler.hasLinks()) {
-				relayHandler.autoLink();
-			}
+//			if (relayHandler != null && !relayHandler.hasLinks()) {
+//				relayHandler.autoLink();
+//			}
 		}
 		
-		@Override
-		public void onLinkChange() {
-			this.markDirty();
-			BlockState state = world.getBlockState(pos);
-			world.notifyBlockUpdate(pos, state, state, 2);
-		}
+//		@Override
+//		public void onLinkChange() {
+//			this.markDirty();
+//			BlockState state = world.getBlockState(pos);
+//			world.notifyBlockUpdate(pos, state, state, 2);
+//		}
 		
 		@Override
 		public void onChunkUnloaded() {
 			super.onChunkUnloaded();
 			
 			// For any linked relays, let them know we're going away (but weren't destroyed)
-			relayHandler.unloadRelay();
+//			relayHandler.unloadRelay();
 		}
 		
 		public Direction getSide() {
@@ -146,6 +214,14 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 			super.write(compound);
 			
 			compound.putByte(NBT_SIDE, (byte) this.side.ordinal());
+			if (!this.links.isEmpty()) {
+				ListNBT list = new ListNBT();
+				for (BlockPos link : links) {
+					list.add(NBTUtil.writeBlockPos(link));
+				}
+				compound.put(NBT_LINKS, list);
+			}
+			compound.putString(NBT_MODE, this.mode.name());
 			
 			return compound;
 		}
@@ -154,14 +230,24 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 		public void read(CompoundNBT compound) {
 			super.read(compound);
 			
+			links.clear();
 			this.side = Direction.values()[compound.getByte(NBT_SIDE)];
-			relayHandler.setSide(this.side);
+			if (compound.contains(NBT_LINKS)) {
+				ListNBT list = compound.getList(NBT_LINKS, NBT.TAG_COMPOUND);
+				for (int i = 0; i < list.size(); i++) {
+					links.add(NBTUtil.readBlockPos(list.getCompound(i)));
+				}
+			}
+			try {
+				this.mode = RelayMode.valueOf(compound.getString(NBT_MODE));
+			} catch (Exception e) {
+				this.mode = RelayMode.INOUT;
+			}
+			
+//			relayHandler.setSide(this.side);
 		}
 		
 		protected void idleVisualTick() {
-			AetherRelayComponent relay = (AetherRelayComponent) this.getHandler();
-			final Collection<BlockPos> links = relay.getLinkedPositions();
-			
 			if (links == null || links.isEmpty()) {
 				return;
 			}
@@ -174,7 +260,8 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 			//}
 			
 			for (BlockPos dest : links) {
-				if (NostrumMagica.rand.nextBoolean() && NostrumMagica.rand.nextBoolean()) {
+				AetherTickIOEntry entry = this.handler.getIOStatsFor(dest);
+				if (entry != null && entry.getOutput() > 0) {
 					NostrumParticles.FILLED_ORB.spawn(world, new SpawnParams(
 							1, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 0, 20 * 1, 10, new Vec3d(dest.getX() + .5, dest.getY() + .5, dest.getZ() + .5)
 						).color(color));
@@ -185,15 +272,92 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity implements 
 			}
 		}
 		
+		protected void refreshConnections() {
+			this.handler.clearConnections();
+			for (IAetherHandler remoteHandler : this.getLinkHandlers(null)) {
+				this.handler.addAetherConnection(remoteHandler, null);
+			}
+		}
+		
+		/**
+		 * Configure handler IO for pulling in aether. Notably, we don't want to pull from the block
+		 * we're attached to unless our mode says that's right.
+		 */
+		protected void setupForPull() {
+			final boolean pullFromAttached = this.mode != RelayMode.IN;
+			final boolean pullFromRelays = this.mode != RelayMode.OUT;
+			
+			for (Direction dir : Direction.values()) {
+				handler.enableSide(dir, dir == this.getSide().getOpposite() ? pullFromAttached : false, false);
+			}
+
+			handler.enableSide(null, pullFromRelays, true); // Relays pull from null
+		}
+		
+		protected void setupForPush() {
+			final boolean pushToAttached = this.mode != RelayMode.OUT;
+			final boolean pushToRelays = this.mode != RelayMode.IN;
+			
+			for (Direction dir : Direction.values()) {
+				handler.enableSide(dir, dir == this.getSide().getOpposite() ? pushToAttached : false, false);
+			}
+
+			handler.enableSide(null, pushToRelays, true); // Relays push to null
+		}
+		
 		@Override
 		public void tick() {
-			super.tick();
-			
-			if (this.world != null && this.world.isRemote) {
-				if (ticksExisted > idleTicks) {
+			if (this.world != null && !this.world.isRemote) {
+				//if (ticksExisted > idleTicks) {
 					idleTicks = ticksExisted + NostrumMagica.rand.nextInt(120) + 60;
 					idleVisualTick();
+				//}
+			}
+			
+			super.tick();
+		
+			if (this.world != null && !this.world.isRemote()) {
+				// Possibly refresh connections
+				{
+					if (this.world != null && !this.world.isRemote()) {
+						// Refresh links every little while
+						if (this.ticksExisted % 5 == 0) {
+							refreshConnections();
+						}
+					}
 				}
+				
+				// Note: expect to still be configured for pulling from end of last tick
+				
+				// Pull
+				handler.fillAether(AETHER_BUFFER_AMT);
+				
+				// Configure sides for pushing
+				setupForPush();
+				
+				// Try to push aether into connections
+				{
+					this.handler.pushAether(AETHER_BUFFER_AMT);
+//					IAetherHandler otherHandler = IAetherHandler.GetHandlerAt(world, pos.offset(this.getSide().getOpposite()), this.getSide());
+//					if (otherHandler != null) {
+//						int amt = this.handler.getAether(null);
+//						final int start = amt;
+//						amt = otherHandler.addAether(this.getSide(), amt);
+//						
+//						if (amt != start) {
+//							if (otherHandler instanceof IWorldAetherHandler) {
+//								final BlockPos otherPos = ((IWorldAetherHandler) otherHandler).getPosition();
+//								if (otherPos != null) {
+//									handler.addTickIO(otherPos, 0, start - amt);
+//								}
+//							}
+//						}
+//					}
+				}
+				
+				// Set back up for pulling, so that other handlers can push into us if needed
+				// Configure side IO for pulling
+				setupForPull();
 			}
 		}
 	}

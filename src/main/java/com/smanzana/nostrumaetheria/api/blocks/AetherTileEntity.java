@@ -20,6 +20,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -41,7 +42,7 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	}
 	
 	protected OptionalAetherHandlerComponent createComponent(int defaultAether, int defaultMaxAether) {
-		return new OptionalAetherHandlerComponent(this, defaultAether, defaultMaxAether);
+		return new OptionalAetherHandlerComponent(world, pos, this, defaultAether, defaultMaxAether);
 	}
 	
 	protected IAetherStatTracker createTracker() {
@@ -156,5 +157,12 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	
 	public IAetherStatTracker getStats() {
 		return this.statTracker;
+	}
+	
+	@Override
+	public void setWorld(World world) {
+		super.setWorld(world);
+		
+		this.compWrapper.getHandlerIfPresent().setPosition(this.world, this.pos);
 	}
 }

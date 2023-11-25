@@ -1,0 +1,14 @@
+# Blender MTL File: 'None'
+# Material Count: 2
+
+newmtl aether_relay_base
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+d 1.000000
+map_Kd nostrumaetheria:block/aether_relay_out
+
+newmtl aether_relay_crystal
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+d 0.950000
+map_Kd nostrumaetheria:block/aether_relay_out

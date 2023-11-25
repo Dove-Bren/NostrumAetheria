@@ -7,14 +7,34 @@ import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.StringNBT;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 public class OptionalAetherHandlerComponent {
+	
+	public static interface AetherHandlerFactory {
+		
+		public IAetherHandlerComponent make();
+	}
 
 	private final @Nullable IAetherHandlerComponent component;
 	
 	public OptionalAetherHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
+		this((DimensionType) null, null, listener, defaultAether, defaultMaxAether);
+	}
+	
+	public OptionalAetherHandlerComponent(@Nullable World world, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
+		this(() -> APIProxy.createHandlerComponent(world == null ? null : world.getDimension().getType(), pos, listener, defaultAether, defaultMaxAether));
+	}
+	
+	public OptionalAetherHandlerComponent(@Nullable DimensionType dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
+		this(() -> APIProxy.createHandlerComponent(dimension, pos, listener, defaultAether, defaultMaxAether));
+	}
+	
+	public OptionalAetherHandlerComponent(AetherHandlerFactory supplier) {
 		if (APIProxy.isEnabled()) {
-			component = APIProxy.createHandlerComponent(listener, defaultAether, defaultMaxAether);
+			component = supplier.make();
 		} else {
 			component = null;
 		}

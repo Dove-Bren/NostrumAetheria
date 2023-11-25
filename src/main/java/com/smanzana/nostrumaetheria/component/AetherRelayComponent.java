@@ -49,7 +49,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	protected final AetherRelayListener listener;
 	
 	public AetherRelayComponent(AetherRelayListener listener, Direction side, int range) {
-		super(listener, 0, 0);
+		super(null, null, listener, 0, 0);
 		this.range = range;
 		this.links = new HashSet<>();
 		this.linkCache = new LinkedList<>();

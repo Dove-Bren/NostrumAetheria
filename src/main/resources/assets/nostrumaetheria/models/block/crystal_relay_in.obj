@@ -1,6 +1,6 @@
 # Blender v2.77 (sub 0) OBJ File: ''
 # www.blender.org
-mtllib crystal_relay.mtl
+mtllib crystal_relay_in.mtl
 o Cube.001_Cube.004
 v 0.522785 0.025014 0.477215
 v 0.583537 0.255892 0.416463

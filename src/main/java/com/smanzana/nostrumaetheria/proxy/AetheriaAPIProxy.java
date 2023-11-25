@@ -30,6 +30,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
@@ -142,9 +143,9 @@ public class AetheriaAPIProxy extends APIProxy {
 	}
 
 	@Override
-	protected IAetherHandlerComponent handleCreateHandlerComponent(IAetherComponentListener listener, int defaultAether,
+	protected IAetherHandlerComponent handleCreateHandlerComponent(@Nullable DimensionType dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether,
 			int defaultMaxAether) {
-		return new AetherHandlerComponent(listener, defaultAether, defaultMaxAether);
+		return new AetherHandlerComponent(dimension, pos, listener, defaultAether, defaultMaxAether);
 	}
 
 	@Override

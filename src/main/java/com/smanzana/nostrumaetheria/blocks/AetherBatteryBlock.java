@@ -1,5 +1,6 @@
 package com.smanzana.nostrumaetheria.blocks;
 
+import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -54,9 +55,17 @@ public class AetherBatteryBlock extends Block implements ILoreTagged {
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
-		if (!worldIn.isRemote) {
+		if (!worldIn.isRemote && handIn == Hand.MAIN_HAND) {
 			// request an update
 			worldIn.notifyBlockUpdate(pos, worldIn.getBlockState(pos), worldIn.getBlockState(pos), 2);
+			
+			int unused;
+			{
+				AetherBatteryEntity tileentity = (AetherBatteryEntity) worldIn.getTileEntity(pos);
+				NostrumAetheria.logger.debug(tileentity.getHandler().getAether(null));
+			}
+			
+			return true;
 		}
 		
 		return false;
