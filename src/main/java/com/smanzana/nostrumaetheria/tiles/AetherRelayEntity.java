@@ -22,6 +22,7 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -40,7 +41,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		private static final int MAX_LINK_RANGE = 10;
 		
 		private Direction side;
-		private RelayMode mode;
+		protected RelayMode mode;
 		private final List<BlockPos> links;
 		
 		private int idleTicks;
@@ -50,7 +51,11 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		}
 		
 		public AetherRelayEntity(Direction facing, RelayMode mode) {
-			super(AetheriaTileEntities.Relay, 0, AETHER_BUFFER_AMT);
+			this(AetheriaTileEntities.Relay, facing, mode);
+		}
+		
+		protected AetherRelayEntity(TileEntityType<? extends AetherRelayEntity> type, Direction facing, RelayMode mode) {
+			super(type, 0, AETHER_BUFFER_AMT);
 			
 			side = facing;
 			this.setMode(mode, false);
@@ -340,7 +345,51 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		}
 		
 		protected void setupForInOut() {
-			handler.setShouldPropagate(true);
+			handler.setShouldPropagate(false);
+			handler.configureInOut(true, true); // Both allowed
+			handler.enableSide(getSide().getOpposite(), false);
+		}
+		
+		protected void inTick() {
+			final Direction mySide = this.getSide();
+			
+			// Pull aether, and try to insert it into our attached component
+			handler.fillAether(AETHER_BUFFER_AMT);
+			
+			// Fill attached component
+			IAetherHandler otherHandler = IAetherHandler.GetHandlerAt(world, pos.offset(mySide.getOpposite()), mySide);
+			if (otherHandler != null) {
+				// Avoid constantly pulling and putting back to a full component by finding out how much
+				// it needs first.
+				final int room = otherHandler.getMaxAether(mySide) - otherHandler.getAether(mySide);
+				if (room > 0) {
+					int amt = this.handler.drawAether(mySide.getOpposite(), AETHER_BUFFER_AMT);
+					amt = otherHandler.addAether(mySide, amt);
+					this.handler.addAether(null, amt, true); // Put what doesn't fit back
+				}
+			}
+		}
+		
+		protected void outTick() {
+			final Direction mySide = this.getSide();
+			
+			// Pull aether out of attached component and make it available for drawing
+			IAetherHandler otherHandler = IAetherHandler.GetHandlerAt(world, pos.offset(mySide.getOpposite()), mySide);
+			if (otherHandler != null) {
+				final int room = this.handler.getMaxAether(mySide.getOpposite()) - this.handler.getAether(mySide.getOpposite());
+				if (room > 0) {
+					final int taken = otherHandler.drawAether(mySide, room);
+					this.handler.addAether(mySide.getOpposite(), taken, true);
+				}
+			}
+		}
+		
+		protected void inOutTick() {
+			//final Direction mySide = this.getSide();
+			
+			// Pull aether into ourselves so that other things can take it, but don't
+			// try to push into the att ached thing.
+			handler.fillAether(AETHER_BUFFER_AMT);
 		}
 		
 		@Override
@@ -365,35 +414,12 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 					}
 				}
 				
-				final Direction mySide = this.getSide();
 				if (this.mode == RelayMode.IN) {
-					// Pull aether, and try to insert it into our attached component
-					handler.fillAether(AETHER_BUFFER_AMT);
-					
-					// Fill attached component
-					IAetherHandler otherHandler = IAetherHandler.GetHandlerAt(world, pos.offset(mySide.getOpposite()), mySide);
-					if (otherHandler != null) {
-						// Avoid constantly pulling and putting back to a full component by finding out how much
-						// it needs first.
-						final int room = otherHandler.getMaxAether(mySide) - otherHandler.getAether(mySide);
-						if (room > 0) {
-							int amt = this.handler.drawAether(mySide.getOpposite(), AETHER_BUFFER_AMT);
-							amt = otherHandler.addAether(mySide, amt);
-							this.handler.addAether(null, amt, true); // Put what doesn't fit back
-						}
-					}
+					inTick();
 				} else if (this.mode == RelayMode.OUT) {
-					// Pull aether out of attached component and make it available for drawing
-					IAetherHandler otherHandler = IAetherHandler.GetHandlerAt(world, pos.offset(mySide.getOpposite()), mySide);
-					if (otherHandler != null) {
-						final int room = this.handler.getMaxAether(mySide.getOpposite()) - this.handler.getAether(mySide.getOpposite());
-						if (room > 0) {
-							final int taken = otherHandler.drawAether(mySide, room);
-							this.handler.addAether(mySide.getOpposite(), taken, true);
-						}
-					}
+					outTick();
 				} else if (this.mode == RelayMode.INOUT) {
-					;
+					inOutTick();
 				}
 				
 //				// Note: expect to still be configured for pulling from end of last tick

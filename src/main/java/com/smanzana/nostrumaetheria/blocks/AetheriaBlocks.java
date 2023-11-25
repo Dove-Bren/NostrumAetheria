@@ -26,6 +26,7 @@ public class AetheriaBlocks {
 	@ObjectHolder(AetheriaIDs.LARGE_BATTERY) public static AetherBatteryBlock largeBattery;
 	@ObjectHolder(AetheriaIDs.GIANT_BARRY) public static AetherBatteryBlock giantBattery;
 	@ObjectHolder(AetheriaIDs.RELAY) public static AetherRelay relay;
+	@ObjectHolder(AetheriaIDs.ENHANCED_RELAY) public static EnhancedAetherRelay enhancedRelay;
 	@ObjectHolder(AetheriaIDs.SMALL_FURNACE) public static AetherFurnaceBlock smallFurnace;
 	@ObjectHolder(AetheriaIDs.MEDIUM_FURNACE) public static AetherFurnaceBlock mediumFurnace;
 	@ObjectHolder(AetheriaIDs.LARGE_FURNACE) public static AetherFurnaceBlock largeFurnace;
@@ -69,6 +70,7 @@ public class AetheriaBlocks {
     	registerBlockItem(pump, pump.getRegistryName(), registry);
     	registerBlockItem(wispBlock, wispBlock.getRegistryName(), registry);
     	registerBlockItem(infuser, infuser.getRegistryName(), registry);
+    	registerBlockItem(enhancedRelay, enhancedRelay.getRegistryName(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -101,5 +103,6 @@ public class AetheriaBlocks {
     	registerBlock(new AetherPumpBlock(), AetheriaIDs.PUMP, registry);
     	registerBlock(new WispBlock(), AetheriaIDs.WISP_BLOCK, registry);
     	registerBlock(new AetherInfuser(), AetheriaIDs.AETHER_INFUSER, registry);
+    	registerBlock(new EnhancedAetherRelay(), AetheriaIDs.ENHANCED_RELAY, registry);
 	}
 }

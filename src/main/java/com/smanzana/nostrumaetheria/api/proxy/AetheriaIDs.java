@@ -31,6 +31,7 @@ public class AetheriaIDs {
 	public static final String LARGE_BATTERY = "aether_battery_large";
 	public static final String GIANT_BARRY = "aether_battery_giant";
 	public static final String RELAY = "aether_relay";
+	public static final String ENHANCED_RELAY = "enhanced_aether_relay";
 	public static final String SMALL_FURNACE = "aether_furnace_small";
 	public static final String MEDIUM_FURNACE = "aether_furnace_medium";
 	public static final String LARGE_FURNACE = "aether_furnace_large";

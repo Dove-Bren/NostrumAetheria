@@ -27,6 +27,7 @@ public class AetheriaTileEntities {
 	private static final String ID_INFINITE = "infinite_aether_block_te";
 	private static final String ID_WISPBLOCK = AetheriaIDs.WISP_BLOCK + "_entity";
 	private static final String ID_INFUSER = AetheriaIDs.AETHER_INFUSER + "_entity";
+	private static final String ID_ENHANCED_RELAY = "enhanced_aether_relay_te";
 
 	@ObjectHolder(ID_BATH) public static TileEntityType<AetherBathTileEntity> Bath;
 	@ObjectHolder(ID_BATTERY) public static TileEntityType<AetherBatteryEntity> Battery;
@@ -40,6 +41,7 @@ public class AetheriaTileEntities {
 	@ObjectHolder(ID_INFINITE) public static TileEntityType<InfiniteAetherBlockEntity> InfiniteBlock;
 	@ObjectHolder(ID_WISPBLOCK) public static TileEntityType<WispBlockTileEntity> WispBlockEnt;
 	@ObjectHolder(ID_INFUSER) public static TileEntityType<AetherInfuserTileEntity> AetherInfuserEnt;
+	@ObjectHolder(ID_ENHANCED_RELAY) public static TileEntityType<EnhancedAetherRelayEntity> EnhancedRelay;
 	
 	private static void register(IForgeRegistry<TileEntityType<?>> registry, TileEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -61,5 +63,6 @@ public class AetheriaTileEntities {
     	register(registry, TileEntityType.Builder.create(InfiniteAetherBlockEntity::new, AetheriaBlocks.infiteAetherBlock).build(null), ID_INFINITE);
     	register(registry, TileEntityType.Builder.create(WispBlockTileEntity::new, AetheriaBlocks.wispBlock).build(null), ID_WISPBLOCK);
     	register(registry, TileEntityType.Builder.create(AetherInfuserTileEntity::new, AetheriaBlocks.infuser).build(null), ID_INFUSER);
+    	register(registry, TileEntityType.Builder.create(EnhancedAetherRelayEntity::new, AetheriaBlocks.enhancedRelay).build(null), ID_ENHANCED_RELAY);
 	}
 }

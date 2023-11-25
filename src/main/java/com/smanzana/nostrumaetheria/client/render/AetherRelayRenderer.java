@@ -42,15 +42,14 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 		final Minecraft mc = Minecraft.getInstance();
 		PlayerEntity player = mc.player;
 		boolean debug = player != null && (player.isCreative() || player.isSpectator());
-		debug = debug || APIProxy.hasAetherVision(player);
+		final boolean show = debug || APIProxy.hasAetherVision(player);
 		
-		if (!debug) {
+		if (!show) {
 			return; // Now we have particles
 		}
 		
-		AetherHandlerComponent relay = (AetherHandlerComponent) handler;
-		
-		{
+		if (debug) {
+			AetherHandlerComponent relay = (AetherHandlerComponent) handler;
 			final String str = relay.getAether(null) + "/" + relay.getMaxAether(null);
 			GlStateManager.pushMatrix();
 			GlStateManager.translated(x + .5, y, z + .5);
