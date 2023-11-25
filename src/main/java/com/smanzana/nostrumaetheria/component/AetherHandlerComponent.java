@@ -50,6 +50,8 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	// Connections set via code instead of from parent (usually distant blocks, like relays)
 	private Set<AetherFlowConnection> remoteConnections;
 	private int maxAetherFill;
+	// Whether this should add its connections to a draw flow
+	protected boolean propagateFlow;
 	
 	protected final IAetherComponentListener listener;
 	
@@ -117,6 +119,10 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	public void configureInOut(boolean inputAllowed, boolean outputAllowed) {
 		setInboundEnabled(inputAllowed);
 		setOutboundEnabled(outputAllowed);
+	}
+	
+	public void setShouldPropagate(boolean propagate) {
+		this.propagateFlow = propagate;
 	}
 	
 	private void fixAether() {
@@ -268,8 +274,14 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	}
 	
 	@Override
+	public void addFlowPropagationConnections(AetherIterateContext context) {
+		if (this.propagateFlow) {
+			context.addConnections(getConnections());
+		}
+	}
+	
+	@Override
 	public int drawAether(Direction side, int amount, AetherIterateContext context) {
-		context.addConnections(getConnections());
 		return this.drawAetherFromMyself(side, amount, false);
 	}
 
@@ -488,7 +500,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 		aetherTickIOData.clear();
 	}
 	
-	protected void addTickIO(BlockPos pos, int input, int output) {
+	public void addTickIO(BlockPos pos, int input, int output) {
 		if (aetherTickIOData.containsKey(pos)) {
 			AetherTickIOEntry entry = aetherTickIOData.get(pos);
 			input += entry.getInput();

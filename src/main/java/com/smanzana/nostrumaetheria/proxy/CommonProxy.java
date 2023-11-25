@@ -185,6 +185,9 @@ public class CommonProxy {
 			.reference("ritual::make_lens_elevator", "ritual.make_lens_elevator.name")
 			.reference("ritual::make_lens_swiftness", "ritual.make_lens_swiftness.name")
 		.build("aether_infusers", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 0, 2, true, new ItemStack(AetheriaBlocks.infuser));
+		
+		int unused;
+		// TODO: ritual for aether_sight_item (and curio?)
     }
     
     @SubscribeEvent

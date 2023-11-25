@@ -30,6 +30,14 @@ public interface IAetherFlowHandler extends IAetherHandler {
 			return handler.hashCode() * 883 + (face == null ? 47 : face.hashCode());
 		}
 	}
+	
+	/**
+	 * Add additional IAetherHandlers that should be tried after this one as part of the aether graph.
+	 * Notably this gives handlers the chance to add their other connections to the context to make a big
+	 * web.
+	 * @param context
+	 */
+	public void addFlowPropagationConnections(AetherIterateContext context);
 
 	public int drawAether(Direction side, int amount, AetherIterateContext context);
 	

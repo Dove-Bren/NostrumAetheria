@@ -98,6 +98,7 @@ public final class AetherFlowMechanics {
 	private static final int drawFromConnection(AetherFlowConnection connection, int amount, AetherIterateContext context) {
 		if (connection.handler instanceof IAetherFlowHandler) {
 			IAetherFlowHandler flowHandler = (IAetherFlowHandler) connection.handler;
+			flowHandler.addFlowPropagationConnections(context);
 			return flowHandler.drawAether(connection.face, amount, context);
 		} else {
 			return connection.handler.drawAether(connection.face, amount);
