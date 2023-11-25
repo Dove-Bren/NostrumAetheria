@@ -193,7 +193,7 @@ public class AetherRelay extends Block implements ILoreTagged {
 					TileEntity te = worldIn.getTileEntity(pos);
 					if (te != null) {
 						AetherRelayEntity ent = (AetherRelayEntity) te;
-						ent.addLink(heldPos);
+						ent.addLink(player, heldPos, player.isCreative());
 						NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 					}
 				}

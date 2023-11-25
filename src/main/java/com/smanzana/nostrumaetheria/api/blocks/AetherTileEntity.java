@@ -165,4 +165,13 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 		
 		this.compWrapper.getHandlerIfPresent().setPosition(this.world, this.pos);
 	}
+	
+	@Override
+	public void setPos(BlockPos pos) {
+		super.setPos(pos);
+		
+		if (this.compWrapper.isPresent() && this.world != null) {
+			this.compWrapper.getHandlerIfPresent().setPosition(this.world, this.pos);
+		}
+	}
 }

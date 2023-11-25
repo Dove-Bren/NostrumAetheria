@@ -70,6 +70,9 @@
     "item.info.pendant.charges": "%d Charges",
     "item.info.aether_gem.desc": "Stores aether and provides it to other items in your inventory",
     "item.info.aether": "%s / %s",
+	
+	"info.relay.already_linked": "These relays are already linked",
+	"info.relay.too_far": "The stored location is too far away",
 
     "itemGroup.nostrumaetheria": "Nostrum Aetheria",
 
