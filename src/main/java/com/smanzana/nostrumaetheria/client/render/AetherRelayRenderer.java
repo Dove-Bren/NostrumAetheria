@@ -71,17 +71,17 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 		float[] notColor = {0f, 0f, 0f, 0f};
 		
 		
-		if (debug) {
+		//if (debug) {
 			period = (20 * 3);
 			dotLength = 10;
 			dotColor = new float[]{1f, 0f, 0f, 1f};
 			notColor = new float[]{0f, 0f, 0f, 0f};
-		} else {
-			period = (20 * 10);
-			dotLength = 4;
-			dotColor = new float[]{1f, .3f, .3f, .2f};
-			notColor = new float[]{0f, 0f, 0f, 0f};
-		}
+//		} else {
+//			period = (20 * 10);
+//			dotLength = 4;
+//			dotColor = new float[]{1f, .3f, .3f, .2f};
+//			notColor = new float[]{0f, 0f, 0f, 0f};
+//		}
 		
 		final float[] dotDelta = {dotColor[0] - notColor[0], dotColor[1] - notColor[1], dotColor[2] - notColor[2], dotColor[3] - notColor[3]};
 		final float perI = (1f / dotLength);

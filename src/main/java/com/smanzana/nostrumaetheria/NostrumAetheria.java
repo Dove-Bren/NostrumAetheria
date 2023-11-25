@@ -9,11 +9,9 @@ import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.integration.curios.CuriosClientProxy;
 import com.smanzana.nostrumaetheria.integration.curios.CuriosProxy;
-import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrumaetheria.proxy.AetheriaAPIProxy;
 import com.smanzana.nostrumaetheria.proxy.ClientProxy;
 import com.smanzana.nostrumaetheria.proxy.CommonProxy;
-import com.smanzana.nostrummagica.research.NostrumResearch;
 
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -64,7 +62,6 @@ public class NostrumAetheria
 	    
     	proxy.preinit();
     	curios.preInit();
-    	APIProxy.ResearchTab = new NostrumResearch.NostrumResearchTab("aether", new ItemStack(AetheriaItems.aetherGem));
     }
     
     

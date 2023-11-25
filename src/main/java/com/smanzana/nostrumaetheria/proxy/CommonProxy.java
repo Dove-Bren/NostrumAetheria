@@ -69,13 +69,16 @@ public class CommonProxy {
 	
     
     private void registerResearch() {
+    	APIProxy.AetherResearchTab = new NostrumResearch.NostrumResearchTab("aether", new ItemStack(AetheriaItems.aetherGem));
+    	APIProxy.AetherGearResearchTab = new NostrumResearch.NostrumResearchTab("aether_gear", new ItemStack(AetheriaItems.aetherSightTool));
+    	
     	NostrumResearch.startBuilding()
 			.hiddenParent("rituals")
 			.hiddenParent("thano_pendant")
 			.lore(NostrumItems.thanoPendant)
 			.reference(AetheriaItems.activePendant)
 			.reference("ritual::active_pendant", "ritual.active_pendant.name")
-		.build("active_pendant", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 0, -1, true, new ItemStack(AetheriaItems.activePendant));
+		.build("active_pendant", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, 0, -1, true, new ItemStack(AetheriaItems.activePendant));
 	
 		NostrumResearch.startBuilding()
 			.parent("active_pendant")
@@ -85,77 +88,83 @@ public class CommonProxy {
 			.lore(AetheriaItems.mandrakeFlower)
 			.reference(AetheriaItems.passivePendant)
 			.reference("ritual::passive_pendant", "ritual.passive_pendant.name")
-		.build("passive_pendant", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, -1, true, new ItemStack(AetheriaItems.passivePendant));
+		.build("passive_pendant", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, 1, -1, true, new ItemStack(AetheriaItems.passivePendant));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("active_pendant")
 			.lore((ILoreTagged) AetheriaItems.activePendant)
 			.reference("ritual::aether_furnace_small", "ritual.aether_furnace_small.name")
-		.build("aether_furnace", (NostrumResearchTab) APIProxy.ResearchTab, Size.GIANT, 0, 0, true, new ItemStack(AetheriaBlocks.smallFurnace));
+		.build("aether_furnace", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.GIANT, 0, 0, true, new ItemStack(AetheriaBlocks.smallFurnace));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_furnace")
 			.hiddenParent("aether_boiler")
 			.reference("ritual::aether_furnace_medium", "ritual.aether_furnace_medium.name")
 			.reference("ritual::aether_furnace_large", "ritual.aether_furnace_large.name")
-		.build("aether_furnace_adv", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -1, 1, true, new ItemStack(AetheriaBlocks.largeFurnace));
+		.build("aether_furnace_adv", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, -1, 1, true, new ItemStack(AetheriaBlocks.largeFurnace));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_furnace")
 			.lore((ILoreTagged) AetheriaItems.activePendant)
 			.reference("ritual::aether_bath", "ritual.aether_bath.name")
-		.build("aether_bath", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 2, 1, true, new ItemStack(AetheriaBlocks.bath));
+		.build("aether_bath", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, 2, 1, true, new ItemStack(AetheriaBlocks.bath));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_bath")
 			.parent("aether_furnace")
 			.hiddenParent("aether_gem")
 			.reference("ritual::aether_charger", "ritual.aether_charger.name")
-		.build("aether_charger", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, 1, true, new ItemStack(AetheriaBlocks.charger));
+		.build("aether_charger", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, 1, 1, true, new ItemStack(AetheriaBlocks.charger));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_charger")
 			.hiddenParent("vani")
 			.reference("ritual::aether_repairer", "ritual.aether_repairer.name")
-		.build("aether_repairer", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, 2, true, new ItemStack(AetheriaBlocks.repairer));
+		.build("aether_repairer", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, 1, 2, true, new ItemStack(AetheriaBlocks.repairer));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_repairer")
 			.reference("ritual::aether_unraveler", "ritual.aether_unraveler.name")
-		.build("aether_unraveler", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 1, 3, true, new ItemStack(AetheriaBlocks.unraveler));
+		.build("aether_unraveler", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, 1, 3, true, new ItemStack(AetheriaBlocks.unraveler));
 		
 		//aether_unraveler
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_furnace")
 			.reference("ritual::aether_boiler", "ritual.aether_boiler.name")
-		.build("aether_boiler", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -2, 1, true, new ItemStack(AetheriaBlocks.boiler));
+		.build("aether_boiler", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, -2, 1, true, new ItemStack(AetheriaBlocks.boiler));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_bath")
 			.reference("ritual::aether_battery_small", "ritual.aether_battery_small.name")
 			.reference("ritual::aether_battery_medium", "ritual.aether_battery_medium.name")
-		.build("aether_battery", (NostrumResearchTab) APIProxy.ResearchTab, Size.LARGE, 2, 2, true, new ItemStack(AetheriaBlocks.smallBattery));
+		.build("aether_battery", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.LARGE, 2, 2, true, new ItemStack(AetheriaBlocks.smallBattery));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_battery")
 			.hiddenParent("kani")
 			.reference("ritual::aether_battery_large", "ritual.aether_battery_large.name")
 			.reference("ritual::aether_battery_giant", "ritual.aether_battery_giant.name")
-		.build("aether_battery_adv", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 4, 2, true, new ItemStack(AetheriaBlocks.giantBattery));
+		.build("aether_battery_adv", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, 4, 2, true, new ItemStack(AetheriaBlocks.giantBattery));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_battery")
 			.hiddenParent("vani")
 			.reference("ritual::aether_gem", "ritual.aether_gem.name")
-		.build("aether_gem", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 3, 1, true, new ItemStack(AetheriaItems.aetherGem));
+		.build("aether_gem", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, 3, 1, true, new ItemStack(AetheriaItems.aetherGem));
 		
 		NostrumResearch.startBuilding()
 			.parent("aether_battery")
 			.hiddenParent("geogems")
 			.hiddenParent("kani")
 			.reference("ritual::aether_relay", "ritual.aether_relay.name")
-		.build("aether_relay", (NostrumResearchTab) APIProxy.ResearchTab, Size.LARGE, 2, 3, true, new ItemStack(AetheriaBlocks.relay));
+		.build("aether_relay", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.LARGE, 2, 3, true, new ItemStack(AetheriaBlocks.relay));
+		
+		NostrumResearch.startBuilding()
+			.parent("aether_relay")
+			.reference("ritual::enhanced_aether_relay", "ritual.enhanced_aether_relay.name")
+			.reference("ritual::enhanced_aether_relay_direct", "ritual.enhanced_aether_relay_direct.name")
+		.build("enhanced_aether_relay", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, 2, 4, true, new ItemStack(AetheriaBlocks.enhancedRelay));
 		
 		// TODO if 'pipes' get added for short-range aether transport, consider making that a requirement for pumps & rails and stuff
 		// For example, pipes -> pumps -> rails with pumps as a separate thing?
@@ -164,14 +173,14 @@ public class CommonProxy {
 			.parent("aether_relay")
 			.reference("ritual::aether_battery_cart", "ritual.aether_battery_cart.name")
 			.reference("ritual::aether_pump", "ritual.aether_pump.name")
-		.build("aether_carts", (NostrumResearchTab) APIProxy.ResearchTab, Size.GIANT, 3, 3, true, new ItemStack(AetheriaItems.aetherBatteryMinecart));
+		.build("aether_carts", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.GIANT, 3, 3, true, new ItemStack(AetheriaItems.aetherBatteryMinecart));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("kani")
 			.hiddenParent("aether_battery")
 			.lore(EntityWisp.LoreKey)
 			.reference("ritual::wisp_crystal", "ritual.wisp_crystal.name")
-		.build("wispblock", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, -3, 2, true, new ItemStack(AetheriaBlocks.wispBlock));
+		.build("wispblock", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, -3, 2, true, new ItemStack(AetheriaBlocks.wispBlock));
 		
 		NostrumResearch.startBuilding()
 			.hiddenParent("aether_battery")
@@ -184,10 +193,12 @@ public class CommonProxy {
 			.reference("ritual::make_lens_bore", "ritual.make_lens_bore.name")
 			.reference("ritual::make_lens_elevator", "ritual.make_lens_elevator.name")
 			.reference("ritual::make_lens_swiftness", "ritual.make_lens_swiftness.name")
-		.build("aether_infusers", (NostrumResearchTab) APIProxy.ResearchTab, Size.NORMAL, 0, 2, true, new ItemStack(AetheriaBlocks.infuser));
+		.build("aether_infusers", (NostrumResearchTab) APIProxy.AetherResearchTab, Size.NORMAL, 0, 2, true, new ItemStack(AetheriaBlocks.infuser));
 		
-		int unused;
-		// TODO: ritual for aether_sight_item (and curio?)
+		NostrumResearch.startBuilding()
+			.hiddenParent("aether_relay")
+			.reference("ritual::aether_sight_item", "ritual.aether_sight_item.name")
+		.build("aether_sight_item", (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 0, 0, true, new ItemStack(AetheriaItems.aetherSightTool));
     }
     
     @SubscribeEvent
@@ -389,6 +400,30 @@ public class CommonProxy {
 				);
 		
 		registry.register(
+				RitualRecipe.createTier3("enhanced_aether_relay",
+						new ItemStack(AetheriaBlocks.enhancedRelay),
+						null,
+						new ReagentType[] {ReagentType.GINSENG, ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM, ReagentType.GRAVE_DUST},
+						Ingredient.fromItems(AetheriaBlocks.relay),
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE), Ingredient.EMPTY, Ingredient.EMPTY, Ingredient.EMPTY},
+						new RRequirementResearch("enhanced_aether_relay"),
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.enhancedRelay, 8))
+						)
+				);
+		
+		registry.register(
+				RitualRecipe.createTier3("enhanced_aether_relay_direct", "enhanced_aether_relay",
+						new ItemStack(AetheriaBlocks.enhancedRelay),
+						EMagicElement.ENDER,
+						new ReagentType[] {ReagentType.SKY_ASH, ReagentType.CRYSTABLOOM, ReagentType.GINSENG, ReagentType.BLACK_PEARL},
+						Ingredient.fromItems(Blocks.REDSTONE_TORCH),
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.ENDER_PEARLS), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromItems(NostrumItems.positionCrystal), Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_REDSTONE)},
+						new RRequirementResearch("enhanced_aether_relay"),
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.enhancedRelay, 64))
+						)
+				);
+		
+		registry.register(
 				RitualRecipe.createTier3("aether_battery_cart",
 						new ItemStack(AetheriaItems.aetherBatteryMinecart),
 						null,
@@ -461,6 +496,18 @@ public class CommonProxy {
 								Ingredient.fromStacks(new ItemStack(AetheriaBlocks.smallBattery))},
 						new RRequirementResearch("aether_infusers"),
 						new OutcomeCreateAetherInfuser()
+						)
+				);
+		
+		registry.register(
+				RitualRecipe.createTier3("aether_sight_item",
+						new ItemStack(AetheriaItems.aetherSightTool),
+						EMagicElement.LIGHTNING,
+						new ReagentType[] {ReagentType.CRYSTABLOOM, ReagentType.SKY_ASH, ReagentType.GINSENG, ReagentType.SPIDER_SILK},
+						Ingredient.fromTag(Tags.Items.GLASS_PANES),
+						new Ingredient[]{Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromTag(Tags.Items.NUGGETS_GOLD)},
+						new RRequirementResearch("aether_sight_item"),
+						new OutcomeSpawnItem(new ItemStack(AetheriaItems.aetherSightTool))
 						)
 				);
     }

@@ -1,6 +1,5 @@
 package com.smanzana.nostrumaetheria.blocks;
 
-import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -47,11 +46,6 @@ public class AetherBatteryBlock extends Block implements ILoreTagged {
 		this.size = size;
 	}
 	
-//	@Override
-//	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-//		return true;
-//	}
-	
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
@@ -59,11 +53,11 @@ public class AetherBatteryBlock extends Block implements ILoreTagged {
 			// request an update
 			worldIn.notifyBlockUpdate(pos, worldIn.getBlockState(pos), worldIn.getBlockState(pos), 2);
 			
-			int unused;
-			{
-				AetherBatteryEntity tileentity = (AetherBatteryEntity) worldIn.getTileEntity(pos);
-				NostrumAetheria.logger.debug(tileentity.getHandler().getAether(null));
-			}
+//			int unused;
+//			{
+//				AetherBatteryEntity tileentity = (AetherBatteryEntity) worldIn.getTileEntity(pos);
+//				NostrumAetheria.logger.debug(tileentity.getHandler().getAether(null));
+//			}
 			
 			return true;
 		}
@@ -92,32 +86,6 @@ public class AetherBatteryBlock extends Block implements ILoreTagged {
 		return BlockRenderLayer.CUTOUT;
 	}
 	
-//	@Override
-//	@OnlyIn(Dist.CLIENT)
-//	public boolean isTranslucent(BlockState state) {
-//		return true;
-//	}
-	
-//	@Override
-//	public boolean isFullyOpaque(BlockState state) {
-//		return false;
-//	}
-	
-//	@Override
-//	public boolean isFullBlock(BlockState state) {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
-	
 	@Override
 	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
@@ -127,19 +95,6 @@ public class AetherBatteryBlock extends Block implements ILoreTagged {
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
-//		TileEntity ent = world.getTileEntity(pos);
-//		if (ent == null || !(ent instanceof AetherBlockEntity))
-//			return;
-//		
-//		AetherBlockEntity table = (AetherBlockEntity) ent;
-//		for (int i = 0; i < table.getSizeInventory(); i++) {
-//			if (table.getStackInSlot(i) != null) {
-//				ItemEntity item = new ItemEntity(
-//						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
-//						table.removeStackFromSlot(i));
-//				world.addEntity(item);
-//			}
-//		}
 		
 	}
 

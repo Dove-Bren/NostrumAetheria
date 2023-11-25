@@ -22,6 +22,7 @@ public class AetheriaCurios {
 	@ObjectHolder(ShieldRingItem.ID_LARGE) public static @Nullable ShieldRingItem ringShieldLarge; // Requires Aether
 	@ObjectHolder(EludeCloakItem.ID) public static @Nullable EludeCloakItem eludeCape; // Requires Aether
 	@ObjectHolder(AetherCloakItem.ID) public static @Nullable AetherCloakItem aetherCloak; // Requires Aether
+	@ObjectHolder(AetherSightPendant.ID) public static @Nullable AetherSightPendant sightPendant;
 	
 	public static Item.Properties PropBase() {
 		return new Item.Properties()
@@ -55,5 +56,6 @@ public class AetheriaCurios {
 		register(registry, new ShieldRingItem(4, ShieldRingItem.ID_LARGE).setRegistryName(ShieldRingItem.ID_LARGE));
 		register(registry, new EludeCloakItem().setRegistryName(EludeCloakItem.ID));
 		register(registry, new AetherCloakItem().setRegistryName(AetherCloakItem.ID));
+		register(registry, new AetherSightPendant().setRegistryName(AetherSightPendant.ID));
 	}
 }

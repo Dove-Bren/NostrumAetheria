@@ -31,6 +31,7 @@
     "item.nostrumaetheria.aether_cloak": "Aether Cloak",
     "item.nostrumaetheria.aether_cloak.desc": "Stores up large amounts of Aether|%2$s+25%% Mana Regen%1$s",
 	"item.nostrumaetheria.aether_sight_item": "Aether Sight Glass",
+	"item.nostrumaetheria.aether_sight_pendant": "Aether Sight Pendant",
 
     "item.nostrumaetheria.aether_resource_ginseng_flower": "Ginseng Flower",
     "item.nostrumaetheria.aether_resource_mandrake_flower": "Mandrake Bloom",
@@ -102,8 +103,13 @@
     "ritual.aether_unraveler.name": "Craft Aether Unraveler",
     "ritual.aether_battery_cart.name": "Craft Aether Cart",
     "ritual.aether_pump.name": "Craft Aether Pump",
+	"ritual.enhanced_aether_relay.name": "Enhance Aether Relay",
+	"ritual.enhanced_aether_relay_direct.name": "Craft Aether Relay",
+	"ritual.aether_sight_item.name": "Craft Aether Sight Glass",
+	"ritual.aether_sight_pendant.name": "Enhance Aether Sight Glass",
 
     "research.tab.aether.name": "Aetheria",
+	"research.tab.aether_gear.name": "Aetheria Gear",
 
     "research.active_pendant.name": "Lyon Pendants",
     "research.active_pendant.desc": "Like a portable coal engine",
@@ -140,11 +146,23 @@
     "research.aether_gem.info": "  Aether batteries were a great exercise in aether storage. Using what you learned while creating them, you've created a new gem that can store a small amount of aether that you can fit in your pocket!|  Aether gems are charged up in baths or similar blocks. The energy they store will automatically be used by any other items in your inventory that use aether.",
     "research.aether_relay.name": "Aether Relays",
     "research.aether_relay.desc": "Aether distribution",
-    "research.aether_relay.info": "  You've quickly realized that you don't have a good way to transfer aether around, making it quite difficult to work with. To solve this, you have created crystal relays which allow aether to flow through them.|  Relays do not store aether themselves, but let blocks that need aether pull the aether from some other block connected by relay. In the same breath, blocks that produce and push aether can use aether relays to push the aether into distant blocks.|  Relays can be connected to many other relays, allowing you to create a aether network of sorts.",
+    "research.aether_relay.info": "  You've quickly realized that you don't have a good way to transfer aether around, making it quite difficult to work with. To solve this, you have created crystal relays which allow aether to flow through them.|  Relays do not store aether themselves, but let blocks that need aether pull the aether from some other block connected by relay. In the same breath, blocks that produce and push aether can use aether relays to push the aether into distant blocks.|  Relays can be connected to many other relays, allowing you to create a aether network of sorts.|  To use relays, you must place two relays and then use a GeoGem to connect them. Once they're connected, you can set the mode of the relay by right clicking it with an empty hand. Note that relays have three modes:|  - Input (green) where the relay will try to pull aether and put it into the machine it's attached to|  - Output (red) where the relay will pull aether from the machine it's attached to so that other relays can pull it|  - Pass (blue) mode, where the relay will take aether from other relays to help in passing it along to input relays.",
     "research.aether_unraveler.name": "Aether Unraveler",
     "research.aether_unraveler.desc": "Undo, Please",
     "research.aether_unraveler.info": "  Aether repairers are fantastic for repairing tools and equipment that has been damaged using the magical raw power of aether. But what if instead of repairing, you used the focused, purified energies to destroy?|  Aether Unravelers take spell scrolls and break them back down into their rune components. You will get all runes back that went into a spell. However, the aether cost is rather high!",
     "research.aether_carts.name": "Aether Carts",
     "research.aether_carts.desc": "Delivery!",
-    "research.aether_carts.info": "  It took a little bit of magic elbow-grease, but you've slotted an Aether Battery in a minecart and got things moving!|  Aether Carts operate like Aether Batteries in that they store mana. To add or draw mana from the cart, you'll need to use an Aether Pump.|  Note that breaking the cart will make it lose all of its aether."
+    "research.aether_carts.info": "  It took a little bit of magic elbow-grease, but you've slotted an Aether Battery in a minecart and got things moving!|  Aether Carts operate like Aether Batteries in that they store mana. To add or draw mana from the cart, you'll need to use an Aether Pump.|  Note that breaking the cart will make it lose all of its aether.",
+	
+	"research.enhanced_aether_relay.name": "Enhanced Relays",
+	"research.enhanced_aether_relay.desc": "Aether Go Farrr",
+	"research.enhanced_aether_relay.info": "  As you work with the relays (and especially the blue mode) you've noticed some places you can improve. Firstly, the relays have a relatively short range. Secondly, there are a LOT of aether bubbles flying around when your aether works really get going!|  Enhanced relays only have one mode, and can't actually store or input/output aether to a nearby machine. Instead, they have a large range and can pass aether between relays. What's more, they don't cause aether bubbles, cutting down on particle count and lag. They work like the blue mode relays.",
+	
+	"research.aether_sight_item.name": "Aether Sight",
+	"research.aether_sight_item.desc": "Making Connections",
+	"research.aether_sight_item.info": "  The Aether Sight Glass is a tool that, when held, lets you see connections between aether devices.",
+	
+	"research.aether_sight_pendant.name": "Aether Sight Pendant",
+	"research.aether_sight_pendant.desc": "Just More Convenient",
+	"research.aether_sight_pendant.info": "  Like the Aether Sight Glass, the Aether Sight Pendant allows you to see connections between aether devices. This version is wearable, though."
 }

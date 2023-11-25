@@ -22,8 +22,9 @@ public abstract class APIProxy {
 	
     public static ItemGroup creativeTab;
 	
-	// This is a NostrumResearchTab, but using that type would cause a circular dependency
-	public static Object ResearchTab = null;
+	// These are NostrumResearchTab, but using that type would cause a circular dependency
+	public static Object AetherResearchTab = null;
+	public static Object AetherGearResearchTab = null;
 	
 	public static APIProxy handler = null;
 	

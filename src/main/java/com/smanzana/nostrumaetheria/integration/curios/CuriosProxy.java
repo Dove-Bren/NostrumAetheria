@@ -3,6 +3,7 @@ package com.smanzana.nostrumaetheria.integration.curios;
 import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetheriaCurios;
@@ -47,6 +48,7 @@ public class CuriosProxy {
 	public void sendImc(InterModEnqueueEvent evt) {
 		InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_TYPE, () -> new CurioIMCMessage("ring").setSize(2));
 		InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_TYPE, () -> new CurioIMCMessage("body"));
+		InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_TYPE, () -> new CurioIMCMessage("charm"));
 	}
 	
 	private boolean enabled;
@@ -141,28 +143,43 @@ public class CuriosProxy {
 					}
 				}, Lists.newArrayList("Allows using aether from the cloak in place of reagents")));
 		registry.register(recipe);
+		
+		recipe = RitualRecipe.createTier3("aether_sight_pendant",
+				new ItemStack(AetheriaCurios.sightPendant),
+				null,
+				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
+				Ingredient.fromItems(AetheriaItems.aetherSightTool),
+				new Ingredient[] {Ingredient.fromTag(Tags.Items.INGOTS_GOLD)},
+				new RRequirementResearch("aether_sight_pendant"),
+				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.sightPendant)));
+		registry.register(recipe);
 	}
 	
 	private void registerCurioResearch() {
 		NostrumResearch.startBuilding()
-			.parent("rings")
+			.hiddenParent("rings")
 			.hiddenParent("kani")
 			.hiddenParent("aether_gem")
 			.reference("ritual::shield_ring_small", "ritual.shield_ring_small.name")
 			.reference("ritual::shield_ring_large", "ritual.shield_ring_large.name")
-		.build("shield_rings", NostrumResearchTab.OUTFITTING, Size.NORMAL, -4, -1, true, new ItemStack(AetheriaCurios.ringShieldSmall));
+		.build("shield_rings", (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 1, 0, true, new ItemStack(AetheriaCurios.ringShieldSmall));
 
 		NostrumResearch.startBuilding()
-			.parent("belts")
+			.hiddenParent("belts")
 			.hiddenParent("shield_rings")
 			.reference("ritual::elude_cape_small", "ritual.elude_cape_small.name")
-		.build("elude_capes", NostrumResearchTab.OUTFITTING, Size.NORMAL, -6, 0, true, new ItemStack(AetheriaCurios.eludeCape));
+		.build("elude_capes", (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 2, 0, true, new ItemStack(AetheriaCurios.eludeCape));
 		
 		NostrumResearch.startBuilding()
 			.parent("elude_capes")
 			.reference("ritual::aether_cloak", "ritual.aether_cloak.name")
 			.reference("ritual::aether_cloak_caster_upgrade", "ritual.aether_cloak_caster_upgrade.name")
-		.build("aether_cloaks", NostrumResearchTab.OUTFITTING, Size.NORMAL, -6, 1, true, new ItemStack(AetheriaCurios.aetherCloak));
+		.build("aether_cloaks", (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 2, 1, true, new ItemStack(AetheriaCurios.aetherCloak));
+		
+		NostrumResearch.startBuilding()
+			.parent("aether_sight_item")
+			.reference("ritual::aether_sight_pendant", "ritual.aether_sight_pendant.name")
+		.build("aether_sight_pendant", (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 0, 1, true, new ItemStack(AetheriaCurios.sightPendant));
 	}
 	
 	private void registerLore() {
