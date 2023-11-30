@@ -10,7 +10,6 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.stats.AetherTickIOEntry;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay.RelayMode;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.utils.TileEntities;
@@ -44,7 +43,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		protected RelayMode mode;
 		private final List<BlockPos> links;
 		
-		private int idleTicks;
+//		private int idleTicks;
 		
 		public AetherRelayEntity() {
 			this(Direction.UP, RelayMode.INOUT);
@@ -60,7 +59,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 			side = facing;
 			this.setMode(mode, false);
 			links = new ArrayList<>();
-			idleTicks = NostrumMagica.rand.nextInt(40) + 10;
+			//idleTicks = NostrumMagica.rand.nextInt(40) + 10;
 		}
 		
 		public List<BlockPos> getLinkLocations() {
@@ -396,7 +395,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		public void tick() {
 			if (this.world != null && !this.world.isRemote) {
 				//if (ticksExisted > idleTicks) {
-					idleTicks = ticksExisted + NostrumMagica.rand.nextInt(120) + 60;
+					//idleTicks = ticksExisted + NostrumMagica.rand.nextInt(120) + 60;
 					idleVisualTick();
 				//}
 			}

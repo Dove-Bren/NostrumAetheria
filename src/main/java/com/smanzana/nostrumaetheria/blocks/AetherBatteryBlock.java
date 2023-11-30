@@ -59,7 +59,7 @@ public class AetherBatteryBlock extends Block implements ILoreTagged {
 //				NostrumAetheria.logger.debug(tileentity.getHandler().getAether(null));
 //			}
 			
-			return true;
+			//return true;
 		}
 		
 		return false;

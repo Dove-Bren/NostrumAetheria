@@ -4,6 +4,7 @@ import net.minecraft.world.World;
 
 public interface IAetherInfuserTileEntity {
 
-	public World getWorld();
+	// Note: can't be named getWorld() as that's the same name as a vanilla obfuscated name
+	public World getInfuserWorld();
 	
 }

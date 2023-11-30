@@ -235,18 +235,6 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 					}
 				}
 			}
-		} else {
-			int unused; // remove
-			//NostrumAetheria.logger.debug("There are " + NostrumTags.Items.CrystalLarge.getAllElements().size());
-			
-//			for (RitualRecipe ritual : RitualRegistry.instance().getRegisteredRituals()) {
-//				Ingredient center = ritual.getCenterItem();
-//				if (center != null && center != Ingredient.EMPTY) {
-//					if (ritual.getTitleKey().contains("vani")) {
-//						//NostrumAetheria.logger.debug("Found ritual " + ritual.getTitleKey() + " with center item: " + (center.hasNoMatchingItems() ? "EMPTY" : center.getMatchingStacks().length + ""));
-//					}
-//				}
-//			}
 		}
 		
 		super.tick();
