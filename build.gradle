@@ -107,7 +107,7 @@ dependencies {
     compileOnly fg.deobf("top.theillusivec4.curios:curios:${curios_version}:api")
 	
 	compileOnly files("libs/NostrumAetheriaAPI-${aetheria_version}.jar")
-	runtimeOnly files("libs/nostrumaetheria-${aetheria_version}-deobf.jar")
+	//runtimeOnly files("libs/nostrumaetheria-${aetheria_version}-deobf.jar")
 	compileOnly files("libs/nostrummagica-${magica_version}-deobf.jar") //At compile time, use actual eclipse project
 	runtimeOnly files("libs/nostrummagica-${magica_version}-deobf.jar")
 
