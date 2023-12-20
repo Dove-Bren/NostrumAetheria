@@ -13,7 +13,7 @@ Magical energy add-on for Nostrum Magica
 [[dependencies.nostrumaetheria]]
 	modId="forge"
 	mandatory=true
-	versionRange="[28.1.92,)"
+	versionRange="[28.2.26,)"
 	ordering="NONE"
 	side="BOTH"
 
