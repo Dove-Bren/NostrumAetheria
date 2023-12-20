@@ -107,6 +107,11 @@
 	"ritual.enhanced_aether_relay_direct.name": "Craft Aether Relay",
 	"ritual.aether_sight_item.name": "Craft Aether Sight Glass",
 	"ritual.aether_sight_pendant.name": "Enhance Aether Sight Glass",
+	"ritual.shield_ring_small.name": "Craft Shield Ring",
+    "ritual.shield_ring_large.name": "Craft Strong Shield Ring",
+    "ritual.elude_cape_small.name": "Craft Elusion Cloak",
+    "ritual.aether_cloak.name": "Craft Aether Cloak",
+    "ritual.aether_cloak_caster_upgrade.name": "Aether Caster Upgrade",
 
     "research.tab.aether.name": "Aetheria",
 	"research.tab.aether_gear.name": "Aetheria Gear",
