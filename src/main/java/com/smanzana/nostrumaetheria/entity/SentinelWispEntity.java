@@ -5,8 +5,10 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -40,8 +42,16 @@ public class SentinelWispEntity extends EntityWisp {
 		
 		if (spell == null) {
 			spell = super.getSpellToUse();
+		} else {
+			this.setElement(spell.getPrimaryElement());
 		}
 		
 		return spell;
+	}
+	
+	@Override
+	public boolean canEnchant(Entity entity, EMagicElement element, int power) {
+		// Only allow buffing with same element
+		return element == this.getElement();
 	}
 }
