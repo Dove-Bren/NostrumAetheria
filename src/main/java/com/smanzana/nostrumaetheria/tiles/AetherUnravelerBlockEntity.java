@@ -9,7 +9,7 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
-import com.smanzana.nostrumaetheria.gui.container.IAutoContainerInventoryWrapper;
+import com.smanzana.nostrumaetheria.client.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrumaetheria.recipes.UnravelerRecipeManager;
 
 import net.minecraft.block.BlockState;

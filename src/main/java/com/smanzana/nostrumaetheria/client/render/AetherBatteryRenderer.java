@@ -1,105 +1,42 @@
 package com.smanzana.nostrumaetheria.client.render;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 
 public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherBatteryEntity> {
 
-	public AetherBatteryRenderer() {
-		super();
+	public AetherBatteryRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+		super(rendererDispatcherIn);
 	}
 	
-	public void renderBatteryAt(World world, double x, double y, double z, float partialTicks, int destroyStage, int aether, int maxAether, boolean opaque) {
-		final double prog = ((double) aether / (double) maxAether);
-		final double min = 0.03;
-		final double max = (1.0 - .03);
-		final double maxy = min + (prog * (max - min));
+	public static void renderBatteryLiquid(MatrixStack matrixStackIn, IVertexBuilder buffer, int combinedLightIn, double totalTicks, int aether, int maxAether, boolean opaque) {
+		final float prog = ((float) aether / (float) maxAether);
+		final float offset = 0.03f;
 		final double glowPeriod = 20 * 5;
-		final float glow = (float) Math.sin(Math.PI * 2 * ((double) world.getGameTime() % glowPeriod) / glowPeriod);
+		final float glow = (float) Math.sin(Math.PI * 2 * (totalTicks % glowPeriod) / glowPeriod);
 		final float alpha = opaque ? 1f : (.6f + (.2f * glow));
 		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder buffer = tessellator.getBuffer();
+		final float red = .83f;
+		final float green = .81f;
+		final float blue = .5f;
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.pushTextureAttributes();
-		GlStateManager.translated(x, y, z);
-		GlStateManager.disableLighting();
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-//		GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA,
-//				SourceFactor.ONE, DestFactor.ZERO);
-		//Minecraft.getInstance().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-		GlStateManager.disableBlend();
-		GlStateManager.enableBlend();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.disableAlphaTest();
-		GlStateManager.enableColorMaterial();
-		GlStateManager.disableColorMaterial();
-		//GlStateManager.enableTexture2D();
-		GlStateManager.disableTexture();
-		GlStateManager.depthMask(false);
-		GlStateManager.depthMask(true);
-		
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-		
-		// xy z=0
-		buffer.pos(min, min, min).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(min, maxy, min).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(max, maxy, min).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(max, min, min).color(.83f, .81f, .5f, alpha).endVertex();
-		
-		// xy z=1
-		buffer.pos(min, min, max).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(max, min, max).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(max, maxy, max).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(min, maxy, max).color(.83f, .81f, .5f, alpha).endVertex();
-		
-		// zy x=0
-		buffer.pos(min, min, min).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(min, min, max).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(min, maxy, max).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(min, maxy, min).color(.83f, .81f, .5f, alpha).endVertex();
-
-		// zy x=1
-		buffer.pos(max, min, min).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(max, maxy, min).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(max, maxy, max).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(max, min, max).color(.83f, .81f, .5f, alpha).endVertex();
-		
-		// maxy
-		buffer.pos(min, maxy, min).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(min, maxy, max).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(max, maxy, max).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(max, maxy, min).color(.83f, .81f, .5f, alpha).endVertex();
-		
-		// miny
-		buffer.pos(min, min, min).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(max, min, min).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(max, min, max).color(.83f, .81f, .5f, alpha).endVertex();
-		buffer.pos(min, min, max).color(.83f, .81f, .5f, alpha).endVertex();
-		
-		tessellator.draw();
-		
-		GlStateManager.enableCull();
-		GlStateManager.disableBlend();
-		GlStateManager.enableTexture();
-		GlStateManager.popAttributes();
-		GlStateManager.popMatrix();
+		matrixStackIn.push();
+		// Translate so block is centered horizontally, and centered vertically based on fill level
+		matrixStackIn.translate(.5, 0 + (prog/2f), .5);
+		matrixStackIn.scale(1-offset, prog, 1-offset);
+		RenderFuncs.drawUnitCube(matrixStackIn, buffer, combinedLightIn, combinedLightIn, red, green, blue, alpha);
+		matrixStackIn.pop();
 	}
 	
 	@Override
-	public void render(AetherBatteryEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(AetherBatteryEntity te, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
-		super.render(te, x, y, z, partialTicks, destroyStage);
+		//super.render(te, partialTicks, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
 		
 		final int aether = te.getHandler().getAether(null);
 		final int maxAether = te.getHandler().getMaxAether(null);
@@ -108,7 +45,9 @@ public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherB
 			return;
 		}
 		
-		renderBatteryAt(te.getWorld(), x, y, z, partialTicks, destroyStage, aether, maxAether, false);
+		final double ticks = (double) te.getWorld().getGameTime() + partialTicks;
+		final IVertexBuilder buffer = bufferIn.getBuffer(AetheriaRenderTypes.AETHER_FLAT);
+		renderBatteryLiquid(matrixStackIn, buffer, combinedLightIn, ticks, aether, maxAether, false);
 	}
 	
 }

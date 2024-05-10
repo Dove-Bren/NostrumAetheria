@@ -6,7 +6,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
-import com.smanzana.nostrumaetheria.gui.container.IAutoContainerInventoryWrapper;
+import com.smanzana.nostrumaetheria.client.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.block.BlockState;

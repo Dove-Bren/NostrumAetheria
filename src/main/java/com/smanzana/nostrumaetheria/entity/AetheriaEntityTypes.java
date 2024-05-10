@@ -5,8 +5,10 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
@@ -30,6 +32,17 @@ public class AetheriaEntityTypes {
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.size(.75F, .75F)
 			.build("").setRegistryName(SentinelWispEntity.ID));
+	}
+	
+	@SubscribeEvent
+	public static void registerEntityPlacement(FMLCommonSetupEvent event) {
+		; // No naturally spawning entities
+	}
+	
+	@SubscribeEvent
+	public static void registerAttributes(EntityAttributeCreationEvent event) {
+		event.put(sentinelWisp, SentinelWispEntity.BuildSentinelAttributes().create());
+		// No attributes event.put(batteryCart, EntityAetherBatteryMinecart.BuildAttributes().create());
 	}
 	
 }

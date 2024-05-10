@@ -7,8 +7,8 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrumaetheria.gui.container.ActivePendantGui;
-import com.smanzana.nostrumaetheria.gui.container.ActivePendantGui.ActivePendantContainer;
+import com.smanzana.nostrumaetheria.client.gui.container.ActivePendantGui;
+import com.smanzana.nostrumaetheria.client.gui.container.ActivePendantGui.ActivePendantContainer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.ISpellArmor;

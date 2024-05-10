@@ -1,70 +1,69 @@
 package com.smanzana.nostrumaetheria.client.render;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrumaetheria.tiles.AetherBathTileEntity;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class AetherBathRenderer extends TileEntityRenderer<AetherBathTileEntity> {
 
-	public AetherBathRenderer() {
-		
+	public AetherBathRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+		super(rendererDispatcherIn);
 	}
 	
-	private void renderPoolFilm(double radius) {
+	private void renderPoolFilm(MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, float red, float green, float blue, float alpha, float radius) {
 		final int points = 8;
 		
-		GlStateManager.disableBlend();
-		GlStateManager.enableBlend();
-		GlStateManager.disableAlphaTest();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.disableLighting();
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.enableTexture();
-		GlStateManager.disableTexture();
-		GlStateManager.enableColorMaterial();
+		RenderFuncs.drawEllipse(radius, radius, points, matrixStackIn, buffer, packedLightIn, red, green, blue, alpha);
 		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder buffer = tessellator.getBuffer();
-		buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_NORMAL);
-		buffer.pos(0, 0, 0).normal(0, 1, 0).endVertex();
-		for (int i = points; i >= 0; i--) {
-			double angle = ((float) i / (float) points) * 2 * Math.PI;
-			double px = Math.cos(angle) * radius;
-			double py = Math.sin(angle) * radius;
-			buffer.pos(px, 0, py).normal(0, 1, 0).endVertex();
-		}
-		
-		tessellator.draw();
+//		GlStateManager.disableBlend();
+//		GlStateManager.enableBlend();
+//		GlStateManager.disableAlphaTest();
+//		GlStateManager.enableAlphaTest();
+//		GlStateManager.disableLighting();
+//		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+//		GlStateManager.enableTexture();
+//		GlStateManager.disableTexture();
+//		GlStateManager.enableColorMaterial();
+//		
+//		Tessellator tessellator = Tessellator.getInstance();
+//		BufferBuilder buffer = tessellator.getBuffer();
+//		buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_NORMAL);
+//		buffer.pos(0, 0, 0).normal(0, 1, 0).endVertex();
+//		for (int i = points; i >= 0; i--) {
+//			double angle = ((float) i / (float) points) * 2 * Math.PI;
+//			double px = Math.cos(angle) * radius;
+//			double py = Math.sin(angle) * radius;
+//			buffer.pos(px, 0, py).normal(0, 1, 0).endVertex();
+//		}
+//		
+//		tessellator.draw();
 	}
 	
 	@Override
-	public void render(AetherBathTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(AetherBathTileEntity te, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
 		int aether = te.getHandler().getAether(null);
 		if (aether > 0) {
 			float aetherLevel = (float) aether / (float) te.getHandler().getMaxAether(null);
-			double radius;
-			double levelOffset;
+			float radius;
+			float levelOffset;
 			
 			if (aetherLevel > .8f) {
-				radius = .535;
-				levelOffset = .95;
+				radius = .535f;
+				levelOffset = .95f;
 			} else if (aetherLevel > .3f) {
-				radius = .485;
-				levelOffset = .92;
+				radius = .485f;
+				levelOffset = .92f;
 			} else {
-				radius = .43;
-				levelOffset = .9;
+				radius = .43f;
+				levelOffset = .9f;
 			}
 			final double glowPeriod = 20 * 5;
 			final float glow = (float) Math.sin(Math.PI * 2 * ((double) te.getWorld().getGameTime() % glowPeriod) / glowPeriod);
@@ -74,13 +73,13 @@ public class AetherBathRenderer extends TileEntityRenderer<AetherBathTileEntity>
 			final float wave = (float) Math.sin(Math.PI * 2 * ((double) te.getWorld().getGameTime() % wavePeriod) / wavePeriod);
 			final float waveHeight = wave * .002f;
 			
+			final IVertexBuilder buffer = bufferIn.getBuffer(AetheriaRenderTypes.AETHER_FLAT_TRIS);
+			
 			//(te.getWorld().getTotalWorldTime() % 300) + partialTicks
-			GlStateManager.pushMatrix();
-			GlStateManager.translated(x + .5, y + levelOffset + waveHeight, z + .5);
-			GlStateManager.color4f(.83f, .81f, .5f, alpha);
-			renderPoolFilm(radius);
-			GlStateManager.popMatrix();
-			GlStateManager.enableTexture();
+			matrixStackIn.push();
+			matrixStackIn.translate(.5f, levelOffset + waveHeight, .5);
+			renderPoolFilm(matrixStackIn, buffer, combinedLightIn, .83f, .81f, .5f, alpha, radius);
+			matrixStackIn.pop();
 		}
 		
 		ItemStack item = te.getItem();
@@ -92,24 +91,14 @@ public class AetherBathRenderer extends TileEntityRenderer<AetherBathTileEntity>
 		float scale = .75f;
 		float yoffset = (float) (.1f * (-.5f + Math.sin(((double) System.currentTimeMillis()) / 1000.0))); // Copied from Altar
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(x + .5, y + 1.25 + yoffset, z + .5);
-		GlStateManager.rotatef(rot, 0, 1f, 0);
+		matrixStackIn.push();
+		matrixStackIn.translate(.5f, 1.25f + yoffset, .5f);
+		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
 		
-		GlStateManager.scalef(scale, scale, scale);
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GlStateManager.disableLighting();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-		GlStateManager.enableTexture();
-		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+		matrixStackIn.scale(scale, scale, scale);
 		
-		RenderFuncs.renderItemStandard(item);
-//		Minecraft.getInstance().getRenderItem()
-//			.renderItem(item, TransformType.GROUND);
-		GlStateManager.popMatrix();
-		GlStateManager.enableTexture();
+		RenderFuncs.ItemRenderer(item, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
+		matrixStackIn.pop();
 	}
 	
 }

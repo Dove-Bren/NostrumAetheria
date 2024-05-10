@@ -1,4 +1,4 @@
-package com.smanzana.nostrumaetheria.gui.container;
+package com.smanzana.nostrumaetheria.client.gui.container;
 
 import javax.annotation.Nonnull;
 

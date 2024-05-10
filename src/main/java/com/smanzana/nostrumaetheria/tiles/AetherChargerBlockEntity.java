@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
-import com.smanzana.nostrumaetheria.gui.container.IAutoContainerInventoryWrapper;
+import com.smanzana.nostrumaetheria.client.gui.container.IAutoContainerInventoryWrapper;
 
 import net.minecraft.block.BlockState;
 import net.minecraftforge.api.distmarker.Dist;

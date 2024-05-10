@@ -2,7 +2,7 @@ package com.smanzana.nostrumaetheria.blocks;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrumaetheria.gui.container.WispBlockGui;
+import com.smanzana.nostrumaetheria.client.gui.container.WispBlockGui;
 import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;

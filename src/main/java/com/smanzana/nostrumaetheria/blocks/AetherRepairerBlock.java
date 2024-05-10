@@ -5,7 +5,7 @@ import java.util.Random;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
-import com.smanzana.nostrumaetheria.gui.container.AetherRepairerGui;
+import com.smanzana.nostrumaetheria.client.gui.container.AetherRepairerGui;
 import com.smanzana.nostrumaetheria.recipes.RepairerRecipeManager;
 import com.smanzana.nostrumaetheria.tiles.AetherRepairerBlockEntity;
 import com.smanzana.nostrummagica.NostrumMagica;

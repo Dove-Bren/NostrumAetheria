@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -24,6 +25,10 @@ public class SentinelWispEntity extends EntityWisp {
 		this(type, worldIn);
 		this.setHomePosAndDistance(homePos, (int) MAX_WISP_DISTANCE_SQ);
 		this.setHome(homePos);
+	}
+	
+	public static final AttributeModifierMap.MutableAttribute BuildSentinelAttributes(){
+		return EntityWisp.BuildAttributes();
 	}
 	
 	@Override

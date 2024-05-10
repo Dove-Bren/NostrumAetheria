@@ -1,4 +1,4 @@
-package com.smanzana.nostrumaetheria.gui.container;
+package com.smanzana.nostrumaetheria.client.gui.container;
 
 import javax.annotation.Nonnull;
 
@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
-import com.smanzana.nostrumaetheria.tiles.AetherChargerBlockEntity;
+import com.smanzana.nostrumaetheria.tiles.AetherRepairerBlockEntity;
 import com.smanzana.nostrummagica.client.gui.container.AutoContainer;
 import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
@@ -24,9 +24,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class AetherChargerGui {
+public class AetherRepairerGui {
 	
-	private static final ResourceLocation TEXT= new ResourceLocation(NostrumAetheria.MODID + ":textures/gui/container/aether_charger.png");
+	private static final ResourceLocation TEXT= new ResourceLocation(NostrumAetheria.MODID + ":textures/gui/container/aether_repairer.png");
 	private static final int GUI_TEXT_WIDTH = 176;
 	private static final int GUI_TEXT_HEIGHT = 132;
 	private static final int GUI_TOP_INV_HOFFSET = 80;
@@ -39,20 +39,16 @@ public class AetherChargerGui {
 	private static final int GUI_TOP_BAR_VOFFSET = 12;
 	private static final int GUI_TOP_BAR_WIDTH = 24;
 	private static final int GUI_TOP_BAR_HEIGHT = 3;
-	private static final int GUI_BOTTOM_BAR_HOFFSET = 80;
-	private static final int GUI_BOTTOM_BAR_VOFFSET = 37;
-	private static final int GUI_BOTTOM_BAR_WIDTH = 16;
-	private static final int GUI_BOTTOM_BAR_HEIGHT = 2;
 	
 
-	public static class AetherChargerContainer extends AutoContainer {
+	public static class AetherRepairerContainer extends AutoContainer {
 		
-		public static final String ID = "aether_charger";
+		public static final String ID = "aether_repairer";
 		
-		protected AetherChargerBlockEntity chest;
+		protected AetherRepairerBlockEntity chest;
 		
-		public AetherChargerContainer(int windowId, PlayerInventory playerInv, AetherChargerBlockEntity chest) {
-			super(AetheriaContainers.Charger, windowId, chest);
+		public AetherRepairerContainer(int windowId, PlayerInventory playerInv, AetherRepairerBlockEntity chest) {
+			super(AetheriaContainers.Repairer, windowId, chest);
 			this.chest = chest;
 						
 			// Construct player inventory
@@ -74,13 +70,13 @@ public class AetherChargerGui {
 			});
 		}
 		
-		public static final AetherChargerContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
-			return new AetherChargerContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
+		public static final AetherRepairerContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+			return new AetherRepairerContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}
 		
-		public static IPackedContainerProvider Make(AetherChargerBlockEntity te) {
+		public static IPackedContainerProvider Make(AetherRepairerBlockEntity te) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
-				return new AetherChargerContainer(windowId, playerInv, te);
+				return new AetherRepairerContainer(windowId, playerInv, te);
 			}, (buffer) -> {
 				ContainerUtil.PackTE(buffer, te);
 			});
@@ -129,11 +125,11 @@ public class AetherChargerGui {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class AetherChargerGuiContainer extends AutoGuiContainer<AetherChargerContainer> {
+	public static class AetherRepairerGuiContainer extends AutoGuiContainer<AetherRepairerContainer> {
 
-		private AetherChargerContainer container;
+		private AetherRepairerContainer container;
 		
-		public AetherChargerGuiContainer(AetherChargerContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public AetherRepairerGuiContainer(AetherRepairerContainer container, PlayerInventory playerInv, ITextComponent name) {
 			super(container, playerInv, name);
 			this.container = container;
 			
@@ -156,24 +152,17 @@ public class AetherChargerGui {
 			
 			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
 			
-			IAetherHandler chargerHandler = container.chest.getHandler();
+			IAetherHandler repairerHandler = container.chest.getHandler();
 			
 			float myAether = 0f;
-			final float nestedAether = (float) container.chest.getAetherDisplay() / (float) container.chest.getMaxAetherDisplay();
 			
-			if (chargerHandler != null) {
-				myAether = (float) chargerHandler.getAether(null) / (float) chargerHandler.getMaxAether(null);
+			if (repairerHandler != null) {
+				myAether = (float) repairerHandler.getAether(null) / (float) repairerHandler.getMaxAether(null);
 			}
 			
 			if (myAether > 0) {
 				RenderFuncs.drawRect(horizontalMargin + GUI_TOP_BAR_HOFFSET, verticalMargin + GUI_TOP_BAR_VOFFSET,
 						horizontalMargin + GUI_TOP_BAR_HOFFSET + (int) (GUI_TOP_BAR_WIDTH * myAether), verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT,
-						0xA0909000);
-			}
-			
-			if (nestedAether > 0) {
-				RenderFuncs.drawRect(horizontalMargin + GUI_BOTTOM_BAR_HOFFSET, verticalMargin + GUI_BOTTOM_BAR_VOFFSET,
-						horizontalMargin + GUI_BOTTOM_BAR_HOFFSET + (int) (GUI_BOTTOM_BAR_WIDTH * nestedAether), verticalMargin + GUI_BOTTOM_BAR_VOFFSET + GUI_BOTTOM_BAR_HEIGHT,
 						0xA0909000);
 			}
 		}
@@ -183,21 +172,11 @@ public class AetherChargerGui {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			IAetherHandler chargerHandler = container.chest.getHandler();
-			if (chargerHandler != null) {
+			IAetherHandler repairerHandler = container.chest.getHandler();
+			if (repairerHandler != null) {
 				if (mouseX >= horizontalMargin + GUI_TOP_BAR_HOFFSET && mouseX <= horizontalMargin + GUI_TOP_BAR_HOFFSET + GUI_TOP_BAR_WIDTH
 						&& mouseY >= verticalMargin + GUI_TOP_BAR_VOFFSET && mouseY <= verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT) {
-					renderTooltip(Lists.newArrayList(String.format("%.2f / %.2f", chargerHandler.getAether(null) * .01f, chargerHandler.getMaxAether(null) * .01f)),
-							mouseX - horizontalMargin, mouseY - verticalMargin);
-				}
-			}
-			
-			final int maxAether = container.chest.getMaxAetherDisplay();
-			final int aether = container.chest.getAetherDisplay();
-			if (maxAether > 0) {
-				if (mouseX >= horizontalMargin + GUI_BOTTOM_BAR_HOFFSET && mouseX <= horizontalMargin + GUI_BOTTOM_BAR_HOFFSET + GUI_BOTTOM_BAR_WIDTH
-						&& mouseY >= verticalMargin + GUI_BOTTOM_BAR_VOFFSET && mouseY <= verticalMargin + GUI_BOTTOM_BAR_VOFFSET + GUI_BOTTOM_BAR_HEIGHT) {
-					renderTooltip(Lists.newArrayList(String.format("%.2f / %.2f", aether * .01f, maxAether * .01f)),
+					renderTooltip(Lists.newArrayList(String.format("%.2f / %.2f", repairerHandler.getAether(null) * .01f, repairerHandler.getMaxAether(null) * .01f)),
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}

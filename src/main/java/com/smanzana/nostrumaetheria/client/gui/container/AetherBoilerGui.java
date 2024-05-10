@@ -1,4 +1,4 @@
-package com.smanzana.nostrumaetheria.gui.container;
+package com.smanzana.nostrumaetheria.client.gui.container;
 
 import javax.annotation.Nonnull;
 
@@ -262,8 +262,8 @@ public class AetherBoilerGui {
 				GlStateManager.color4f(1f, 1f, 1f, 1f);
 				mc.getTextureManager().bindTexture(TEXT);
 				GlStateManager.enableBlend();
-				GlStateManager.pushMatrix();
-				GlStateManager.translated(x, y, 0);
+				matrixStackIn.push();
+				matrixStackIn.translate(x, y, 0);
 				RenderFuncs.drawScaledCustomSizeModalRect(0, 0,
 						textX, GUI_MODE_BUTTON_TEXT_VOFFSET,
 						GUI_MODE_BUTTON_TEXT_WIDTH, GUI_MODE_BUTTON_TEXT_HEIGHT,
@@ -273,7 +273,7 @@ public class AetherBoilerGui {
 				// Draw actual mode overlay
 				BoilerBurnMode mode = container.chest.getBoilerMode();
 				drawBoilerMode(mc, mode);
-				GlStateManager.popMatrix();
+				matrixStackIn.pop();
 				
 				// Draw tooltip if hovered
 				if (this.isHovered) {

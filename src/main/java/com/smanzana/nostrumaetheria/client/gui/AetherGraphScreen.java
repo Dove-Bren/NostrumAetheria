@@ -1,4 +1,4 @@
-package com.smanzana.nostrumaetheria.gui;
+package com.smanzana.nostrumaetheria.client.gui;
 
 import com.smanzana.nostrumaetheria.api.aether.stats.AetherStatInstance;
 

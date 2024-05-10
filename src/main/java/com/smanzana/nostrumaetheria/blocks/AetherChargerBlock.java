@@ -2,7 +2,7 @@ package com.smanzana.nostrumaetheria.blocks;
 
 import java.util.Random;
 
-import com.smanzana.nostrumaetheria.gui.container.AetherChargerGui;
+import com.smanzana.nostrumaetheria.client.gui.container.AetherChargerGui;
 import com.smanzana.nostrumaetheria.tiles.AetherChargerBlockEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;

@@ -3,25 +3,19 @@ package com.smanzana.nostrumaetheria.client.render;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity;
 import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity.EffectSpark;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
 
 public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherInfuserTileEntity> {
 
@@ -29,96 +23,64 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 	
 	//private static final ModelResourceLocation ORB_MODEL_LOC = new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_pure"), "normal");
 	//private static IBakedModel MODEL_ORB;
-	private static final ResourceLocation SPARK_TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
+	public static final ResourceLocation SPARK_TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
 	
 	private List<EffectSpark> sparks;
 	
-	public TileEntityAetherInfuserRenderer() {
+	public TileEntityAetherInfuserRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+		super(rendererDispatcherIn);
 		sparks = new ArrayList<>();
 	}
 	
-	private void renderOrb(Tessellator tessellator, BufferBuilder buffer, float opacity, boolean outside) {
+	private void renderOrb(MatrixStack matrixStackIn, IVertexBuilder buffer, int combinedLightIn, float opacity, boolean outside) {
 		
 		final float mult = 2 * ORB_RADIUS * (outside ? 1 : -1);
 		
-		GlStateManager.disableBlend();
-		GlStateManager.enableBlend();
-		GlStateManager.disableAlphaTest();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.disableTexture();
-		GlStateManager.enableTexture();
-		GlStateManager.color4f(0f, 0f, 0f, 0f);
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
-		//GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0f);
-		GlStateManager.disableLighting();
-		GlStateManager.enableCull();
-		GlStateManager.depthMask(false);
-		
-		
-		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240); TODO this?
-		RenderFuncs.disableLightmap();
-		
 		// outside
-		GlStateManager.pushMatrix();
-		GlStateManager.translatef(0, ORB_RADIUS - .5f, 0);
-		GlStateManager.scalef(mult, mult, mult);
-//		
-//		{
-//			final int color = 0x0033BB88 | (((int) (opacity * 255f) << 24) & 0xFF000000);
-//			//if (MODEL_ORB == null) {
-//				//MODEL_ORB = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(ORB_MODEL_LOC);
-//				IBakedModel MODEL_ORB = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_pure"), "normal"));
-//			//}
-//			
-//			ClientEffectForm.drawModel(MODEL_ORB, color);
-//		}
+		matrixStackIn.push();
+		matrixStackIn.translate(0, ORB_RADIUS - .5f, 0);
+		matrixStackIn.scale(mult, mult, mult);
 		
 		{
-			//ClientEffectForm.drawModel(Model, color);
-			// ARGB
-			// final int color = 0x0033BB88 | ((int) (opacity * 255f) << 24);
 			final float red = .2f;
 			final float green = .73f;
 			final float blue = .53f;
 			final float alpha = opacity;
 			
-			//GlStateManager.disableCull();
-			//GlStateManager.disableDepth();
-			GlStateManager.alphaFunc(516, 0);
-			Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID, "textures/effects/slate.png"));
+			//GlStateManager.alphaFunc(516, 0);
 			final int rows = 10;
 			final int cols = 10;
-			final double radius = 1;
-			for (int i = 1; i <= rows; i++) {
-				final double yRad0 = Math.PI * (-0.5f + (float) (i - 1) / (float) rows);
-				final double y0 = Math.sin(yRad0);
-				final double yR0 = Math.cos(yRad0);
-				final double yRad1 = Math.PI * (-0.5f + (float) (i) / (float) rows);
-				final double y1 = Math.sin(yRad1);
-				final double yR1 = Math.cos(yRad1);
-
-				buffer.begin(GL11.GL_QUAD_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
-				for (int j = 0; j <= cols; j++) {
-					final double xRad = Math.PI * 2 * (double) ((float) (j-1) / (float) cols);
-					final double x = Math.cos(xRad);
-					final double z = Math.sin(xRad);
-					
-					buffer.pos(radius * x * yR0, radius * y0, radius * z * yR0).tex(0, 0).color(red, green, blue, alpha)
-						.normal((float) (x * yR0), (float) (y0), (float) (z * yR0)).endVertex();
-					buffer.pos(radius * x * yR1, radius * y1, radius * z * yR1).tex(1, 1).color(red, green, blue, alpha)
-						.normal((float) (x * yR1), (float) (y1), (float) (z * yR1)).endVertex();
-				}
-				tessellator.draw();
-				
-			}
+			final float radius = 1;
+			
+			RenderFuncs.drawOrb(matrixStackIn, buffer, combinedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha, rows, cols, radius, radius, radius);
+//			for (int i = 1; i <= rows; i++) {
+//				final double yRad0 = Math.PI * (-0.5f + (float) (i - 1) / (float) rows);
+//				final double y0 = Math.sin(yRad0);
+//				final double yR0 = Math.cos(yRad0);
+//				final double yRad1 = Math.PI * (-0.5f + (float) (i) / (float) rows);
+//				final double y1 = Math.sin(yRad1);
+//				final double yR1 = Math.cos(yRad1);
+//
+//				buffer.begin(GL11.GL_QUAD_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
+//				for (int j = 0; j <= cols; j++) {
+//					final double xRad = Math.PI * 2 * (double) ((float) (j-1) / (float) cols);
+//					final double x = Math.cos(xRad);
+//					final double z = Math.sin(xRad);
+//					
+//					buffer.pos(radius * x * yR0, radius * y0, radius * z * yR0).tex(0, 0).color(red, green, blue, alpha)
+//						.normal((float) (x * yR0), (float) (y0), (float) (z * yR0)).endVertex();
+//					buffer.pos(radius * x * yR1, radius * y1, radius * z * yR1).tex(1, 1).color(red, green, blue, alpha)
+//						.normal((float) (x * yR1), (float) (y1), (float) (z * yR1)).endVertex();
+//				}
+//				tessellator.draw();
+//				
+//			}
 		}
 
-		GlStateManager.enableDepthTest();
-		GlStateManager.depthMask(true);
-		GlStateManager.popMatrix();
+		matrixStackIn.pop();
 	}
 	
-	private void renderSpark(Tessellator tessellator, BufferBuilder buffer, Vector3d camera, int ticks, float partialTicks, EffectSpark spark) {
+	private void renderSpark(MatrixStack matrixStackIn, IVertexBuilder buffer, int combinedLightIn, ActiveRenderInfo renderInfo, long ticks, float partialTicks, EffectSpark spark) {
 		
 		// Translation
 		final float pitch = spark.getPitch(ticks, partialTicks);
@@ -132,24 +94,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		final float offsetY = (float) (ORB_RADIUS * -Math.cos(pitchRad)) + ORB_RADIUS -.5f;
 		
 		// Rotation
-//		camera = camera.add(offsetX, offsetY, offsetZ);
-//		double rotY = (Math.atan2(camera.zCoord, camera.xCoord) / (2 * Math.PI));
-//		final double hDist = Math.sqrt(Math.pow(camera.xCoord, 2) + Math.pow(camera.zCoord, 2)); 
-//		double rotX = (Math.atan2(camera.yCoord, hDist) / (2 * Math.PI));
-//		
-//		rotY *= -360f;
-//		rotX *= 360f;
-//		
-//		rotY += 180f;
-//		rotY += 90;
-		
-		final Minecraft mc = Minecraft.getInstance();
-		final ActiveRenderInfo renderInfo = mc.gameRenderer.getActiveRenderInfo();
-//		final float rX = MathHelper.cos(renderInfo.getYaw() * ((float)Math.PI / 180F));
-//		final float rXZ = rX * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
-//		final float rZ = MathHelper.cos(renderInfo.getPitch() * ((float)Math.PI / 180F));
-//		final float rYZ = MathHelper.sin(renderInfo.getYaw() * ((float)Math.PI / 180F));
-//		final float rXY = -rYZ * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
+		;
 		
 		// Size
 		final float scale = .2f * spark.yawStart;
@@ -164,41 +109,15 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		final float alphaInner = .01f + .2f * brightness;
 		final float alphaOuter = .01f + .2f * brightness;
 		
-		//GlStateManager.translatef(offsetX, offsetY, offsetZ);
-		//GlStateManager.rotatef((float)rotY, 0, 1, 0);
-		//GlStateManager.rotatef((float)rotX, 1, 0, 0);
-		//GlStateManager.scalef(scale, scale, scale);
-		
-		RenderFuncs.renderSpaceQuadFacingCamera(buffer, renderInfo, offsetX, offsetY, offsetZ, radius, red, green, blue, alphaOuter);
-		RenderFuncs.renderSpaceQuadFacingCamera(buffer, renderInfo, offsetX, offsetY, offsetZ, smallRadius, red, green, blue, alphaInner);
-		
-//		buffer.pos(offsetX - (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ - (rZ * radius) - (rXY * radius))
-//			.tex(0, 0).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
-//		buffer.pos(offsetX - (rX * radius) + (rYZ * radius), offsetY + (rXZ * radius), offsetZ - (rZ * radius) + (rXY * radius))
-//			.tex(0, 1).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
-//		buffer.pos(offsetX + (rX * radius) + (rYZ * radius), offsetY + (rXZ * radius), offsetZ + (rZ * radius) + (rXY * radius))
-//			.tex(1, 1).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
-//		buffer.pos(offsetX + (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ + (rZ * radius) - (rXY * radius))
-//			.tex(1, 0).color(red, green, blue, alphaOuter).normal(0, 0, 1).endVertex();
-//		
-//		buffer.pos(offsetX - (rX * smallRadius) - (rYZ * smallRadius), offsetY - (rXZ * smallRadius), offsetZ - (rZ * smallRadius) - (rXY * smallRadius))
-//			.tex(0, 0).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
-//		buffer.pos(offsetX - (rX * smallRadius) + (rYZ * smallRadius), offsetY + (rXZ * smallRadius), offsetZ - (rZ * smallRadius) + (rXY * smallRadius))
-//			.tex(0, 1).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
-//		buffer.pos(offsetX + (rX * smallRadius) + (rYZ * smallRadius), offsetY + (rXZ * smallRadius), offsetZ + (rZ * smallRadius) + (rXY * smallRadius))
-//			.tex(1, 1).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
-//		buffer.pos(offsetX + (rX * smallRadius) - (rYZ * smallRadius), offsetY - (rXZ * smallRadius), offsetZ + (rZ * smallRadius) - (rXY * smallRadius))
-//			.tex(1, 0).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
-		
-//		buffer.pos(-.25, .25, 0.01).tex(0, 0).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
-//		buffer.pos(-.25, -.25, 0.01).tex(0, 1).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
-//		buffer.pos(.25, -.25, 0.01).tex(1, 1).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
-//		buffer.pos(.25, .25, 0.01).tex(1, 0).color(red, green, blue, alphaInner).normal(0, 0, 1).endVertex();
-		
+		matrixStackIn.push();
+		matrixStackIn.translate(offsetX, offsetY, offsetZ);
+		RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, renderInfo, radius, combinedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alphaOuter);
+		RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, renderInfo, smallRadius, combinedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alphaInner);
+		matrixStackIn.pop();
 	}
 	
 	@Override
-	public void render(AetherInfuserTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(AetherInfuserTileEntity te, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		
 		final float ORB_PERIOD = 200f;
 		
@@ -212,46 +131,22 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		// 0f to .4f
 		final float maxOrbOpacity = .15f;
 		final float orbOpacity = maxOrbOpacity * (.75f + .25f * (float)Math.sin(t * 2 * Math.PI)) * te.getChargePerc();
-		Minecraft mc = Minecraft.getInstance();
-		Vector3d trueCamPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
-		Vector3d camOffset = new Vector3d((x + .5) - trueCamPos.x, (y + 1) - trueCamPos.y, (z + .5) - trueCamPos.z);
 		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder buffer = tessellator.getBuffer();
+		matrixStackIn.push();
+		matrixStackIn.translate(.5f, 1f, .5f);
 		
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.enableAlphaTest();
-		GlStateManager.disableLighting();
-		GlStateManager.enableLighting();
-		//GlStateManager.disableRescaleNormal();
+		final IVertexBuilder orbBuffer = bufferIn.getBuffer(AetheriaRenderTypes.INFUSER_ORB);
+		//renderOrb(matrixStackIn, orbBuffer, combinedLightIn, orbOpacity, false);
+		renderOrb(matrixStackIn, orbBuffer, combinedLightIn,orbOpacity, true);
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(x + .5, y + 1, z + .5);
+		final IVertexBuilder sparkBuffer = bufferIn.getBuffer(AetheriaRenderTypes.INFUSER_SPARK);
 		
-		Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-		renderOrb(tessellator, buffer, orbOpacity, false);
-		renderOrb(tessellator, buffer, orbOpacity, true);
-		
-		//GlStateManager.clearDepth(100000);
-		
-		Minecraft.getInstance().getTextureManager().bindTexture(SPARK_TEX_LOC);
-		GlStateManager.alphaFunc(516, 0);
-		GlStateManager.color4f(1f, 1f, 1f, .75f);
-		GlStateManager.disableLighting();
-		GlStateManager.depthMask(false);
-		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
+		//GlStateManager.alphaFunc(516, 0);
+//		GlStateManager.disableLighting();
 		for (EffectSpark spark : sparks) {
-			renderSpark(tessellator, buffer, camOffset, ticks, partialTicks, spark);
+			renderSpark(matrixStackIn, sparkBuffer, combinedLightIn, this.renderDispatcher.renderInfo, ticks, partialTicks, spark);
 		}
-		tessellator.draw();
-		GlStateManager.depthMask(true);
 		
-//		Minecraft.getInstance().getTextureManager().bindTexture(SPARK_TEX_LOC);
-//		renderSpark(tessellator, buffer, camOffset, ticks, partialTicks, null);
-		
-		
-		GlStateManager.popMatrix();
+		matrixStackIn.pop();
 	}
 }

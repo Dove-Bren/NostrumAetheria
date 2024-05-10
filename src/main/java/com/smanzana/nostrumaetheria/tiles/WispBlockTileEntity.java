@@ -7,9 +7,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
+import com.smanzana.nostrumaetheria.client.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrumaetheria.entity.AetheriaEntityTypes;
 import com.smanzana.nostrumaetheria.entity.SentinelWispEntity;
-import com.smanzana.nostrumaetheria.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.items.ReagentItem;

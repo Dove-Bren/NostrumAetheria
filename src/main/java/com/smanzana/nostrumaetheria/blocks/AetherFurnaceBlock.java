@@ -3,7 +3,7 @@ package com.smanzana.nostrumaetheria.blocks;
 import java.util.Random;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
-import com.smanzana.nostrumaetheria.gui.container.AetherFurnaceGui;
+import com.smanzana.nostrumaetheria.client.gui.container.AetherFurnaceGui;
 import com.smanzana.nostrumaetheria.tiles.AetherFurnaceBlockEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;

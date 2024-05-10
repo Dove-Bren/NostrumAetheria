@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
-import com.smanzana.nostrumaetheria.gui.container.IAutoContainerInventoryWrapper;
+import com.smanzana.nostrumaetheria.client.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrumaetheria.recipes.RepairerRecipeManager;
 
 import net.minecraft.block.BlockState;

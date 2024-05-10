@@ -793,18 +793,18 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 			return in % 1f;
 		}
 		
-		public float getPitch(int ticks, float partialTicks) {
+		public float getPitch(long ticks, float partialTicks) {
 			return Clamp(pitchStart + (float) (
 					((double) (ticks - spawnTime) + (double) partialTicks) * pitchFactor)
 				);
 		}
 		
-		public float getYaw(int ticks, float partialTicks) {
+		public float getYaw(long ticks, float partialTicks) {
 			return Clamp(yawStart + (float) (((double) (ticks - spawnTime) + (double) partialTicks) * yawFactor)
 				);
 		}
 		
-		public float getBrightness(int ticks, float partialTicks) {
+		public float getBrightness(long ticks, float partialTicks) {
 			brightness = 1f;
 			// use input brightness (0-1) at 60% to allow for glowing
 			// glow based on BLINK_PERIOD
