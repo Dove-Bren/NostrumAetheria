@@ -2,8 +2,7 @@ package com.smanzana.nostrumaetheria.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 import com.smanzana.nostrummagica.client.gui.container.AutoContainer;
@@ -23,6 +22,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -286,7 +286,7 @@ public class WispBlockGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			@Nonnull ItemStack scroll = container.table.getScroll();
@@ -302,20 +302,18 @@ public class WispBlockGui {
 			float G = (float) ((color & 0x0000FF00) >> 8) / 256f;
 			float B = (float) ((color & 0x000000FF) >> 0) / 256f;
 			
-			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			float fuel = container.table.getPartialReagent();
 			if (fuel > 0f) {
 				int x = (int) (fuel * PROGRESS_WIDTH);
-				GlStateManager.color4f(R, G, B, 1f);
-				RenderFuncs.drawModalRectWithCustomSizedTexture(
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, 
 						horizontalMargin + PROGRESS_GUI_HOFFSET,
 						verticalMargin + PROGRESS_GUI_VOFFSET,
-						0, GUI_HEIGHT, x, PROGRESS_HEIGHT, 256, 256);
-				GlStateManager.color4f(1f, 1f, 1f, 1f);
+						0, GUI_HEIGHT, x, PROGRESS_HEIGHT, 256, 256,
+						R, G, B, 1f);
 			}
 			
 			int max = container.table.getMaxWisps();
@@ -326,21 +324,20 @@ public class WispBlockGui {
 				final int leftx = centerx - ((xspace / 2) * (max - 1));
 				final int x = leftx + (xspace * i) - (WISP_SOCKET_LENGTH / 2);
 				final int y = verticalMargin + PROGRESS_GUI_VOFFSET + 7;
-				RenderFuncs.drawModalRectWithCustomSizedTexture(x, y,
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y,
 						WISP_SOCKET_HOFFSET,
 						WISP_SOCKET_VOFFSET,
 						WISP_SOCKET_LENGTH,
 						WISP_SOCKET_LENGTH,
 						256, 256);
 				if (i < filled) {
-					GlStateManager.color4f(R, G, B, 1f);
-					RenderFuncs.drawModalRectWithCustomSizedTexture(x + 2, y + 2,
+					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x + 2, y + 2,
 							WISP_SOCKET_HOFFSET,
 							WISP_SOCKET_VOFFSET + WISP_SOCKET_LENGTH,
 							5,
 							5,
-							256, 256);
-					GlStateManager.color4f(1f, 1f, 1f, 1f); 
+							256, 256,
+							R, G, B, 1f);
 				}
 			}
 			
@@ -348,7 +345,7 @@ public class WispBlockGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			/*
@@ -360,7 +357,7 @@ public class WispBlockGui {
 					&& mouseX <= horizontalMargin + PROGRESS_GUI_HOFFSET + PROGRESS_WIDTH
 					&& mouseY >= verticalMargin + PROGRESS_GUI_VOFFSET
 					&& mouseY <= verticalMargin + PROGRESS_GUI_VOFFSET + PROGRESS_HEIGHT) {
-				this.renderTooltip(Lists.newArrayList(((int) (container.table.getPartialReagent() * 100.0)) + "%"), mouseX - horizontalMargin, mouseY - verticalMargin);
+				this.renderTooltip(matrixStackIn, new StringTextComponent(((int) (container.table.getPartialReagent() * 100.0)) + "%"), mouseX - horizontalMargin, mouseY - verticalMargin);
 			}
 		}
 		

@@ -2,8 +2,8 @@ package com.smanzana.nostrumaetheria.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
@@ -19,7 +19,6 @@ import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
@@ -27,6 +26,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -172,22 +173,21 @@ public class AetherBoilerGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
 			
 			float progress = container.chest.getBurnProgress();
 			if (progress > 0) {
 				int y = (int) (14f * (1f - progress));
-				RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin + 64, verticalMargin + GUI_TOP_INV_VOFFSET + 2 + y,
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin + 64, verticalMargin + GUI_TOP_INV_VOFFSET + 2 + y,
 						176, y,
 						GUI_FIRE_FIRE_WIDTH, GUI_FIRE_FIRE_HEIGHT - y, 256, 256);
-				RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin + 101, verticalMargin + GUI_TOP_INV_VOFFSET + 2 + y,
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin + 101, verticalMargin + GUI_TOP_INV_VOFFSET + 2 + y,
 						176, y,
 						GUI_FIRE_FIRE_WIDTH, GUI_FIRE_FIRE_HEIGHT - y, 256, 256);
 			}
@@ -200,14 +200,14 @@ public class AetherBoilerGui {
 			}
 			
 			if (myAether > 0) {
-				RenderFuncs.drawRect(horizontalMargin + GUI_TOP_BAR_HOFFSET, verticalMargin + GUI_TOP_BAR_VOFFSET,
+				RenderFuncs.drawRect(matrixStackIn, horizontalMargin + GUI_TOP_BAR_HOFFSET, verticalMargin + GUI_TOP_BAR_VOFFSET,
 						horizontalMargin + GUI_TOP_BAR_HOFFSET + (int) (GUI_TOP_BAR_WIDTH * myAether), verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT,
 						0xA0909000);
 			}
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
@@ -215,7 +215,7 @@ public class AetherBoilerGui {
 			if (boilerHandler != null) {
 				if (mouseX >= horizontalMargin + GUI_TOP_BAR_HOFFSET && mouseX <= horizontalMargin + GUI_TOP_BAR_HOFFSET + GUI_TOP_BAR_WIDTH
 						&& mouseY >= verticalMargin + GUI_TOP_BAR_VOFFSET && mouseY <= verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT) {
-					renderTooltip(Lists.newArrayList(String.format("%.2f / %.2f", boilerHandler.getAether(null) * .01f, boilerHandler.getMaxAether(null) * .01f)),
+					renderTooltip(matrixStackIn, new StringTextComponent(String.format("%.2f / %.2f", boilerHandler.getAether(null) * .01f, boilerHandler.getMaxAether(null) * .01f)),
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}
@@ -242,14 +242,14 @@ public class AetherBoilerGui {
 			private boolean pressed;
 			
 			public ModeButton(int x, int y, AetherBoilerGuiContainer gui) {
-				super(x, y, GUI_MODE_BUTTON_UI_WIDTH, GUI_MODE_BUTTON_UI_HEIGHT, "", (b) -> {
+				super(x, y, GUI_MODE_BUTTON_UI_WIDTH, GUI_MODE_BUTTON_UI_HEIGHT, StringTextComponent.EMPTY, (b) -> {
 					gui.modeClicked(b);
 				});
 				pressed = false;
 			}
 			
 			@Override
-			public void render(int mouseX, int mouseY, float partialTicks) {
+			public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 				
 				int textX = GUI_MODE_BUTTON_TEXT_HOFFSET;
@@ -259,12 +259,11 @@ public class AetherBoilerGui {
 					textX += GUI_MODE_BUTTON_TEXT_WIDTH;
 				}
 				
-				GlStateManager.color4f(1f, 1f, 1f, 1f);
 				mc.getTextureManager().bindTexture(TEXT);
-				GlStateManager.enableBlend();
+				RenderSystem.enableBlend();
 				matrixStackIn.push();
 				matrixStackIn.translate(x, y, 0);
-				RenderFuncs.drawScaledCustomSizeModalRect(0, 0,
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 						textX, GUI_MODE_BUTTON_TEXT_VOFFSET,
 						GUI_MODE_BUTTON_TEXT_WIDTH, GUI_MODE_BUTTON_TEXT_HEIGHT,
 						GUI_MODE_BUTTON_UI_WIDTH, GUI_MODE_BUTTON_UI_HEIGHT,
@@ -272,12 +271,13 @@ public class AetherBoilerGui {
 				
 				// Draw actual mode overlay
 				BoilerBurnMode mode = container.chest.getBoilerMode();
-				drawBoilerMode(mc, mode);
+				drawBoilerMode(matrixStackIn, mc, mode);
 				matrixStackIn.pop();
+				RenderSystem.disableBlend();
 				
 				// Draw tooltip if hovered
 				if (this.isHovered) {
-					AetherBoilerGuiContainer.this.renderTooltip(I18n.format("gui.aether_boiler.mode." + mode.getUnlocID()), mouseX + 8, mouseY + 8);
+					AetherBoilerGuiContainer.this.renderTooltip(matrixStackIn, new TranslationTextComponent("gui.aether_boiler.mode." + mode.getUnlocID()), mouseX + 8, mouseY + 8);
 				}
 			}
 			
@@ -293,7 +293,7 @@ public class AetherBoilerGui {
 				pressed = true;
 			}
 			
-			protected void drawBoilerMode(Minecraft mc, BoilerBurnMode mode) {
+			protected void drawBoilerMode(MatrixStack matrixStackIn, Minecraft mc, BoilerBurnMode mode) {
 				int textX = GUI_MODE_ICON_TEXT_HOFFSET;
 				int textY = GUI_MODE_ICON_TEXT_VOFFSET;
 				switch (mode) {
@@ -313,14 +313,14 @@ public class AetherBoilerGui {
 					break;
 				}
 				
-				GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1f);
 				mc.getTextureManager().bindTexture(TEXT);
-				GlStateManager.enableBlend();
-				RenderFuncs.drawScaledCustomSizeModalRect(1, 1,
+				RenderSystem.enableBlend();
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 1, 1,
 						textX, textY,
 						GUI_MODE_ICON_WIDTH, GUI_MODE_ICON_HEIGHT,
 						GUI_MODE_BUTTON_UI_WIDTH - 2, GUI_MODE_BUTTON_UI_HEIGHT - 2,
 						256, 256);
+				RenderSystem.disableBlend();
 			}
 		}
 		

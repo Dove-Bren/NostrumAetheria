@@ -1,5 +1,6 @@
 package com.smanzana.nostrumaetheria.client.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrumaetheria.api.aether.stats.AetherStatInstance;
 
 import net.minecraft.client.gui.screen.Screen;
@@ -44,7 +45,7 @@ public class AetherGraphScreen extends Screen {
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks) {
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		
 	}
 	

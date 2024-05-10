@@ -2,8 +2,7 @@ package com.smanzana.nostrumaetheria.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.tiles.AetherUnravelerBlockEntity;
@@ -21,6 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -148,14 +148,13 @@ public class AetherUnravelerGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
 			
 			IAetherHandler unravelerHandler = container.chest.getHandler();
 			
@@ -166,24 +165,24 @@ public class AetherUnravelerGui {
 			}
 			
 			if (myAether > 0) {
-				RenderFuncs.drawRect(horizontalMargin + GUI_TOP_BAR_HOFFSET, verticalMargin + GUI_TOP_BAR_VOFFSET,
+				RenderFuncs.drawRect(matrixStackIn, horizontalMargin + GUI_TOP_BAR_HOFFSET, verticalMargin + GUI_TOP_BAR_VOFFSET,
 						horizontalMargin + GUI_TOP_BAR_HOFFSET + (int) (GUI_TOP_BAR_WIDTH * myAether), verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT,
 						0xA0909000);
 			}
 			
 			float progress = ((float) container.chest.getField(1) / 100f);
 			if (progress > 0f) {
-				GlStateManager.color4f(.3f, .7f, .45f, 1f);
 				final int drawW = (int) (GUI_PROGRESS_BAR_WIDTH * progress);
-				RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin + GUI_PROGRESS_BAR_HOFFSET, verticalMargin + GUI_PROGRESS_BAR_VOFFSET,
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin + GUI_PROGRESS_BAR_HOFFSET, verticalMargin + GUI_PROGRESS_BAR_VOFFSET,
 						GUI_PROGRESS_BAR_TEXT_HOFFSET, GUI_PROGRESS_BAR_TEXT_VOFFSET,
 						drawW, GUI_PROGRESS_BAR_HEIGHT,
-						256, 256);
+						256, 256,
+						.3f, .7f, .45f, 1f);
 			}
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
@@ -191,7 +190,7 @@ public class AetherUnravelerGui {
 			if (unravelerHandler != null) {
 				if (mouseX >= horizontalMargin + GUI_TOP_BAR_HOFFSET && mouseX <= horizontalMargin + GUI_TOP_BAR_HOFFSET + GUI_TOP_BAR_WIDTH
 						&& mouseY >= verticalMargin + GUI_TOP_BAR_VOFFSET && mouseY <= verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT) {
-					renderTooltip(Lists.newArrayList(String.format("%.2f / %.2f", unravelerHandler.getAether(null) * .01f, unravelerHandler.getMaxAether(null) * .01f)),
+					renderTooltip(matrixStackIn, new StringTextComponent(String.format("%.2f / %.2f", unravelerHandler.getAether(null) * .01f, unravelerHandler.getMaxAether(null) * .01f)),
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}
