@@ -1,7 +1,7 @@
 {
     "forge_marker": 1,
     "defaults": {
-      "model": "nostrumaetheria:block/pedestal_with_plate.obj",
+      "model": "nostrumaetheria:block/pedestal_with_plate",
 		"textures": {
 			"particle": "nostrummagica:block/stone_generic1"
 		}

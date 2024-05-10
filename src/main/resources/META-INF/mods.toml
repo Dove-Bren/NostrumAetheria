@@ -1,11 +1,16 @@
 modLoader="javafml" #mandatory
-loaderVersion="[25,)" #botania has 28+
+loaderVersion="[36,)"
+
+# The license for your mod. This is mandatory and allows for easier comprehension of your redistributive properties.
+# Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
+license="All Rights Reserved"
 
 [[mods]]
 modId="nostrumaetheria"
 version="${file.jarVersion}"
 displayName="Nostrum Aetheria"
 #logoFile="examplemod.png" #optional
+authors="Skyler Manzanares"
 description='''
 Magical energy add-on for Nostrum Magica
 '''
@@ -13,20 +18,20 @@ Magical energy add-on for Nostrum Magica
 [[dependencies.nostrumaetheria]]
 	modId="forge"
 	mandatory=true
-	versionRange="[28.2.26,)"
+	versionRange="[36,)"
 	ordering="NONE"
 	side="BOTH"
 
 [[dependencies.nostrumaetheria]]
 	modId="curios"
 	mandatory=false
-	versionRange="[FORGE-1.14.4-1.0.6.1,)"
+	versionRange="[1.16.4-4.0.3.5,)"
 	ordering="AFTER"
 	side="BOTH"
 
 [[dependencies.nostrumaetheria]]
 	modId="nostrummagica"
 	mandatory=true
-	versionRange="[1.14.4-1.10.0,)"
+	versionRange="[1.16.5-1.11.0,)"
 	ordering="AFTER"
 	side="BOTH"

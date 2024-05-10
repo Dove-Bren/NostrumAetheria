@@ -1,7 +1,7 @@
 {
     "forge_marker": 1,
     "defaults": {
-      "model": "nostrumaetheria:block/crystal_relay_stubbed.obj",
+      "model": "nostrumaetheria:block/crystal_relay_stubbed",
 		"textures": {
 			"particle": "nostrummagica:block/stone_generic1"
 		}

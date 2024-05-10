@@ -1,7 +1,7 @@
 {
     "forge_marker": 1,
     "defaults": {
-      "model": "nostrumaetheria:block/crystal_relay.obj",
+      "model": "nostrumaetheria:block/crystal_relay",
 		"textures": {
 			"particle": "nostrummagica:block/stone_generic1"
 		}
@@ -16,9 +16,9 @@
             "west": { "x": 90, "y": 270}
         },
 		"mode": {
-			"in": { "model": "nostrumaetheria:block/crystal_relay_in.obj" },
-			"out": { "model": "nostrumaetheria:block/crystal_relay_out.obj" },
-			"inout": { "model": "nostrumaetheria:block/crystal_relay_inout.obj" }
+			"in": { "model": "nostrumaetheria:block/crystal_relay_in" },
+			"out": { "model": "nostrumaetheria:block/crystal_relay_out" },
+			"inout": { "model": "nostrumaetheria:block/crystal_relay_inout" }
 		}
     }
 }

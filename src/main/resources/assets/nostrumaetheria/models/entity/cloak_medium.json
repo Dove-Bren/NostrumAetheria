@@ -1,0 +1,4 @@
+{
+	"loader": "forge:obj",
+    "model": "nostrumaetheria:models/block/cloak_medium.obj"
+}

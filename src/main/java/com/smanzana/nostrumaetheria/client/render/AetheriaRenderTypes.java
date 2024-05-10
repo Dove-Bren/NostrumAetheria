@@ -32,7 +32,7 @@ public class AetheriaRenderTypes {
 		final RenderState.CullState NO_CULL = new RenderState.CullState(false);
 		final RenderState.DepthTestState DEPTH_EQUAL = new RenderState.DepthTestState("==", GL11.GL_EQUAL);
 		final RenderState.DepthTestState NO_DEPTH = new RenderState.DepthTestState("none", GL11.GL_ALWAYS);
-		final RenderState.LightmapState NO_LIGHTING = new RenderState.LightmapState(false);
+		//final RenderState.LightmapState NO_LIGHTING = new RenderState.LightmapState(false);
 	    final RenderState.LightmapState LIGHTMAP_ENABLED = new RenderState.LightmapState(true);
 	    final RenderState.LineState LINE_2 = new RenderState.LineState(OptionalDouble.of(2));
 	    final RenderState.LineState LINE_3 = new RenderState.LineState(OptionalDouble.of(3));

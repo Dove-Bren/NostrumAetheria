@@ -30,9 +30,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
@@ -47,7 +47,7 @@ public class AetheriaAPIProxy extends APIProxy {
 	@Override
 	protected void handleSyncTEAether(AetherTileEntity te) {
 		NetworkHandler.getSyncChannel().send(PacketDistributor.NEAR.with(() ->
-				new TargetPoint(te.getPos().getX(), te.getPos().getY(), te.getPos().getZ(), 64, te.getWorld().getDimension().getType())),
+				new TargetPoint(te.getPos().getX(), te.getPos().getY(), te.getPos().getZ(), 64, te.getWorld().getDimensionKey())),
 				new AetherTileEntityMessage(te));
 	}
 
@@ -145,7 +145,7 @@ public class AetheriaAPIProxy extends APIProxy {
 	}
 
 	@Override
-	protected IAetherHandlerComponent handleCreateHandlerComponent(@Nullable DimensionType dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether,
+	protected IAetherHandlerComponent handleCreateHandlerComponent(@Nullable RegistryKey<World> dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether,
 			int defaultMaxAether) {
 		return new AetherHandlerComponent(dimension, pos, listener, defaultAether, defaultMaxAether);
 	}

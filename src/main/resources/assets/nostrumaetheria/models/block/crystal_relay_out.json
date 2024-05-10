@@ -1,0 +1,4 @@
+{
+	"loader": "forge:obj",
+    "model": "nostrumaetheria:models/block/crystal_relay_out.obj"
+}
