@@ -43,8 +43,7 @@ import net.minecraft.potion.Potions;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -220,7 +219,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		}
 		
 		if (type.isMasterOnly()) {
-			tooltip.add(new TranslationTextComponent("item.lens.master").applyTextStyle(TextFormatting.DARK_RED));
+			tooltip.add(new TranslationTextComponent("item.lens.master").mergeStyle(TextFormatting.DARK_RED));
 		}
 	}
 	
@@ -275,8 +274,8 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		@Nullable BlockPos growPos = MagicArmor.DoEarthGrow(world, center); 
 		if (growPos != null) {
 			AetherInfuserTileEntity.DoChargeEffect(world,
-					new Vec3d(center.getX() + .5, center.getY() + 1, center.getZ() + .5),
-					new Vec3d(growPos.getX() + .5, growPos.getY() + .5, growPos.getZ() + .5),
+					new Vector3d(center.getX() + .5, center.getY() + 1, center.getZ() + .5),
+					new Vector3d(growPos.getX() + .5, growPos.getY() + .5, growPos.getZ() + .5),
 					1, 0x6622FF44);
 			
 			return LensType.GROW.getAetherPerTick();
@@ -309,13 +308,13 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		int cost = 0;
 		for (LivingEntity ent : Entities.GetEntities(world, (e) -> {
 			return e.isAlive()
-					&& e.posY >= center.getY() && e.posY < center.getY() + MAX_HEIGHT
-					&& Math.abs(e.posX - (center.getX() + .5)) < HORZ_DIST_RADIUS
-					&& Math.abs(e.posZ - (center.getZ() + .5)) < HORZ_DIST_RADIUS;
+					&& e.getPosY() >= center.getY() && e.getPosY() < center.getY() + MAX_HEIGHT
+					&& Math.abs(e.getPosX() - (center.getX() + .5)) < HORZ_DIST_RADIUS
+					&& Math.abs(e.getPosZ() - (center.getZ() + .5)) < HORZ_DIST_RADIUS;
 		})) {
-			if (!ent.isSneaking() && !ent.onGround) {
+			if (!ent.isSneaking() && !ent.isOnGround()) {
 				cost += 1;
-				Vec3d motion = ent.getMotion();
+				Vector3d motion = ent.getMotion();
 				ent.setMotion(motion.x, Math.min(.3, motion.y + .1), motion.z);
 				ent.velocityChanged = true;
 				AetherInfuserTileEntity.DoChargeEffect(ent, 1, 0xFF77AA22);
@@ -387,7 +386,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	}
 	
 	protected boolean doBoreInternal(ServerWorld world, BlockPos center, int maxAether, boolean down) {
-		MutableBlockPos cursor = new MutableBlockPos(
+		BlockPos.Mutable cursor = new BlockPos.Mutable().setPos(
 				down ? center.down().down() : center.up().up().up()
 				);
 		while (cursor.getY() >= 0 && cursor.getY() < world.getHeight()) {

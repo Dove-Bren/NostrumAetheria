@@ -19,7 +19,7 @@ import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 
@@ -63,7 +63,7 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 			GlStateManager.popMatrix();
 		}
 
-		final Vec3d origin = Vec3d.ZERO;
+		final Vector3d origin = Vector3d.ZERO;
 		final int intervals = 50;
 		double period = (20 * 3);
 		float dotLength = 10;
@@ -112,13 +112,13 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 			
 			
 			
-			final Vec3d offset = new Vec3d(linked.toImmutable().subtract(te.getPos()));
-			final Vec3d dist = offset.scale(.25);
-			final Vec3d control1 = dist.add(dist.rotateYaw((float) (Math.PI * .5)));
-			final Vec3d control2 = offset.subtract(dist).subtract(dist.rotateYaw((float) (Math.PI * .5)));
+			final Vector3d offset = new Vector3d(linked.toImmutable().subtract(te.getPos()));
+			final Vector3d dist = offset.scale(.25);
+			final Vector3d control1 = dist.add(dist.rotateYaw((float) (Math.PI * .5)));
+			final Vector3d control2 = offset.subtract(dist).subtract(dist.rotateYaw((float) (Math.PI * .5)));
 			
 			// Point debugging
-	//		for (Vec3d point : new Vec3d[]{origin, control1, control2, offset}) {
+	//		for (Vector3d point : new Vector3d[]{origin, control1, control2, offset}) {
 	//			buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 	//			buffer.pos(point.xCoord, point.yCoord, point.zCoord).color(1f, 0f, 0f, 1f).endVertex();
 	//			buffer.pos(point.xCoord, point.yCoord + .5, point.zCoord).color(1f, 0f, 0f, 1f).endVertex();
@@ -132,7 +132,7 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 			
 			for (int i = 0; i <= intervals; i++) {
 				float prog = (float) i / (float) intervals;
-				Vec3d point = Curves.bezier(prog, origin, control1, control2, offset);
+				Vector3d point = Curves.bezier(prog, origin, control1, control2, offset);
 				
 				float dotAmt = Math.max(0f, 1f - (perI * Math.abs(dotI - (float) i)));
 				if (dotAmt == 0f) {

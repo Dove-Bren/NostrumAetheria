@@ -3,6 +3,7 @@ package com.smanzana.nostrumaetheria.tiles;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock.Type;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 
 public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
@@ -35,8 +36,8 @@ public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		try {
 			this.type = Type.valueOf(nbt.getString(NBT_TYPE));

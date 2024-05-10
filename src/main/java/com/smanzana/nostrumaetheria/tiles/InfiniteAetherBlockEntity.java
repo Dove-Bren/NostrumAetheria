@@ -1,5 +1,6 @@
 package com.smanzana.nostrumaetheria.tiles;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 
 public class InfiniteAetherBlockEntity extends NativeAetherTickingTileEntity {
@@ -30,7 +31,7 @@ public class InfiniteAetherBlockEntity extends NativeAetherTickingTileEntity {
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 	}
 }

@@ -64,7 +64,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArm
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		tooltip.add(new TranslationTextComponent("item.info.aen.desc"));
 		int charges = getWholeCharges(stack);
-		tooltip.add(new TranslationTextComponent("item.info.pendant.charges", charges).applyTextStyle(TextFormatting.GREEN));
+		tooltip.add(new TranslationTextComponent("item.info.pendant.charges", charges).mergeStyle(TextFormatting.GREEN));
 	}
 
 	@Override

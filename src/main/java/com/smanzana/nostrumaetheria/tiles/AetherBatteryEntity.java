@@ -7,6 +7,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock.Size;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -148,8 +149,8 @@ public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		try {
 			this.size = Size.valueOf(nbt.getString(NBT_SIZE));

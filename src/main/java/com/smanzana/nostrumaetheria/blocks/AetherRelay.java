@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -21,7 +22,7 @@ import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IStringSerializable;
@@ -46,7 +47,7 @@ public class AetherRelay extends Block implements ILoreTagged {
 		;
 
 		@Override
-		public String getName() {
+		public String getString() {
 			return this.name().toLowerCase();
 		}
 		
@@ -84,8 +85,7 @@ public class AetherRelay extends Block implements ILoreTagged {
 				.hardnessAndResistance(0.5f, 2.0f)
 				.sound(SoundType.GLASS)
 				.harvestTool(ToolType.AXE)
-				.lightValue(4)
-				
+				.setLightLevel((state) -> 4)
 				);
 		
 		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP).with(RELAY_MODE, RelayMode.INOUT));
@@ -96,60 +96,15 @@ public class AetherRelay extends Block implements ILoreTagged {
 		builder.add(FACING, RELAY_MODE);
 	}
 	
-//	@Override
-//	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-//		return state.getValue(FACING) == side;
-//	}
-	
-//	@Override
-//	public boolean isVisuallyOpaque() {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isFullyOpaque(BlockState state) {
-//		return false;
-//	}
-	
-//	@Override
-//	public boolean isFullBlock(BlockState state) {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
-	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		return RELAY_AABBs[state.get(FACING).ordinal()];
 	}
 	
-//	@Override
-//	public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
-//		return RELAY_AABBs[state.getValue(FACING).ordinal()];
-//	}
-	
-//	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-//		for (Direction enumfacing : FACING.getAllowedValues()) {
-//			if (this.canPlaceAt(worldIn, pos, enumfacing)) {
-//				return true;
-//			}
-//		}
-//
-//		return false;
-//	}
-	
 	public boolean canPlaceAt(IWorldReader world, BlockPos pos, Direction facing) {
 		BlockPos blockpos = pos.offset(facing.getOpposite());
 		BlockState wallState = world.getBlockState(blockpos);
-		return wallState.func_224755_d(world, blockpos, facing);// || facing.equals(Direction.UP) && this.canPlaceOn(worldIn, blockpos);
+		return wallState.isSolidSide(world, blockpos, facing);// || facing.equals(Direction.UP) && this.canPlaceOn(worldIn, blockpos);
 	}
 
 	@Override
@@ -163,7 +118,7 @@ public class AetherRelay extends Block implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
 		if (!worldIn.isRemote) {
 //			// request an update
@@ -186,10 +141,10 @@ public class AetherRelay extends Block implements ILoreTagged {
 					ent.setMode(state.get(RELAY_MODE).next());
 					NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 				}
-				return true;
+				return ActionResultType.SUCCESS;
 			} else if (heldItem.getItem() instanceof PositionCrystal) {
 				BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
-				if (heldPos != null && PositionCrystal.getDimension(heldItem) == worldIn.getDimension().getType().getId()) {
+				if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.getDimensionKey())) {
 					TileEntity te = worldIn.getTileEntity(pos);
 					if (te != null) {
 						AetherRelayEntity ent = (AetherRelayEntity) te;
@@ -197,11 +152,11 @@ public class AetherRelay extends Block implements ILoreTagged {
 						NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 					}
 				}
-				return true;
+				return ActionResultType.SUCCESS;
 			}
 		}
 		
-		return false;
+		return ActionResultType.FAIL;
 	}
 	
 	@Override
@@ -241,18 +196,6 @@ public class AetherRelay extends Block implements ILoreTagged {
 	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		
 	}
-	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT;
-	}
-	
-//	@Override
-//	@OnlyIn(Dist.CLIENT)
-//	public boolean isTranslucent(BlockState state) {
-//		return true;
-//	}
 	
 	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
 		return facing.getOpposite() == stateIn.get(FACING) && !stateIn.isValidPosition(worldIn, currentPos) ? Blocks.AIR.getDefaultState() : stateIn;

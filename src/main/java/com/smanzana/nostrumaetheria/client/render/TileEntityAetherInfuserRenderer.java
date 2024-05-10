@@ -21,7 +21,7 @@ import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherInfuserTileEntity> {
 
@@ -118,7 +118,7 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		GlStateManager.popMatrix();
 	}
 	
-	private void renderSpark(Tessellator tessellator, BufferBuilder buffer, Vec3d camera, int ticks, float partialTicks, EffectSpark spark) {
+	private void renderSpark(Tessellator tessellator, BufferBuilder buffer, Vector3d camera, int ticks, float partialTicks, EffectSpark spark) {
 		
 		// Translation
 		final float pitch = spark.getPitch(ticks, partialTicks);
@@ -213,8 +213,8 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		final float maxOrbOpacity = .15f;
 		final float orbOpacity = maxOrbOpacity * (.75f + .25f * (float)Math.sin(t * 2 * Math.PI)) * te.getChargePerc();
 		Minecraft mc = Minecraft.getInstance();
-		Vec3d trueCamPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
-		Vec3d camOffset = new Vec3d((x + .5) - trueCamPos.x, (y + 1) - trueCamPos.y, (z + .5) - trueCamPos.z);
+		Vector3d trueCamPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
+		Vector3d camOffset = new Vector3d((x + .5) - trueCamPos.x, (y + 1) - trueCamPos.y, (z + .5) - trueCamPos.z);
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();

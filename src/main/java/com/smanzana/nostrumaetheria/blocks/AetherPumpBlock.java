@@ -16,7 +16,7 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -66,13 +66,13 @@ public class AetherPumpBlock extends Block implements ILoreTagged {
 //	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 //		if (!worldIn.isRemote) {
 //			playerIn.openGui(NostrumAetheria.instance, NostrumAetheriaGui.aetherChargerID, worldIn, pos.getX(), pos.getY(), pos.getZ());
 //			return true;
 //		}
 		
-		return false;
+		return ActionResultType.PASS;
 	}
 	
 	@Override
@@ -94,43 +94,6 @@ public class AetherPumpBlock extends Block implements ILoreTagged {
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		return this.getDefaultState().with(FACING, context.getNearestLookingDirection());
 	}
-	
-//	@Override
-//	public boolean isVisuallyOpaque() {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isFullyOpaque(BlockState state) {
-//		return false;
-//	}
-	
-//	@Override
-//	public boolean isFullBlock(BlockState state) {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
-	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT_MIPPED;
-	}
-	
-//	@Override
-//	@OnlyIn(Dist.CLIENT)
-//	public boolean isTranslucent(BlockState state) {
-//		return true;
-//	}
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {

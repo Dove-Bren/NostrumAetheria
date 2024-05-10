@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.event.LivingAetherDrawEvent;
@@ -23,13 +23,14 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.utils.ColorUtil;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -257,34 +258,34 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 		final boolean castUpgrade = isAetherCaster(stack);
 
 		if (castUpgrade) {
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.spender").applyTextStyles(TextFormatting.DARK_GREEN));
+			tooltip.add(new TranslationTextComponent("item.aether_cloak.spender").mergeStyle(TextFormatting.DARK_GREEN));
 		}
 		if (displayTrimmed) {
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.trimmed").applyTextStyles(TextFormatting.DARK_GRAY));
+			tooltip.add(new TranslationTextComponent("item.aether_cloak.trimmed").mergeStyle(TextFormatting.DARK_GRAY));
 		}
 		if (displayRunes) {
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.runed").applyTextStyles(TextFormatting.DARK_GRAY));
+			tooltip.add(new TranslationTextComponent("item.aether_cloak.runed").mergeStyle(TextFormatting.DARK_GRAY));
 		}
 		if (displayWings) {
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.wings").applyTextStyles(TextFormatting.DARK_GRAY));
+			tooltip.add(new TranslationTextComponent("item.aether_cloak.wings").mergeStyle(TextFormatting.DARK_GRAY));
 		}
 		if (colorOutside != COLOR_DEFAULT_OUTSIDE) {
 			String name = I18n.format(colorOutside.getTranslationKey());
 			name = name.toLowerCase();
 			name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.color.outside", name).applyTextStyles(TextFormatting.DARK_BLUE));
+			tooltip.add(new TranslationTextComponent("item.aether_cloak.color.outside", name).mergeStyle(TextFormatting.DARK_BLUE));
 		}
 		if (colorInside != COLOR_DEFAULT_INSIDE) {
 			String name = I18n.format(colorInside.getTranslationKey());
 			name = name.toLowerCase();
 			name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.color.inside", name).applyTextStyles(TextFormatting.DARK_BLUE));
+			tooltip.add(new TranslationTextComponent("item.aether_cloak.color.inside", name).mergeStyle(TextFormatting.DARK_BLUE));
 		}
 		if (colorRunes != COLOR_DEFAULT_RUNES) {
 			String name = I18n.format(colorRunes.getTranslationKey());
 			name = name.toLowerCase();
 			name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.color.runes", name).applyTextStyles(TextFormatting.DARK_BLUE));
+			tooltip.add(new TranslationTextComponent("item.aether_cloak.color.runes", name).mergeStyle(TextFormatting.DARK_BLUE));
 		}
 	}
 	
@@ -600,7 +601,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public ModelResourceLocation[] getCapeModels(LivingEntity entity, ItemStack stack) {
+	public ResourceLocation[] getCapeModels(LivingEntity entity, ItemStack stack) {
 		final boolean trimmed = getDisplayTrimmed(stack);
 		final boolean runes = getDisplayRunes(stack);
 		if (trimmed) {
@@ -620,17 +621,31 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void preRender(Entity entity, int model, ItemStack stack, float headYaw, float partialTicks) {
-		if (model == 2) {
-			// Decor needs to be scaled just a litle to not z fight
-			GlStateManager.scaled(1.001, 1.001, 1.001);
+	public RenderType[] getCapeRenderTypes(LivingEntity entity, ItemStack stack) {
+		final boolean trimmed = getDisplayTrimmed(stack);
+		final boolean runes = getDisplayRunes(stack);
+		if (trimmed) {
+			if (runes) {
+				return AetherCloakModels.CapeRenderTypesTrimmedDecor;
+			} else {
+				return AetherCloakModels.CapeRenderTypesTrimmed;
+			}
+		} else {
+			if (runes) {
+				return AetherCloakModels.CapeRenderTypesFullDecor;
+			} else {
+				return AetherCloakModels.CapeRenderTypesFull;
+			}
 		}
 	}
 
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public ResourceLocation[] getCapeTextures(LivingEntity entity, ItemStack stack) {
-		return null; // obj uses material and has prebaked texture
+	public void preRender(Entity entity, int model, ItemStack stack, MatrixStack matrixStackIn, float headYaw, float partialTicks) {
+		if (model == 2) {
+			// Decor needs to be scaled just a litle to not z fight
+			matrixStackIn.scale(1.001f, 1.001f, 1.001f);
+		}
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -661,7 +676,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 
 	@Override
-	public Multimap<String, AttributeModifier> getEquippedAttributeModifiers(ItemStack stack) {
+	public Multimap<Attribute, AttributeModifier> getEquippedAttributeModifiers(ItemStack stack) {
 		return null;
 	}
 
@@ -671,43 +686,71 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 
 	@Override
-	public void doRender(ItemStack stack, LivingEntity player, float limbSwing, float limbSwingAmount,
-			float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void doRender(ItemStack stack, MatrixStack matrixStackIn, int index, IRenderTypeBuffer bufferIn, int packedLightIn,
+			LivingEntity player, float limbSwing, float limbSwingAmount,
+			float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		;
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	public static class AetherCloakModels {
-		private static final ModelResourceLocation CapeModelTrimmedOutside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_outside"));
-		private static final ModelResourceLocation CapeModelTrimmedInside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_inside"));
-		private static final ModelResourceLocation CapeModelTrimmedDecor = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_decor"));
-		private static final ModelResourceLocation CapeModelFullOutside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_outside"));
-		private static final ModelResourceLocation CapeModelFullInside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_inside"));
-		private static final ModelResourceLocation CapeModelFullDecor = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_decor"));
+		private static final ResourceLocation CapeModelTrimmedOutside = new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_outside");
+		private static final ResourceLocation CapeModelTrimmedInside = new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_inside");
+		private static final ResourceLocation CapeModelTrimmedDecor = new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_decor");
+		private static final ResourceLocation CapeModelFullOutside = new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_outside");
+		private static final ResourceLocation CapeModelFullInside = new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_inside");
+		private static final ResourceLocation CapeModelFullDecor = new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_decor");
+		private static final RenderType CapeRenderTypeCutout = RenderType.getCutoutMipped(); // block texture atlas and vertex format
+		private static final RenderType CapeRenderTypeTranslucent = RenderType.getTranslucent(); // block texture atlas and vertex format
 		
-		private static final ModelResourceLocation[] CapeModelsTrimmed = new ModelResourceLocation[] {
+		private static final ResourceLocation[] CapeModelsTrimmed = new ResourceLocation[] {
 			CapeModelTrimmedInside,
 			CapeModelTrimmedOutside,
 		};
+		
+		private static final RenderType[] CapeRenderTypesTrimmed = new RenderType[] {
+			CapeRenderTypeCutout,
+			CapeRenderTypeCutout,
+		};
 
-		private static final ModelResourceLocation[] CapeModelsTrimmedDecor = new ModelResourceLocation[] {
+		private static final ResourceLocation[] CapeModelsTrimmedDecor = new ResourceLocation[] {
 			CapeModelTrimmedInside,
 			CapeModelTrimmedOutside,
 			CapeModelTrimmedDecor,
 		};
 		
-		private static final ModelResourceLocation[] CapeModelsFull = new ModelResourceLocation[] {
+		private static final RenderType[] CapeRenderTypesTrimmedDecor = new RenderType[] {
+			CapeRenderTypeCutout,
+			CapeRenderTypeCutout,
+			CapeRenderTypeTranslucent,
+		};
+		
+		private static final ResourceLocation[] CapeModelsFull = new ResourceLocation[] {
 			CapeModelFullInside,
 			CapeModelFullOutside,
 		};
 		
-		private static final ModelResourceLocation[] CapeModelsFullDecor = new ModelResourceLocation[] {
+		private static final RenderType[] CapeRenderTypesFull = new RenderType[] {
+			CapeRenderTypeCutout,
+			CapeRenderTypeCutout,
+		};
+		
+		private static final ResourceLocation[] CapeModelsFullDecor = new ResourceLocation[] {
 			CapeModelFullInside,
 			CapeModelFullOutside,
 			CapeModelFullDecor,
 		};
 		
-		public static final ModelResourceLocation[] AllCapeModels = new ModelResourceLocation[] {
+		private static final RenderType[] CapeRenderTypesFullDecor = new RenderType[] {
+			CapeRenderTypeCutout,
+			CapeRenderTypeCutout,
+			CapeRenderTypeTranslucent,
+			CapeRenderTypeCutout,
+			CapeRenderTypeCutout,
+			CapeRenderTypeTranslucent,
+		};
+		
+		public static final ResourceLocation[] AllCapeModels = new ResourceLocation[] {
 				CapeModelTrimmedOutside,
 				CapeModelTrimmedInside,
 				CapeModelTrimmedDecor,

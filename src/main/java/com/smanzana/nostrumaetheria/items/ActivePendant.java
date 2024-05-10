@@ -80,7 +80,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		tooltip.add(new TranslationTextComponent("item.info.lyon.desc"));
 		int charges = lyonGetWholeCharges(stack);
-		tooltip.add(new TranslationTextComponent("item.info.pendant.charges", charges).applyTextStyle(TextFormatting.GREEN));
+		tooltip.add(new TranslationTextComponent("item.info.pendant.charges", charges).mergeStyle(TextFormatting.GREEN));
 	}
 
 	@Override

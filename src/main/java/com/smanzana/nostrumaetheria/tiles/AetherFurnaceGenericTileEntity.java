@@ -9,6 +9,7 @@ import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
 import com.smanzana.nostrumaetheria.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrummagica.utils.Inventories;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -184,8 +185,8 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		int slotCount = nbt.getInt(NBT_INVENTORY_SLOTS);
 		if (slotCount <= 0) {

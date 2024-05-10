@@ -12,6 +12,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -45,7 +46,7 @@ public class EludeCloakItem extends NostrumCurio {
 					int cost = 150;
 					
 					// Check to see if we're facing the enemy that attacked us
-					Vec3d attackFrom = source.getPositionVector().subtract(player.getPositionVector());
+					Vector3d attackFrom = source.getPositionVec().subtract(player.getPositionVec());
 					double attackFromYaw = -Math.atan2(attackFrom.x, attackFrom.z) * 180.0F / (float)Math.PI;
 					
 					if (Math.abs(((player.rotationYaw + 360f) % 360f) - ((attackFromYaw + 360f) % 360f)) < 30f) {
@@ -55,7 +56,7 @@ public class EludeCloakItem extends NostrumCurio {
 							if (taken > 0) {
 								// Dodge!
 								event.setCanceled(true);
-								NostrumMagicaSounds.DAMAGE_WIND.play(player.world, player.posX, player.posY, player.posZ);
+								NostrumMagicaSounds.DAMAGE_WIND.play(player.world, player.getPosX(), player.getPosY(), player.getPosZ());
 								float dir = player.rotationYaw + (NostrumMagica.rand.nextBoolean() ? -1 : 1) * 90f;
 								float velocity = .5f;
 								player.setMotion(velocity * MathHelper.cos(dir), player.getMotion().y, velocity * MathHelper.sin(dir));

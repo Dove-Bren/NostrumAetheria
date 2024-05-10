@@ -1,6 +1,7 @@
 package com.smanzana.nostrumaetheria.proxy;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
+import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.client.render.AetherBathRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherBatteryRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherRelayRenderer;
@@ -27,6 +28,8 @@ import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.model.IBakedModel;
@@ -122,6 +125,28 @@ public class ClientProxy extends CommonProxy {
 				return new RenderAetherBatteryMinecart(manager);
 			}
 		});
+	}
+	
+	@Override // just overriding here to make a compile error to remember to actually call it somewhere
+	private void registerBlockRenderLayer() {
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.bath, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.smallBattery, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.mediumBattery, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.largeBattery, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.giantBattery, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.boiler, RenderType.getSolid());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.charger, RenderType.getSolid());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.smallFurnace, RenderType.getSolid());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.mediumFurnace, RenderType.getSolid());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.largeFurnace, RenderType.getSolid());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.infuser, RenderType.getSolid());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.pump, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.relay, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.repairer, RenderType.getSolid());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.unraveler, RenderType.getSolid());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.enhancedRelay, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.infiteAetherBlock, RenderType.getSolid());
+		RenderTypeLookup.setRenderLayer(AetheriaBlocks.wispBlock, RenderType.getSolid()); // actually invisible
 	}
 	
 	@SubscribeEvent

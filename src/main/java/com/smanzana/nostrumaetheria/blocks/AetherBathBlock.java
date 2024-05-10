@@ -18,6 +18,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -36,7 +37,7 @@ public class AetherBathBlock extends Block implements ILoreTagged {
 		super(Block.Properties.create(Material.ROCK)
 				.hardnessAndResistance(3.5f, 10.0f)
 				.sound(SoundType.STONE)
-				.lightValue(1)
+				.setLightLevel((state) -> 1)
 				);
 	}
 	
@@ -111,14 +112,14 @@ public class AetherBathBlock extends Block implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
 		if (worldIn.isRemote) {
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null)
-			return false;
+			return ActionResultType.FAIL;
 		
 		final @Nonnull ItemStack heldItem = player.getHeldItem(hand);
 		
@@ -127,9 +128,9 @@ public class AetherBathBlock extends Block implements ILoreTagged {
 			// Accepting items
 			if (!heldItem.isEmpty() && altar.isItemValidForSlot(0, heldItem)) {
 				altar.setItem(heldItem.split(1));
-				return true;
+				return ActionResultType.SUCCESS;
 			} else
-				return false;
+				return ActionResultType.FAIL;
 		} else {
 			// Has an item
 			if (heldItem.isEmpty()) {
@@ -141,9 +142,9 @@ public class AetherBathBlock extends Block implements ILoreTagged {
 							);
 				}
 				altar.setItem(ItemStack.EMPTY);
-				return true;
+				return ActionResultType.SUCCESS;
 			} else
-				return false;
+				return ActionResultType.FAIL;
 		}
 		
 	}

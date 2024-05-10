@@ -10,12 +10,14 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -60,8 +62,8 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -241,8 +243,8 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 	
 	@Override
-	public void setWorld(World world) {
-		super.setWorld(world);
+	public void setWorldAndPos(World world, BlockPos pos) {
+		super.setWorldAndPos(world, pos);
 		
 		if (!world.isRemote) {
 			this.handler.setAutoFill(true);

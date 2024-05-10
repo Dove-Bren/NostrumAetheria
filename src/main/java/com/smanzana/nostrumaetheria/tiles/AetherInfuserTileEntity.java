@@ -22,6 +22,7 @@ import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.utils.Inventories.ItemStackArrayWrapper;
 import com.smanzana.nostrummagica.utils.WorldUtil;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.MonsterEntity;
@@ -33,7 +34,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraftforge.api.distmarker.Dist;
@@ -81,17 +82,17 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 	public static final void DoChargeEffect(LivingEntity entity, int count, int color) {
 		NostrumParticles.GLOW_ORB.spawn(entity.getEntityWorld(), new SpawnParams(
 				count,
-				entity.posX, entity.posY + entity.getHeight()/2f, entity.posZ, 2.0,
+				entity.getPosX(), entity.getPosY() + entity.getHeight()/2f, entity.getPosZ(), 2.0,
 				40, 0,
 				entity.getEntityId()
 				).color(color));
 	}
 	
 	public static final void DoChargeEffect(World world, BlockPos pos, int count, int color) {
-		DoChargeEffect(world, new Vec3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5), count, color);
+		DoChargeEffect(world, new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5), count, color);
 	}
 	
-	public static final void DoChargeEffect(World world, Vec3d center, int count, int color) {
+	public static final void DoChargeEffect(World world, Vector3d center, int count, int color) {
 		NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 				count,
 				center.x, center.y, center.z, 2.0,
@@ -100,7 +101,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 				).color(color));
 	}
 	
-	public static final void DoChargeEffect(World world, Vec3d start, Vec3d end, int count, int color) {
+	public static final void DoChargeEffect(World world, Vector3d start, Vector3d end, int count, int color) {
 		NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 				count,
 				start.x, start.y, start.z, .5,
@@ -161,9 +162,9 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 //							whole > 0 ? whole : 1,
 //							pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5, 2.0,
 //							40, 0,
-//							new Vec3d(pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5)
+//							new Vector3d(pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5)
 //							));
-				DoChargeEffect(world, new Vec3d(pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5), whole > 0 ? whole : 1, 0x4D3366FF);
+				DoChargeEffect(world, new Vector3d(pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5), whole > 0 ? whole : 1, 0x4D3366FF);
 			}
 		}
 	}
@@ -198,7 +199,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 					NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 							num,
 							x, y, z, 0, 100, 20,
-							new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
+							new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
 						).color(.1f, .3f, 1f, .4f));
 				}
 			}
@@ -230,8 +231,8 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 									final int whole = (int) countRaw;
 									if (whole > 0 || NostrumMagica.rand.nextFloat() < countRaw) {
 										DoChargeEffect(world,
-												new Vec3d(pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5),
-												new Vec3d(teRaw.getPos().getX() + .5, teRaw.getPos().getY() + 1.2, teRaw.getPos().getZ() + .5),
+												new Vector3d(pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5),
+												new Vector3d(teRaw.getPos().getX() + .5, teRaw.getPos().getY() + 1.2, teRaw.getPos().getZ() + .5),
 												whole > 0 ? whole : 1,
 												0x4D3366FF);
 										
@@ -258,7 +259,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 							final int whole = (int) countRaw;
 							if (whole > 0 || NostrumMagica.rand.nextFloat() < countRaw) {
 								DoChargeEffect(world,
-										new Vec3d(centerAltar.getPos().getX() + .5, centerAltar.getPos().getY() + 1.2, centerAltar.getPos().getZ() + .5),
+										new Vector3d(centerAltar.getPos().getX() + .5, centerAltar.getPos().getY() + 1.2, centerAltar.getPos().getZ() + .5),
 										whole > 0 ? whole : 1,
 										0x4D3366FF);
 							}
@@ -316,8 +317,8 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -326,8 +327,8 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 	}
 	
 	@Override
-	public void setWorld(World world) {
-		super.setWorld(world);
+	public void setWorldAndPos(World world, BlockPos pos) {
+		super.setWorldAndPos(world, pos);
 		
 		if (!world.isRemote) {
 			this.compWrapper.setAutoFill(true, 20);

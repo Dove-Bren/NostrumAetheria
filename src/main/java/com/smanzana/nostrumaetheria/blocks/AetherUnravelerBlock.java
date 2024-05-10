@@ -32,6 +32,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
@@ -70,16 +71,11 @@ public class AetherUnravelerBlock extends Block implements ILoreTagged {
 		return state.get(ON);
 	}
 	
-//	@Override
-//	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-//		return true;
-//	}
-	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		AetherUnravelerBlockEntity unraveler = (AetherUnravelerBlockEntity) worldIn.getTileEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(player, AetherUnravelerGui.AetherUnravelerContainer.Make(unraveler));
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override

@@ -22,6 +22,7 @@ import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
@@ -66,10 +67,10 @@ public class AetherChargerBlock extends Block implements ILoreTagged {
 //	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		AetherChargerBlockEntity charger = (AetherChargerBlockEntity) worldIn.getTileEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(player, AetherChargerGui.AetherChargerContainer.Make(charger));
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override

@@ -242,8 +242,8 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt.contains(NBT_BOILER_MODE, NBT.TAG_STRING)) {
 			BoilerBurnMode readMode = BoilerBurnMode.FOCUS_AETHER;

@@ -17,6 +17,7 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -43,7 +44,7 @@ public class WispBlock extends Block {
 //	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		
 		ItemStack heldItem = playerIn.getHeldItem(hand);
 		
@@ -56,19 +57,19 @@ public class WispBlock extends Block {
 				// Take scroll
 				te.setScroll(heldItem.copy());
 				heldItem.shrink(1);
-				return true;
+				return ActionResultType.SUCCESS;
 			} else if (heldItem.getItem() instanceof ReagentItem) {
 				
 				if (te.getReagent().isEmpty()) {
 					te.setReagent(heldItem.split(heldItem.getCount()));
-					return true;
+					return ActionResultType.SUCCESS;
 				} else if (ReagentItem.FindType(heldItem) == ReagentItem.FindType(te.getReagent())) {
 					int avail = Math.max(0, Math.min(64, 64 - te.getReagent().getCount()));
 					if (avail != 0) {
 						int take = Math.min(avail, heldItem.getCount());
 						heldItem.shrink(take);
 						te.getReagent().grow(take);
-						return true;
+						return ActionResultType.SUCCESS;
 					}
 				}
 			}
@@ -77,7 +78,7 @@ public class WispBlock extends Block {
 		WispBlockTileEntity te = (WispBlockTileEntity) worldIn.getTileEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(playerIn, WispBlockGui.WispBlockContainer.Make(te));
 		
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override

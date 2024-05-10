@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.utils.Inventories;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -266,8 +267,8 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -282,8 +283,8 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 	
 	@Override
-	public void setWorld(World world) {
-		super.setWorld(world);
+	public void setWorldAndPos(World world, BlockPos pos) {
+		super.setWorldAndPos(world, pos);
 		
 		if (!world.isRemote) {
 			this.compWrapper.setAutoFill(true);

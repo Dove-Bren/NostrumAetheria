@@ -21,6 +21,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IStringSerializable;
@@ -50,13 +51,13 @@ public class AetherFurnaceBlock extends Block implements ILoreTagged {
 		}
 		
 		@Override
-		public String getName() {
+		public String getString() {
 			return this.name().toLowerCase();
 		}
 		
 		@Override
 		public String toString() {
-			return this.getName();
+			return this.getString();
 		}
 		
 		public float getAetherMultiplier() {
@@ -115,16 +116,11 @@ public class AetherFurnaceBlock extends Block implements ILoreTagged {
 		return state.get(ON);
 	}
 	
-//	@Override
-//	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-//		return true;
-//	}
-	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		AetherFurnaceBlockEntity furnace = (AetherFurnaceBlockEntity) worldIn.getTileEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(player, AetherFurnaceGui.AetherFurnaceContainer.Make(furnace));
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override

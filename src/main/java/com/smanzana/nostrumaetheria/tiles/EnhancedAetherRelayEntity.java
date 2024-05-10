@@ -2,6 +2,7 @@ package com.smanzana.nostrumaetheria.tiles;
 
 import com.smanzana.nostrumaetheria.blocks.AetherRelay.RelayMode;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -44,8 +45,8 @@ public class EnhancedAetherRelayEntity extends AetherRelayEntity {
 		}
 		
 		@Override
-		public void read(CompoundNBT compound) {
-			super.read(compound);
+		public void read(BlockState state, CompoundNBT compound) {
+			super.read(state, compound);
 		}
 		
 		@Override

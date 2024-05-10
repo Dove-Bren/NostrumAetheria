@@ -33,6 +33,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
@@ -78,10 +79,10 @@ public class AetherRepairerBlock extends Block implements ILoreTagged {
 //	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		AetherRepairerBlockEntity repairer = (AetherRepairerBlockEntity) worldIn.getTileEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(player, AetherRepairerGui.AetherRepairerContainer.Make(repairer));
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override

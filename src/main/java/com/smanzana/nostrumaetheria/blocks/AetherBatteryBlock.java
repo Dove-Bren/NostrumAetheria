@@ -11,14 +11,12 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class AetherBatteryBlock extends Block implements ILoreTagged {
 	
@@ -47,7 +45,7 @@ public class AetherBatteryBlock extends Block implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
 		if (!worldIn.isRemote && handIn == Hand.MAIN_HAND) {
 			// request an update
@@ -62,7 +60,7 @@ public class AetherBatteryBlock extends Block implements ILoreTagged {
 			//return true;
 		}
 		
-		return false;
+		return ActionResultType.PASS;
 	}
 	
 	@Override
@@ -78,12 +76,6 @@ public class AetherBatteryBlock extends Block implements ILoreTagged {
 	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
 		TileEntity tileentity = worldIn.getTileEntity(pos);
 		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
-	}
-	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT;
 	}
 	
 	@Override
