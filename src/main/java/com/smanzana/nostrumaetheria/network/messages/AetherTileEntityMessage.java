@@ -4,13 +4,15 @@ import java.util.function.Supplier;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.nostrummagica.utils.NetUtils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
@@ -24,7 +26,7 @@ public class AetherTileEntityMessage {
 		
 		ctx.get().enqueueWork(() -> {
 			Minecraft mc = Minecraft.getInstance();
-			if (mc.player.world.getDimension().getType() == message.dimension) {
+			if (DimensionUtils.DimEquals(mc.player.world.getDimensionKey(), message.dimension)) {
 				World world = mc.player.world;
 				if (!NostrumMagica.isBlockLoaded(world, message.pos)) {
 					return;
@@ -39,15 +41,15 @@ public class AetherTileEntityMessage {
 		ctx.get().setPacketHandled(true);
 	}
 	
-	private final DimensionType dimension;
+	private final RegistryKey<World> dimension;
 	private final BlockPos pos;
 	private final int aether;
 	
 	public AetherTileEntityMessage(World world, BlockPos pos, int aether) {
-		this(world.getDimension().getType(), pos, aether);
+		this(world.getDimensionKey(), pos, aether);
 	}
 	
-	public AetherTileEntityMessage(DimensionType dimension, BlockPos pos, int aether) {
+	public AetherTileEntityMessage(RegistryKey<World> dimension, BlockPos pos, int aether) {
 		this.dimension = dimension;
 		this.pos = pos;
 		this.aether = aether;
@@ -58,20 +60,15 @@ public class AetherTileEntityMessage {
 	}
 
 	public static AetherTileEntityMessage decode(PacketBuffer buf) {
-		final int dimID = buf.readVarInt();
+		RegistryKey<World> dim = NetUtils.unpackDimension(buf);
 		final BlockPos pos = buf.readBlockPos();
 		final int aether = buf.readVarInt();
-		
-		DimensionType dim = DimensionType.getById(dimID);
-		if (dim == null) {
-			dim = DimensionType.OVERWORLD;
-		}
 		
 		return new AetherTileEntityMessage(dim, pos, aether);
 	}
 
 	public static void encode(AetherTileEntityMessage message, PacketBuffer buf) {
-		buf.writeVarInt(message.dimension.getId());
+		NetUtils.packDimension(buf, message.dimension);
 		buf.writeBlockPos(message.pos);
 		buf.writeVarInt(message.aether);
 	}

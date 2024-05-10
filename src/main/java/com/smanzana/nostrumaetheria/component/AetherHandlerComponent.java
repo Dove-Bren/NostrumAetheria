@@ -22,9 +22,11 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 public class AetherHandlerComponent implements IAetherHandlerComponent {
 	
@@ -45,7 +47,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	protected boolean allowInboundAether;
 	// "" but for outbound aether
 	protected boolean allowOutboundAether;
-	protected @Nullable DimensionType dimension;
+	protected @Nullable RegistryKey<World> dimension;
 	protected @Nullable BlockPos pos;
 	// Connections set via code instead of from parent (usually distant blocks, like relays)
 	private Set<AetherFlowConnection> remoteConnections;
@@ -63,7 +65,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	protected boolean aetherActiveTick; // useful for checking if active after super.tick()
 	protected int aetherLastTick;
 	
-	public AetherHandlerComponent(@Nullable DimensionType dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
+	public AetherHandlerComponent(@Nullable RegistryKey<World> dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
 		maxAether = defaultMaxAether;
 		aether = defaultAether;
 		this.dimension = dimension;
@@ -457,7 +459,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 		compound.putByte(NBT_SIDE_CONFIG, configToByte(sideConnections));
 		compound.putByte(NBT_INOUTBOUND_CONFIG, inoutConfigToByte(allowInboundAether, allowOutboundAether));
 		if (dimension != null && pos != null) {
-			compound.putInt(NBT_DIM, dimension.getId());
+			compound.putString(NBT_DIM, dimension.getLocation().toString());
 			compound.put(NBT_POS, NBTUtil.writeBlockPos(pos));
 		}
 		
@@ -470,9 +472,8 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 		configFromByte(sideConnections, compound.getByte(NBT_SIDE_CONFIG));
 		inoutConfigFromByte(this, compound.getByte(NBT_INOUTBOUND_CONFIG));
 		if (compound.contains(NBT_DIM) && compound.contains(NBT_POS)) {
-			this.dimension = DimensionType.getById(compound.getInt(NBT_DIM));
+			this.dimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString(NBT_DIM)));
 		}
-		
 		
 		fixAether();
 	}
@@ -483,7 +484,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	}
 
 	@Override
-	public DimensionType getDimension() {
+	public RegistryKey<World> getDimension() {
 		return this.dimension;
 	}
 
@@ -522,7 +523,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	
 	@Override
 	public void setPosition(World world, BlockPos pos) {
-		this.dimension = world == null ? null : world.getDimension().getType();
+		this.dimension = world == null ? null : world.getDimensionKey();
 		this.pos = pos;
 		//this.dirty();
 	}

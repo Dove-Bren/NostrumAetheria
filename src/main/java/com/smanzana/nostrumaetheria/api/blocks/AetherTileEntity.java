@@ -136,8 +136,8 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	}
 	
 	@Override
-	public void read(CompoundNBT compound) {
-		super.read(compound);
+	public void read(BlockState state, CompoundNBT compound) {
+		super.read(state, compound);
 		
 		compWrapper.loadNBT(compound.get(NBT_HANDLER));
 	}
@@ -160,8 +160,8 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	}
 	
 	@Override
-	public void setWorld(World world) {
-		super.setWorld(world);
+	public void setWorldAndPos(World world, BlockPos pos) {
+		super.setWorldAndPos(world, pos);
 		
 		this.compWrapper.getHandlerIfPresent().setPosition(this.world, this.pos);
 	}

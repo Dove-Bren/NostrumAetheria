@@ -55,7 +55,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 			int aether = comp.getAether(null);
 			int maxAether = comp.getMaxAether(null);
 			tooltip.add(new TranslationTextComponent("item.info.aether", String.format("%.2f", (float) aether * .01f), String.format("%.2f", (float) maxAether * .01f))
-					.applyTextStyle(TextFormatting.DARK_PURPLE));
+					.mergeStyle(TextFormatting.DARK_PURPLE));
 		}
 	}
 	

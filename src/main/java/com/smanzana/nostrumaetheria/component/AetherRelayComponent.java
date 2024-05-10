@@ -19,7 +19,6 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -197,7 +196,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	}
 	
 	public void autoLink() {
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		
 		for (int i = -range; i <= range; i++) {
 			int innerRadius = range - Math.abs(i);

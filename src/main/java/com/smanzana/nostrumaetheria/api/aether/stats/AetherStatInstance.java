@@ -62,19 +62,19 @@ public class AetherStatInstance {
 		tag.putInt(NBT_INTERVALS, TOTAL_INTERVALS);
 		ListNBT list = new ListNBT();
 		for (int i = 0; i < TOTAL_INTERVALS; i++) {
-			list.add(new IntNBT(aetherTotalHistory[i]));
+			list.add(IntNBT.valueOf(aetherTotalHistory[i]));
 		}
 		tag.put(NBT_TOTAL_LIST, list);
 		
 		list = new ListNBT();
 		for (int i = 0; i < TOTAL_INTERVALS; i++) {
-			list.add(new IntNBT(aetherInHistory[i]));
+			list.add(IntNBT.valueOf(aetherInHistory[i]));
 		}
 		tag.put(NBT_INPUT_LIST, list);
 		
 		list = new ListNBT();
 		for (int i = 0; i < TOTAL_INTERVALS; i++) {
-			list.add(new IntNBT(aetherOutHistory[i]));
+			list.add(IntNBT.valueOf(aetherOutHistory[i]));
 		}
 		tag.put(NBT_OUTPUT_LIST, list);
 		
