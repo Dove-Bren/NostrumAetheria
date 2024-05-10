@@ -1,4 +1,7 @@
 {
 	"loader": "forge:obj",
-    "model": "nostrumaetheria:models/block/pedestal_with_plate.obj"
+    "model": "nostrumaetheria:models/block/pedestal_with_plate.obj",
+	"textures": {
+		"particle": "nostrummagica:block/stone_generic1"
+	}
 }

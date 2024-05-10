@@ -1,4 +1,7 @@
 {
 	"loader": "forge:obj",
-    "model": "nostrumaetheria:models/block/crystal_relay_inout.obj"
+    "model": "nostrumaetheria:models/block/crystal_relay_inout.obj",
+	"textures": {
+		"particle": "nostrummagica:block/stone_generic1"
+	}
 }

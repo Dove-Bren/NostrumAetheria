@@ -1,4 +1,4 @@
 {
 	"loader": "forge:obj",
-    "model": "nostrumaetheria:models/block/cloak.obj"
+    "model": "nostrumaetheria:models/entity/cloak.obj"
 }
