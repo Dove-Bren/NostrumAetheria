@@ -1,5 +1,6 @@
 package com.smanzana.nostrumaetheria.init;
 
+import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.client.gui.container.ActivePendantGui;
 import com.smanzana.nostrumaetheria.client.gui.container.AetherBoilerGui;
@@ -19,7 +20,6 @@ import com.smanzana.nostrumaetheria.client.render.TileEntityWispBlockRenderer;
 import com.smanzana.nostrumaetheria.entity.AetheriaEntityTypes;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrumaetheria.tiles.AetheriaTileEntities;
-import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.RenderType;
@@ -41,7 +41,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
  * @author Skyler
  *
  */
-@Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = NostrumAetheria.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientInit {
 	
 	@SubscribeEvent

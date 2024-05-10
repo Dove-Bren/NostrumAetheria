@@ -39,6 +39,7 @@ public class AetherBatteryBlock extends Block implements ILoreTagged {
 		super(Block.Properties.create(Material.ROCK)
 				.hardnessAndResistance(3.0f, 10.0f)
 				.sound(SoundType.GLASS)
+				.notSolid()
 				);
 		
 		this.size = size;

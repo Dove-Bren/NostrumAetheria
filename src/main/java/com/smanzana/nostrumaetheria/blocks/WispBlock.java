@@ -35,6 +35,7 @@ public class WispBlock extends Block {
 		super(Block.Properties.create(Material.GLASS)
 				.hardnessAndResistance(3.0f, 10.0f)
 				.sound(SoundType.GLASS)
+				.notSolid()
 				);
 	}
 	

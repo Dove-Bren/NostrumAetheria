@@ -38,6 +38,7 @@ public class AetherBathBlock extends Block implements ILoreTagged {
 				.hardnessAndResistance(3.5f, 10.0f)
 				.sound(SoundType.STONE)
 				.setLightLevel((state) -> 1)
+				.notSolid()
 				);
 	}
 	

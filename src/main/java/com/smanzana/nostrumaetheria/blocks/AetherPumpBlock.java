@@ -48,6 +48,7 @@ public class AetherPumpBlock extends Block implements ILoreTagged {
 				.hardnessAndResistance(1.0f, 10.0f)
 				.sound(SoundType.STONE)
 				.harvestTool(ToolType.PICKAXE)
+				.notSolid()
 				);
 	}
 	

@@ -46,7 +46,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
  * @author Skyler
  *
  */
-@Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = NostrumAetheria.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModInit {
 
 	@SubscribeEvent
