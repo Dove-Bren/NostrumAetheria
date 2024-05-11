@@ -20,6 +20,7 @@ import com.smanzana.nostrumaetheria.client.render.TileEntityWispBlockRenderer;
 import com.smanzana.nostrumaetheria.entity.AetheriaEntityTypes;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrumaetheria.tiles.AetheriaTileEntities;
+import com.smanzana.nostrummagica.client.render.entity.RenderWisp;
 
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.RenderType;
@@ -90,6 +91,7 @@ public class ClientInit {
 	
 	private static final void registerEntityRenderers() {
 		RenderingRegistry.registerEntityRenderingHandler(AetheriaEntityTypes.batteryCart, (manager) -> new RenderAetherBatteryMinecart(manager));
+		RenderingRegistry.registerEntityRenderingHandler(AetheriaEntityTypes.sentinelWisp, (manager) -> new RenderWisp(manager));
 	}
 	
 	@SubscribeEvent

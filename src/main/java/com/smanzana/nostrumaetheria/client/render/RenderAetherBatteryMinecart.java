@@ -24,7 +24,7 @@ public class RenderAetherBatteryMinecart extends MinecartRenderer<EntityAetherBa
 			
 			//(cart.world, 0, 0, -1, partialTicks, 0, cart.getAether(), cart.getMaxAether(), true);
 			matrixStackIn.push();
-			matrixStackIn.translate(0, 0, -1);
+			matrixStackIn.translate(0, 0, 0);
 			AetherBatteryRenderer.renderBatteryLiquid(matrixStackIn, buffer, packedLightIn, time, cart.getAether(), cart.getMaxAether(), true);
 			matrixStackIn.pop();
 		}

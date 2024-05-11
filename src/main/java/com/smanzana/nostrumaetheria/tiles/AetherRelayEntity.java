@@ -283,7 +283,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 			
 			final int color;
 			//if (relay.isAetherActive()) {
-				color = 0x80D4CF80;
+				color = 0xA0D4CF80;
 			//} else {
 			//	color = 0x80D3D3CD;
 			//}
@@ -301,7 +301,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 					
 					if (count > 0) {
 						NostrumParticles.FILLED_ORB.spawn(world, new SpawnParams(
-								count, dest.getX() + .5, dest.getY() + .5, dest.getZ() + .5, 0, 20 * 1, 10, new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5)
+								count, dest.getX() + .5, dest.getY() + .5, dest.getZ() + .5, 0, 30 * 1, 10, new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5)
 							).color(color));
 					}
 					

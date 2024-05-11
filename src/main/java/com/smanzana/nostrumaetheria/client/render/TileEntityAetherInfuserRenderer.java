@@ -33,7 +33,6 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 	}
 	
 	private void renderOrb(MatrixStack matrixStackIn, IVertexBuilder buffer, int combinedLightIn, float opacity, boolean outside) {
-		
 		final float mult = 2 * ORB_RADIUS * (outside ? 1 : -1);
 		
 		// outside
@@ -87,11 +86,11 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		final float yaw = spark.getYaw(ticks, partialTicks);
 		final double pitchRad = 2 * Math.PI * pitch;
 		final double yawRad = 2 * Math.PI * yaw;
-		final float offsetX = (float) (ORB_RADIUS * Math.sin(pitchRad) * Math.cos(yawRad));
-		final float offsetZ = (float) (ORB_RADIUS * Math.sin(pitchRad) * Math.sin(yawRad));
+		final float offsetX = (float) (2 * ORB_RADIUS * Math.sin(pitchRad) * Math.cos(yawRad));
+		final float offsetZ = (float) (2 * ORB_RADIUS * Math.sin(pitchRad) * Math.sin(yawRad));
 		
 		// Y offset so that lowest is at -.5, not -radius
-		final float offsetY = (float) (ORB_RADIUS * -Math.cos(pitchRad)) + ORB_RADIUS -.5f;
+		final float offsetY = (float) (2 * ORB_RADIUS * -Math.cos(pitchRad)) + ORB_RADIUS -.5f;
 		
 		// Rotation
 		;
@@ -129,15 +128,15 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		
 		// Calculate opacity for orb. Probably should add glow.
 		// 0f to .4f
-		final float maxOrbOpacity = .15f;
+		final float maxOrbOpacity = .6f;
 		final float orbOpacity = maxOrbOpacity * (.75f + .25f * (float)Math.sin(t * 2 * Math.PI)) * te.getChargePerc();
 		
 		matrixStackIn.push();
 		matrixStackIn.translate(.5f, 1f, .5f);
 		
 		final IVertexBuilder orbBuffer = bufferIn.getBuffer(AetheriaRenderTypes.INFUSER_ORB);
-		//renderOrb(matrixStackIn, orbBuffer, combinedLightIn, orbOpacity, false);
-		renderOrb(matrixStackIn, orbBuffer, combinedLightIn,orbOpacity, true);
+		renderOrb(matrixStackIn, orbBuffer, combinedLightIn, orbOpacity, false);
+		renderOrb(matrixStackIn, orbBuffer, combinedLightIn, orbOpacity, true);
 		
 		final IVertexBuilder sparkBuffer = bufferIn.getBuffer(AetheriaRenderTypes.INFUSER_SPARK);
 		

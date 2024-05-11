@@ -8,6 +8,7 @@ import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.component.AetherHandlerComponent;
 import com.smanzana.nostrumaetheria.tiles.AetherRelayEntity;
 import com.smanzana.nostrummagica.utils.Curves;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -16,7 +17,6 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
 
 public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 
@@ -103,13 +103,16 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 			AetherHandlerComponent relay = (AetherHandlerComponent) handler;
 			final String str = relay.getAether(null) + "/" + relay.getMaxAether(null);
 			matrixStackIn.push();
-			matrixStackIn.translate(.5f, 0, .5f);
-			matrixStackIn.scale(.0625f, .0625f, .0625f);
-			matrixStackIn.rotate(Vector3f.YP.rotationDegrees(-90f));
-			matrixStackIn.translate(-mc.fontRenderer.getStringWidth(str)/2, AetherRelay.height + 8, 0);
-			matrixStackIn.scale(1f, -1f, 1f);
-			
-			mc.fontRenderer.drawString(matrixStackIn, str, 0, 0, 0xFFFFFFFF);
+//			matrixStackIn.translate(.5f, 0, .5f);
+//			matrixStackIn.rotate(Vector3f.YP.rotationDegrees(180f));
+//			matrixStackIn.scale(1f, -1f, 1f);
+//			matrixStackIn.rotate(this.renderDispatcher.renderInfo.getRotation());
+//			matrixStackIn.scale(.0625f, .0625f, .0625f);
+//			matrixStackIn.translate(-mc.fontRenderer.getStringWidth(str)/2, AetherRelay.height + 8, 0);
+//			
+//			mc.fontRenderer.drawString(matrixStackIn, str, 0, 0, 0xFFFFFFFF);
+			matrixStackIn.translate(.5f, (float)AetherRelay.height/8f, .5f);
+			RenderFuncs.drawNameplate(matrixStackIn, bufferIn, str, mc.fontRenderer, combinedLightIn, 0, false, this.renderDispatcher.renderInfo);
 			
 			matrixStackIn.pop();
 		}

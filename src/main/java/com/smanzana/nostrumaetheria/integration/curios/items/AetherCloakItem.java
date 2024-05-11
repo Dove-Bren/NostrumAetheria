@@ -745,9 +745,6 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 			CapeRenderTypeCutout,
 			CapeRenderTypeCutout,
 			CapeRenderTypeTranslucent,
-			CapeRenderTypeCutout,
-			CapeRenderTypeCutout,
-			CapeRenderTypeTranslucent,
 		};
 		
 		public static final ResourceLocation[] AllCapeModels = new ResourceLocation[] {

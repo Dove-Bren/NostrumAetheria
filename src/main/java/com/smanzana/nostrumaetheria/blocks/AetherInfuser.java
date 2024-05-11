@@ -24,6 +24,7 @@ public class AetherInfuser extends Block {
 				.hardnessAndResistance(5.0f, 8.0f)
 				.sound(SoundType.STONE)
 				.noDrops()
+				.notSolid() // so that light f or TE is non-zero
 				);
 		
 	}

@@ -76,8 +76,6 @@ public class TileEntityWispBlockRenderer extends TileEntityRenderer<WispBlockTil
 	
 	// Origin at center of bottom
 	protected void renderBase(MatrixStack matrixStackIn, IVertexBuilder buffer, int combinedLightIn) {
-		int unused; // unit cube means short faces will have squished texture...
-		
 		matrixStackIn.push();
 		matrixStackIn.translate(0, .1f, 0); // move so origin is 0, .1, 0
 		matrixStackIn.scale(1f, .2f, 1f); // scale so range is -.5,5 for x and z but 0,.2 for y

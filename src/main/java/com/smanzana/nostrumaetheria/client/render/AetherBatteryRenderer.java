@@ -6,6 +6,7 @@ import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 
 public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherBatteryEntity> {
@@ -28,8 +29,8 @@ public class AetherBatteryRenderer extends TileEntityAetherDebugRenderer<AetherB
 		matrixStackIn.push();
 		// Translate so block is centered horizontally, and centered vertically based on fill level
 		matrixStackIn.translate(.5, 0 + (prog/2f), .5);
-		matrixStackIn.scale(1-offset, prog, 1-offset);
-		RenderFuncs.drawUnitCube(matrixStackIn, buffer, combinedLightIn, combinedLightIn, red, green, blue, alpha);
+		matrixStackIn.scale(1-offset, prog*(1-offset*2), 1-offset);
+		RenderFuncs.drawUnitCube(matrixStackIn, buffer, combinedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
 		matrixStackIn.pop();
 	}
 	
