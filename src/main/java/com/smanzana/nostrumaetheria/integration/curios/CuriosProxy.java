@@ -66,7 +66,7 @@ public class CuriosProxy {
 	}
 	
 	public void init() {
-		MinecraftForge.EVENT_BUS.register(this);
+		MinecraftForge.EVENT_BUS.addListener(this::registerCurioRituals);
 		registerCurioQuests();
 //		registerCurioRituals();
 		registerCurioResearch();

@@ -481,7 +481,7 @@ public class ModInit {
 			}
 			
 			registry.register(
-				RitualRecipe.createTier3("make_lens_" + type.getUnlocSuffix(),
+				RitualRecipe.createTier3("make_" + type.getUnlocSuffix(),
 						new ItemStack(ItemAetherLens.GetLens(type)),
 						null,
 						new ReagentType[] {ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
