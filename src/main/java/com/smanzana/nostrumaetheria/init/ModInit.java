@@ -86,6 +86,8 @@ public class ModInit {
 		registerResearch();
 		AetherRepairerBlock.initDefaultRecipes();
 		AetherUnravelerBlock.initDefaultRecipes();
+		APIProxy.AetherResearchTab = new NostrumResearch.NostrumResearchTab("aether", new ItemStack(AetheriaItems.aetherGem));
+    	APIProxy.AetherGearResearchTab = new NostrumResearch.NostrumResearchTab("aether_gear", new ItemStack(AetheriaItems.aetherSightTool));
 		NostrumMagica.instance.registerResearchReloadHook((i) -> {
     		registerResearch();
     		return 0;
@@ -97,9 +99,6 @@ public class ModInit {
 	}
 	
 	private static final void registerResearch() {
-    	APIProxy.AetherResearchTab = new NostrumResearch.NostrumResearchTab("aether", new ItemStack(AetheriaItems.aetherGem));
-    	APIProxy.AetherGearResearchTab = new NostrumResearch.NostrumResearchTab("aether_gear", new ItemStack(AetheriaItems.aetherSightTool));
-    	
     	NostrumResearch.startBuilding()
 			.hiddenParent("rituals")
 			.hiddenParent("thano_pendant")
