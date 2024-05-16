@@ -151,6 +151,9 @@ dependencies {
 	//runtimeOnly files("libs/nostrumaetheria-${aetheria_version}-deobf.jar")
 	compileOnly files("libs/nostrummagica-${magica_version}-deobf.jar") //At compile time, use actual eclipse project
 	runtimeOnly files("libs/nostrummagica-${magica_version}-deobf.jar")
+	
+	runtimeOnly files("libs/petcommand-${petcommand_version}-deobf.jar")
+	compileOnly files("libs/petcommand-${petcommand_version}-api.jar")
 
 }
 

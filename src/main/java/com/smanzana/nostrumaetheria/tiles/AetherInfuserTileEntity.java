@@ -17,10 +17,10 @@ import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.utils.Inventories.ItemStackArrayWrapper;
 import com.smanzana.nostrummagica.utils.WorldUtil;
+import com.smanzana.petcommand.api.entity.ITameableEntity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;

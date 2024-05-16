@@ -35,3 +35,10 @@ Magical energy add-on for Nostrum Magica
 	versionRange="[1.16.5-1.11.0,)"
 	ordering="AFTER"
 	side="BOTH"
+
+[[dependencies.nostrumaetheria]]
+	modId="petcommand"
+	mandatory=true
+	versionRange="[1.16.5-1.0.0,)"
+	ordering="AFTER"
+	side="BOTH"
