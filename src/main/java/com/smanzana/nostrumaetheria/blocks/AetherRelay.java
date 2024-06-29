@@ -4,11 +4,11 @@ import java.util.Random;
 
 import com.smanzana.nostrumaetheria.tiles.AetherRelayEntity;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.PositionCrystal;
+import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

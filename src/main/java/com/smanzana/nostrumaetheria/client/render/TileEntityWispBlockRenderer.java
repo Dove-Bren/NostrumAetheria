@@ -7,10 +7,10 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
-import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.utils.ColorUtil;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.util.ColorUtil;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -231,7 +231,7 @@ public class TileEntityWispBlockRenderer extends TileEntityRenderer<WispBlockTil
 		int spellIcon = -1;
 		@Nonnull ItemStack scroll = te.getScroll();
 		if (!scroll.isEmpty()) {
-			Spell spell = SpellScroll.getSpell(scroll);
+			Spell spell = SpellScroll.GetSpell(scroll);
 			if (spell != null) {
 				baseColor = spell.getPrimaryElement().getColor();
 				spellIcon = spell.getIconIndex();
@@ -272,7 +272,7 @@ public class TileEntityWispBlockRenderer extends TileEntityRenderer<WispBlockTil
 			matrixStackIn.scale(.25f, .25f, .25f);
 			//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 			
-			RenderFuncs.ItemRenderer(scroll, matrixStackIn, bufferIn, combinedLightIn);
+			RenderFuncs.RenderWorldItem(scroll, matrixStackIn, bufferIn, combinedLightIn);
 			
 			matrixStackIn.pop();
 		}
@@ -287,7 +287,7 @@ public class TileEntityWispBlockRenderer extends TileEntityRenderer<WispBlockTil
 			
 			matrixStackIn.scale(.25f, .25f, .25f);
 			
-			RenderFuncs.ItemRenderer(reagents, matrixStackIn, bufferIn, combinedLightIn);
+			RenderFuncs.RenderWorldItem(reagents, matrixStackIn, bufferIn, combinedLightIn);
 			
 			matrixStackIn.pop();
 		}

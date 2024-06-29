@@ -11,10 +11,10 @@ import com.smanzana.nostrumaetheria.client.gui.container.IAutoContainerInventory
 import com.smanzana.nostrumaetheria.entity.AetheriaEntityTypes;
 import com.smanzana.nostrumaetheria.entity.SentinelWispEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntityWisp;
-import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.utils.Inventories;
+import com.smanzana.nostrummagica.entity.WispEntity;
+import com.smanzana.nostrummagica.item.ReagentItem;
+import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.util.Inventories;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,7 +35,7 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	private boolean activated;
 	
 	// Transient
-	private List<EntityWisp> wisps; // on server
+	private List<WispEntity> wisps; // on server
 	private int numWisps;
 	
 	// TODO add progression. Maybe insert essences or mani crystals?
@@ -116,7 +116,7 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	public void deactivate() {
 		this.activated = false;
 		
-		for (EntityWisp wisp : this.wisps) {
+		for (WispEntity wisp : this.wisps) {
 			wisp.remove();
 		}
 		wisps.clear();
@@ -143,7 +143,7 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 		} while (!world.isAirBlock(spawnPos) && attempts-- >= 0);
 		
 		if (world.isAirBlock(spawnPos)) {
-			EntityWisp wisp = new SentinelWispEntity(AetheriaEntityTypes.sentinelWisp, this.world, this.pos);
+			WispEntity wisp = new SentinelWispEntity(AetheriaEntityTypes.sentinelWisp, this.world, this.pos);
 			wisp.setPosition(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
 			this.wisps.add(wisp);
 			this.world.addEntity(wisp);
@@ -160,9 +160,9 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 			return;
 		}
 		
-		Iterator<EntityWisp> it = wisps.iterator();
+		Iterator<WispEntity> it = wisps.iterator();
 		while (it.hasNext()) {
-			EntityWisp wisp = it.next();
+			WispEntity wisp = it.next();
 			if (!wisp.isAlive()) {
 				it.remove();
 				//this.dirtyAndUpdate();
@@ -393,7 +393,7 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 			return false;
 		
 		if (index == 0) {
-			return (stack.isEmpty() || (stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null));
+			return (stack.isEmpty() || (stack.getItem() instanceof SpellScroll && SpellScroll.GetSpell(stack) != null));
 		} else {
 			return (stack.isEmpty() || stack.getItem() instanceof ReagentItem);
 		}

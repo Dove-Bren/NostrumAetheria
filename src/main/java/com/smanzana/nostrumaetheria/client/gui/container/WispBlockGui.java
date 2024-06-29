@@ -7,12 +7,12 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 import com.smanzana.nostrummagica.client.gui.container.AutoContainer;
 import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
-import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.utils.ContainerUtil;
-import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.item.ReagentItem;
+import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.util.ContainerUtil;
+import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -74,7 +74,7 @@ public class WispBlockGui {
 				@Override
 				public boolean isItemValid(@Nonnull ItemStack stack) {
 					return stack.isEmpty() ||
-							(stack.getItem() instanceof SpellScroll && SpellScroll.getSpell(stack) != null);
+							(stack.getItem() instanceof SpellScroll && SpellScroll.GetSpell(stack) != null);
 				}
 //				
 //				@Override
@@ -293,7 +293,7 @@ public class WispBlockGui {
 			int color = 0xFFFFFFFF;
 			
 			if (!scroll.isEmpty()) {
-				Spell spell = SpellScroll.getSpell(scroll);
+				Spell spell = SpellScroll.GetSpell(scroll);
 				if (spell != null) {
 					color = spell.getPrimaryElement().getColor();
 				}

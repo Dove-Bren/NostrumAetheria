@@ -3,7 +3,7 @@ package com.smanzana.nostrumaetheria.client.render;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrumaetheria.tiles.AetherBatteryEntity;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.texture.OverlayTexture;

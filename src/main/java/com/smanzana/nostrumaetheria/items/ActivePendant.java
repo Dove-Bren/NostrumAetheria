@@ -11,11 +11,11 @@ import com.smanzana.nostrumaetheria.client.gui.container.ActivePendantGui;
 import com.smanzana.nostrumaetheria.client.gui.container.ActivePendantGui.ActivePendantContainer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.ISpellArmor;
+import com.smanzana.nostrummagica.item.ISpellEquipment;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
-import com.smanzana.nostrummagica.utils.Inventories;
+import com.smanzana.nostrummagica.util.Inventories;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -39,7 +39,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Skyler
  *
  */
-public class ActivePendant extends Item implements ILoreTagged, ISpellArmor {
+public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment {
 
 	private static final String NBT_PENDANT_REAGENTS = "reagent_stack";
 	private static final String NBT_PENDANT_POINTS = "points"; // Reagents burnt, including fractional part for current. NOT charges.

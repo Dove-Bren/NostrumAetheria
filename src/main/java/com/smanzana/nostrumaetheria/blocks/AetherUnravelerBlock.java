@@ -12,13 +12,14 @@ import com.smanzana.nostrumaetheria.client.gui.container.AetherUnravelerGui;
 import com.smanzana.nostrumaetheria.tiles.AetherUnravelerBlockEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.SpellRune;
-import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.item.SpellRune;
+import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPart;
+import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
+import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -192,46 +193,20 @@ public class AetherUnravelerBlock extends Block implements ILoreTagged {
 		public NonNullList<ItemStack> unravel(ItemStack stack) {
 			NonNullList<ItemStack> ret = NonNullList.create();
 			
-			Spell spell = SpellScroll.getSpell(stack);
+			Spell spell = SpellScroll.GetSpell(stack);
 			if (spell == null) {
 				NostrumAetheria.logger.error("Tried to process spell scroll in unraveler but found no spell");
 				return ret;
 			}
 			
-			List<SpellPart> parts = spell.getSpellParts();
-			NonNullList<ItemStack> runes = NonNullList.create();
-			for (SpellPart part : parts) {
-				runes.clear();
-				runes = SpellRune.decomposeRune(SpellRune.getRune(part), runes);
-				
-//				if (part.isTrigger()) {
-//					SpellTrigger trigger = part.getTrigger();
-//					runes = new ItemStack[] {SpellRune.getRune(trigger)};
-//				} else {
-//					SpellShape shape = part.getShape();
-//					EMagicElement elem = part.getElement();
-//					int elemCount = part.getElementCount();
-//					EAlteration alt = part.getAlteration();
-//					
-//					// TIER 3 element is 4 runes
-//					elemCount = (int) Math.pow(2, elemCount-1);
-//					
-//					runes = new ItemStack[1 + elemCount + (alt == null ? 0 : 1)];
-//					runes[0] = SpellRune.getRune(shape);
-//					if (alt != null) {
-//						runes[1] = SpellRune.getRune(alt);
-//					}
-//					
-//					
-//					for (; elemCount > 0; elemCount--) {
-//						runes[1 + (alt == null ? 0 : 1) + (elemCount - 1)]
-//								= SpellRune.getRune(elem, 1);
-//					}
-//				}
-				
-				for (ItemStack rune : runes) {
-					ret.add(rune);
-				}
+			List<SpellShapePart> shapes = spell.getSpellShapeParts();
+			List<SpellEffectPart> effects = spell.getSpellEffectParts();
+			
+			for (SpellShapePart shape : shapes) {
+				ret.add(SpellRune.getRune(shape));
+			}
+			for (SpellEffectPart effect : effects) {
+				ret.addAll(SpellRune.getRune(effect));
 			}
 			
 			return ret;
@@ -246,7 +221,7 @@ public class AetherUnravelerBlock extends Block implements ILoreTagged {
 		
 		@Override
 		public boolean matches(@Nonnull ItemStack stack) {
-			return stack.getItem() instanceof SpellTome && !SpellTome.getSpells(stack).isEmpty();
+			return stack.getItem() instanceof SpellTome && !SpellTome.getSpellLibrary(stack).isEmpty();
 		}
 
 		@Override
@@ -264,7 +239,7 @@ public class AetherUnravelerBlock extends Block implements ILoreTagged {
 			NonNullList<ItemStack> ret = NonNullList.create();
 			ret.add(stack.copy());
 			
-			List<Spell> spells = SpellTome.getSpells(stack);
+			List<Spell> spells = SpellTome.getSpellLibrary(stack);
 			if (spells == null || spells.isEmpty()) {
 				;
 			} else {

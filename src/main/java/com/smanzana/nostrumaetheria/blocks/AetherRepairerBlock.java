@@ -10,7 +10,7 @@ import com.smanzana.nostrumaetheria.recipes.RepairerRecipeManager;
 import com.smanzana.nostrumaetheria.tiles.AetherRepairerBlockEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 

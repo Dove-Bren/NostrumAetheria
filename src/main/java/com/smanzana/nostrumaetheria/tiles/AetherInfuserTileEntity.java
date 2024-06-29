@@ -17,9 +17,9 @@ import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.tiles.AltarTileEntity;
-import com.smanzana.nostrummagica.utils.Inventories.ItemStackArrayWrapper;
-import com.smanzana.nostrummagica.utils.WorldUtil;
+import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.util.Inventories.ItemStackArrayWrapper;
+import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
 import net.minecraft.block.BlockState;

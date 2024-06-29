@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.ISpellArmor;
+import com.smanzana.nostrummagica.item.ISpellEquipment;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
@@ -28,7 +28,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Skyler
  *
  */
-public class PassivePendant extends AetherItem implements ILoreTagged, ISpellArmor {
+public class PassivePendant extends AetherItem implements ILoreTagged, ISpellEquipment {
 
 	private static final int AETHER_PER_CHARGE = 500;
 	private static final int MAX_CHARGES = 3;

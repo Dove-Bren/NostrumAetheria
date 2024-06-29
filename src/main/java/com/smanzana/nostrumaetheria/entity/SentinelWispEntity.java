@@ -3,10 +3,10 @@ package com.smanzana.nostrumaetheria.entity;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.blocks.WispBlock;
-import com.smanzana.nostrummagica.entity.EntityWisp;
-import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.entity.WispEntity;
+import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Spell;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -15,7 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SentinelWispEntity extends EntityWisp {
+public class SentinelWispEntity extends WispEntity {
 
 	public SentinelWispEntity(EntityType<? extends SentinelWispEntity> type, World worldIn) {
 		super(type, worldIn);
@@ -28,7 +28,7 @@ public class SentinelWispEntity extends EntityWisp {
 	}
 	
 	public static final AttributeModifierMap.MutableAttribute BuildSentinelAttributes(){
-		return EntityWisp.BuildAttributes();
+		return WispEntity.BuildAttributes();
 	}
 	
 	@Override
@@ -42,7 +42,7 @@ public class SentinelWispEntity extends EntityWisp {
 		
 		
 		if (!scroll.isEmpty()) {
-			spell = SpellScroll.getSpell(scroll);
+			spell = SpellScroll.GetSpell(scroll);
 		}
 		
 		if (spell == null) {

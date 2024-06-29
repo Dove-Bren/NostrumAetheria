@@ -3,7 +3,7 @@ package com.smanzana.nostrumaetheria.integration.curios.items;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurio;
-import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
+import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;

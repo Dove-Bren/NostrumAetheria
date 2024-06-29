@@ -14,13 +14,13 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
-import com.smanzana.nostrummagica.effects.NostrumPotions;
+import com.smanzana.nostrummagica.effect.NostrumPotions;
 import com.smanzana.nostrummagica.entity.IMagicEntity;
-import com.smanzana.nostrummagica.items.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.MagicArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.utils.Entities;
-import com.smanzana.nostrummagica.utils.Inventories;
+import com.smanzana.nostrummagica.util.Entities;
+import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
 import net.minecraft.block.Block;

@@ -17,12 +17,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.integration.curios.items.INostrumCurio;
-import com.smanzana.nostrummagica.items.ICapeProvider;
-import com.smanzana.nostrummagica.items.ISpellArmor;
+import com.smanzana.nostrummagica.item.armor.ICapeProvider;
+import com.smanzana.nostrummagica.item.ISpellEquipment;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
-import com.smanzana.nostrummagica.utils.ColorUtil;
+import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
@@ -49,7 +49,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = NostrumAetheria.MODID)
-public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreTagged, ISpellArmor, ICapeProvider {
+public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreTagged, ISpellEquipment, ICapeProvider {
 	
 	public static interface UpgradeToggleFunc {
 		public boolean isSet(@Nonnull ItemStack stack);

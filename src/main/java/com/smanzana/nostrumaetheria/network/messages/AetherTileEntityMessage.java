@@ -4,8 +4,8 @@ import java.util.function.Supplier;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.utils.DimensionUtils;
-import com.smanzana.nostrummagica.utils.NetUtils;
+import com.smanzana.nostrummagica.util.DimensionUtils;
+import com.smanzana.nostrummagica.util.NetUtils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;

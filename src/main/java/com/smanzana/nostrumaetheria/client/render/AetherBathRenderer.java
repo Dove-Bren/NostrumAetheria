@@ -3,7 +3,7 @@ package com.smanzana.nostrumaetheria.client.render;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrumaetheria.tiles.AetherBathTileEntity;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
@@ -100,7 +100,7 @@ public class AetherBathRenderer extends TileEntityRenderer<AetherBathTileEntity>
 		
 		matrixStackIn.scale(scale, scale, scale);
 		
-		RenderFuncs.ItemRenderer(item, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
+		RenderFuncs.RenderWorldItem(item, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
 		matrixStackIn.pop();
 	}
 	

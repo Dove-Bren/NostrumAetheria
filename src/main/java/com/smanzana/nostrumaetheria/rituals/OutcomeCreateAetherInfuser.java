@@ -3,13 +3,13 @@ package com.smanzana.nostrumaetheria.rituals;
 import java.util.List;
 
 import com.smanzana.nostrumaetheria.blocks.AetherInfuser;
-import com.smanzana.nostrummagica.blocks.AltarBlock;
-import com.smanzana.nostrummagica.blocks.Candle;
-import com.smanzana.nostrummagica.blocks.ChalkBlock;
-import com.smanzana.nostrummagica.rituals.RitualRecipe;
-import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
-import com.smanzana.nostrummagica.tiles.AltarTileEntity;
-import com.smanzana.nostrummagica.utils.TextUtils;
+import com.smanzana.nostrummagica.block.AltarBlock;
+import com.smanzana.nostrummagica.block.CandleBlock;
+import com.smanzana.nostrummagica.block.ChalkBlock;
+import com.smanzana.nostrummagica.ritual.RitualRecipe;
+import com.smanzana.nostrummagica.ritual.outcome.IRitualOutcome;
+import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -42,7 +42,7 @@ public class OutcomeCreateAetherInfuser implements IRitualOutcome {
 				BlockPos pos = center.add(i, 0, j);
 				BlockState state = world.getBlockState(pos);
 				if (state != null &&
-						(state.getBlock() instanceof Candle || state.getBlock() instanceof AltarBlock || state.getBlock() instanceof ChalkBlock)) {
+						(state.getBlock() instanceof CandleBlock || state.getBlock() instanceof AltarBlock || state.getBlock() instanceof ChalkBlock)) {
 					world.destroyBlock(pos, true);
 				}
 			}

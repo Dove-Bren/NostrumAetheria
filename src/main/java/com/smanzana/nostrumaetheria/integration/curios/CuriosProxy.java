@@ -11,20 +11,19 @@ import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.integration.curios.inventory.CurioInventoryWrapper;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.items.SpellRune;
-import com.smanzana.nostrummagica.research.NostrumResearch;
-import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
-import com.smanzana.nostrummagica.research.NostrumResearch.Size;
-import com.smanzana.nostrummagica.rituals.RitualRecipe;
-import com.smanzana.nostrummagica.rituals.RitualRegistry;
-import com.smanzana.nostrummagica.rituals.outcomes.OutcomeModifyCenterItemGeneric;
-import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
-import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
-import com.smanzana.nostrummagica.utils.Ingredients;
+import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.item.SpellRune;
+import com.smanzana.nostrummagica.progression.requirement.ResearchRequirement;
+import com.smanzana.nostrummagica.progression.research.NostrumResearch;
+import com.smanzana.nostrummagica.progression.research.NostrumResearch.NostrumResearchTab;
+import com.smanzana.nostrummagica.progression.research.NostrumResearch.Size;
+import com.smanzana.nostrummagica.ritual.RitualRecipe;
+import com.smanzana.nostrummagica.ritual.RitualRegistry;
+import com.smanzana.nostrummagica.ritual.outcome.OutcomeModifyCenterItemGeneric;
+import com.smanzana.nostrummagica.ritual.outcome.OutcomeSpawnItem;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
+import com.smanzana.nostrummagica.util.Ingredients;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -92,8 +91,8 @@ public class CuriosProxy {
 				EMagicElement.EARTH,
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
 				Ingredient.fromItems(NostrumCurios.ringSilver),
-				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(SelfTrigger.instance())), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
-				new RRequirementResearch("shield_rings"),
+				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(NostrumSpellShapes.Self)), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
+				new ResearchRequirement("shield_rings"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.ringShieldSmall)));
 		registry.register(recipe);
 		
@@ -103,7 +102,7 @@ public class CuriosProxy {
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
 				Ingredient.fromItems(AetheriaCurios.ringShieldSmall),
 				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), silver, Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
-				new RRequirementResearch("shield_rings"),
+				new ResearchRequirement("shield_rings"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.ringShieldLarge)));
 		registry.register(recipe);
 		
@@ -112,8 +111,8 @@ public class CuriosProxy {
 				EMagicElement.WIND,
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
 				Ingredient.fromTag(ItemTags.WOOL),
-				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(DamagedTrigger.instance())), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
-				new RRequirementResearch("elude_capes"),
+				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(NostrumSpellShapes.OnDamage)), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
+				new ResearchRequirement("elude_capes"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.eludeCape)));
 		registry.register(recipe);
 		
@@ -123,7 +122,7 @@ public class CuriosProxy {
 				new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL, ReagentType.SKY_ASH},
 				Ingredient.fromItems(AetheriaBlocks.smallBattery),
 				new Ingredient[] {Ingredient.fromItems(AetheriaItems.aetherGem), Ingredient.fromItems(AetheriaCurios.eludeCape), Ingredient.fromTag(NostrumTags.Items.CrystalLarge), Ingredient.fromItems(AetheriaItems.aetherGem)},
-				new RRequirementResearch("aether_cloaks"),
+				new ResearchRequirement("aether_cloaks"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.aetherCloak)));
 		registry.register(recipe);
 		
@@ -135,7 +134,7 @@ public class CuriosProxy {
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
 				Ingredient.fromItems(AetheriaCurios.aetherCloak),
 				new Ingredient[] {Ingredient.fromItems(AetheriaItems.passivePendant), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.EMPTY, Ingredient.fromItems(AetheriaItems.passivePendant)},
-				new RRequirementResearch("aether_cloaks"),
+				new ResearchRequirement("aether_cloaks"),
 				new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
 					if (!item.isEmpty() && item.getItem() instanceof AetherCloakItem) {
 						((AetherCloakItem) item.getItem()).setAetherCaster(item, true);
@@ -149,7 +148,7 @@ public class CuriosProxy {
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
 				Ingredient.fromItems(AetheriaItems.aetherSightTool),
 				new Ingredient[] {Ingredient.fromTag(Tags.Items.INGOTS_GOLD)},
-				new RRequirementResearch("aether_sight_pendant"),
+				new ResearchRequirement("aether_sight_pendant"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.sightPendant)));
 		registry.register(recipe);
 	}

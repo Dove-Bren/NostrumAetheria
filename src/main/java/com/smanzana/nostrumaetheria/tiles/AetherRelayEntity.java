@@ -12,7 +12,7 @@ import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay.RelayMode;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.utils.TileEntities;
+import com.smanzana.nostrummagica.util.TileEntities;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;

@@ -5,8 +5,8 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrumaetheria.client.gui.container.WispBlockGui;
 import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.item.ReagentItem;
+import com.smanzana.nostrummagica.item.SpellScroll;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -54,7 +54,7 @@ public class WispBlock extends Block {
 			WispBlockTileEntity te = (WispBlockTileEntity) worldIn.getTileEntity(pos);
 			if (heldItem.getItem() instanceof SpellScroll
 					&& te.getScroll() == null
-					&& SpellScroll.getSpell(heldItem) != null) {
+					&& SpellScroll.GetSpell(heldItem) != null) {
 				// Take scroll
 				te.setScroll(heldItem.copy());
 				heldItem.shrink(1);

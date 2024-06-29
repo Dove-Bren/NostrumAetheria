@@ -7,8 +7,8 @@ import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.component.AetherHandlerComponent;
 import com.smanzana.nostrumaetheria.tiles.AetherRelayEntity;
-import com.smanzana.nostrummagica.utils.Curves;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.util.Curves;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;

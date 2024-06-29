@@ -8,7 +8,7 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity;
 import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity.EffectSpark;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
