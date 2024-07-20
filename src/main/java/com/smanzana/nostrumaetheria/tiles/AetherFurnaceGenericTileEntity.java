@@ -5,7 +5,8 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
+import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
+import com.smanzana.nostrumaetheria.capability.AetherBurnableCapabilityProvider;
 import com.smanzana.nostrumaetheria.client.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrummagica.util.Inventories;
 
@@ -18,6 +19,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.common.util.LazyOptional;
 
 public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTickingTileEntity implements IInventory, IAutoContainerInventoryWrapper {
 
@@ -93,10 +95,10 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		float totalAether = 0;
 		for (int i = 0; i < getSizeInventory(); i++) {
 			ItemStack stack = this.decrStackSize(i, 1);
-			if (stack.getItem() instanceof IAetherBurnable) {
-				totalAether += ((IAetherBurnable) stack.getItem()).getAetherYield(stack);
-				burnTicksMax += ((IAetherBurnable) stack.getItem()).getBurnTicks(stack);
-			}
+			LazyOptional<IAetherBurnable> cap = stack.getCapability(AetherBurnableCapabilityProvider.CAPABILITY);
+			
+			totalAether += cap.map(burn -> burn.getAetherYield()).orElse(0f);
+			burnTicksMax += cap.map(burn -> burn.getBurnTicks()).orElse(0);
 		}
 		
 		// Add multipliers
@@ -273,9 +275,7 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		if (index < 0 || index >= getSizeInventory())
 			return false;
 		
-		if (!stack.isEmpty() && (
-				!(stack.getItem() instanceof IAetherBurnable) || ((IAetherBurnable) stack.getItem()).getBurnTicks(stack) <= 0
-				)) {
+		if (!stack.isEmpty() && !stack.getCapability(AetherBurnableCapabilityProvider.CAPABILITY).isPresent()) {
 			return false;
 		}
 		

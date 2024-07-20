@@ -8,6 +8,7 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
+import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.event.LivingAetherDrawEvent;
@@ -17,6 +18,7 @@ import com.smanzana.nostrumaetheria.api.item.IAetherVisionProvider;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
+import com.smanzana.nostrumaetheria.capability.AetherBurnableCapability;
 import com.smanzana.nostrumaetheria.component.AetherHandlerComponent;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 import com.smanzana.nostrumaetheria.network.messages.AetherTileEntityMessage;
@@ -189,6 +191,11 @@ public class AetheriaAPIProxy extends APIProxy {
 		}
 		
 		return false;
+	}
+
+	@Override
+	protected IAetherBurnable handleMakeBurnable(int burnTicks, float aether) {
+		return new AetherBurnableCapability(burnTicks, aether);
 	}
 	
 }

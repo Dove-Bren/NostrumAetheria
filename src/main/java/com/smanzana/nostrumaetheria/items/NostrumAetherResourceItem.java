@@ -1,19 +1,28 @@
 package com.smanzana.nostrumaetheria.items;
 
-import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
+import javax.annotation.Nullable;
+
+import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
+import com.smanzana.nostrumaetheria.capability.AetherBurnableCapability;
+import com.smanzana.nostrumaetheria.capability.AetherBurnableCapabilityProvider;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 
 /**
  * Misc. resource items for aether-related progression
  * @author Skyler
  *
  */
-public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAetherBurnable {
+public class NostrumAetherResourceItem extends Item implements ILoreTagged, ICapabilityProvider {
 
 	private final int burnTicks;
 	private final int aetherYield;
@@ -50,13 +59,27 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, IAet
 		return InfoScreenTabs.INFO_ITEMS;
 	}
 	
+	private LazyOptional<IAetherBurnable> BurnableOptional = LazyOptional.of(() -> new AetherBurnableCapability(getBurnTicks(), getAetherYield()));
+	
 	@Override
-	public int getBurnTicks(ItemStack stack) {
+	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+		if (cap == AetherBurnableCapabilityProvider.CAPABILITY) {
+			return BurnableOptional.cast();
+		}
+		
+		return LazyOptional.empty();
+	}
+	
+	@Override
+	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
+		return this::getCapability;
+	}
+	
+	public int getBurnTicks() {
 		return this.burnTicks;
 	}
 
-	@Override
-	public float getAetherYield(ItemStack stack) {
+	public float getAetherYield() {
 		return this.aetherYield;
 	}
 }

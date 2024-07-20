@@ -93,6 +93,11 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories { 
 	mavenCentral()
+	
+	flatDir {
+		dir 'libs'
+	}
+	
 	maven {
         url = "https://maven.blamejared.com"
     }
@@ -129,31 +134,14 @@ repositories {
 dependencies {
 	minecraft 'net.minecraftforge:forge:1.16.5-36.2.34'
 
-   //implementation fileTree(dir: "${project.rootDir}/libs", include: '*.jar')
-	
-    //deobfCompile "mezz.jei:jei_${mc_version}:${jei_version}:api"
-    //runtime "mezz.jei:jei_${mc_version}:${jei_version}"
-	
-	//compile "com.enderio:EnderIO:1.12.2-5.3.70"
-	//deobfCompile "com.enderio.core:EnderCore:1.12.2-0.5.76"
-    //deobfCompile("com.enderio:EnderIO:1.12.2-5.3.68") {
-    //    exclude group: 'com.enderio', module: 'ap'
-    //    exclude group: "deobf.com.enderio.core"
-    //}
-	
-	//runtimeOnly fg.deobf("top.theillusivec4.curios:curios:${curios_version}")
-
-    //compile "baubles:baubles:1.12:1.5.2"
 	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
 	
-	compileOnly files("libs/NostrumAetheriaAPI-${aetheria_version}.jar")
-	//runtimeOnly files("libs/nostrumaetheria-${aetheria_version}-deobf.jar")
-	compileOnly files("libs/nostrummagica-${magica_version}-deobf.jar") //At compile time, use actual eclipse project
-	runtimeOnly files("libs/nostrummagica-${magica_version}-deobf.jar")
+	compileOnly fg.deobf("com.smanzana:nostrummagica:${magica_version}") //At compile time, use actual eclipse project
+	runtimeOnly fg.deobf("com.smanzana:nostrummagica:${magica_version}")
 	
-	runtimeOnly files("libs/petcommand-${petcommand_version}-deobf.jar")
-	compileOnly files("libs/petcommand-${petcommand_version}-api.jar")
+	runtimeOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}")
+	compileOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}:api")
 
 }
 
@@ -167,7 +155,15 @@ task deobfJar(type: Jar) {
     from sourceSets.main.output
 }
 
-tasks.build.dependsOn sourcesJar, deobfJar
+task apiJar(type: Jar) {
+	from(sourceSets.main.allJava)
+	from(sourceSets.main.output)
+	include 'com/smanzana/nostrumaetheria/api/**'
+	
+	classifier = 'api'
+}
+
+tasks.build.dependsOn sourcesJar, deobfJar, apiJar
 
 jar {
 	//from(coreJar.archivePath.absolutePath) {

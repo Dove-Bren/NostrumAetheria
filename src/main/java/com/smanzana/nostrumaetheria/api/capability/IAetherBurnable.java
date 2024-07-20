@@ -1,18 +1,14 @@
-package com.smanzana.nostrumaetheria.api.item;
-
-import javax.annotation.Nonnull;
-
-import net.minecraft.item.ItemStack;
+package com.smanzana.nostrumaetheria.api.capability;
 
 public interface IAetherBurnable {
-
+	
 	/**
-	 * Return how long 1 of the provided item stack should burn in a regular base small aether furnace.
+	 * Return how long this should burn in a regular base small aether furnace.
 	 * Reagents, for example, burn for 5 seconds each (100 ticks).
 	 * @param stack
 	 * @return
 	 */
-	public int getBurnTicks(@Nonnull ItemStack stack);
+	public int getBurnTicks();
 	
 	/**
 	 * How much aether to produce for each of the items in this stack when burned in a regular base small aether furnace.
@@ -20,6 +16,5 @@ public interface IAetherBurnable {
 	 * @param stack
 	 * @return
 	 */
-	public float getAetherYield(@Nonnull ItemStack stack);
-	
+	public float getAetherYield();
 }

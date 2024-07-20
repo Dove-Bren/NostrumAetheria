@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
+import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
@@ -154,6 +155,13 @@ public abstract class APIProxy {
 		return false;
 	}
 	
+	public static IAetherBurnable makeBurnable(int burnTicks, float aether) {
+		if (handler != null) {
+			return handler.handleMakeBurnable(burnTicks, aether);
+		}
+		return null;
+	}
+	
 	protected abstract boolean handleIsEnabled();
 	protected abstract IAetherHandlerComponent handleCreateHandlerComponent(@Nullable RegistryKey<World> dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether);
 	protected abstract void handleSyncTEAether(AetherTileEntity te);
@@ -164,4 +172,5 @@ public abstract class APIProxy {
 	protected abstract void handleAddUnravelerRecipe(IAetherUnravelerRecipe recipe);
 	protected abstract PlayerEntity handleGetClientPlayer();
 	protected abstract boolean handleHasAetherVision(PlayerEntity player);
+	protected abstract IAetherBurnable handleMakeBurnable(int burnTicks, float aether);
 }

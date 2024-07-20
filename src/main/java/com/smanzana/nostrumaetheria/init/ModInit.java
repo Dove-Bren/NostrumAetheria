@@ -1,10 +1,12 @@
 package com.smanzana.nostrumaetheria.init;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
+import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
+import com.smanzana.nostrumaetheria.capability.AetherBurnableCapability;
 import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrumaetheria.items.ItemAetherLens;
 import com.smanzana.nostrumaetheria.items.ItemAetherLens.LensType;
@@ -35,6 +37,7 @@ import net.minecraft.potion.Potion;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -91,6 +94,8 @@ public class ModInit {
 		NostrumMagica.instance.registerResearchReloadHook(() -> {
     		registerResearch();
     	});
+		
+		CapabilityManager.INSTANCE.register(IAetherBurnable.class, AetherBurnableCapability.Serializer.INSTANCE, AetherBurnableCapability::new);
 	}
 	
 	private static final void postinit() {
