@@ -17,8 +17,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.integration.curios.items.INostrumCurio;
-import com.smanzana.nostrummagica.item.armor.ICapeProvider;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
+import com.smanzana.nostrummagica.item.armor.ICapeProvider;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
@@ -45,10 +45,8 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.common.MinecraftForge;
 
-@Mod.EventBusSubscriber(modid = NostrumAetheria.MODID)
 public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreTagged, ISpellEquipment, ICapeProvider {
 	
 	public static interface UpgradeToggleFunc {
@@ -168,6 +166,8 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 
 	public AetherCloakItem() {
 		super(AetheriaCurios.PropCurio());
+		
+		MinecraftForge.EVENT_BUS.addListener(AetherCloakItem::onAetherDraw);
 	}
 	
 //    @Override
@@ -385,7 +385,6 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 		;
 	}
 	
-	@SubscribeEvent
 	public static void onAetherDraw(LivingAetherDrawEvent event) {
 		// Aether cloak contributes aether after inventory items if it has any
 		if (event.phase == Phase.BEFORE_LATE) {

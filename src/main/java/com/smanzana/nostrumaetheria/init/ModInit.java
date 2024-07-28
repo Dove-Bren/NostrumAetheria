@@ -86,11 +86,11 @@ public class ModInit {
 	}
 	
 	private static final void init() {
+		APIProxy.AetherResearchTab = new NostrumResearch.NostrumResearchTab("aether", new ItemStack(AetheriaItems.aetherGem));
+    	APIProxy.AetherGearResearchTab = new NostrumResearch.NostrumResearchTab("aether_gear", new ItemStack(AetheriaItems.aetherSightTool));
 		registerResearch();
 		AetherRepairerBlock.initDefaultRecipes();
 		AetherUnravelerBlock.initDefaultRecipes();
-		APIProxy.AetherResearchTab = new NostrumResearch.NostrumResearchTab("aether", new ItemStack(AetheriaItems.aetherGem));
-    	APIProxy.AetherGearResearchTab = new NostrumResearch.NostrumResearchTab("aether_gear", new ItemStack(AetheriaItems.aetherSightTool));
 		NostrumMagica.instance.registerResearchReloadHook(() -> {
     		registerResearch();
     	});

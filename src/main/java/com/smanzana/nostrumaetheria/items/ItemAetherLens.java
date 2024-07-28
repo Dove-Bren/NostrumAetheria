@@ -16,7 +16,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumPotions;
 import com.smanzana.nostrummagica.entity.IMagicEntity;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.Entities;
@@ -271,7 +271,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	}
 	
 	protected int doGrow(ServerWorld world, BlockPos center, int maxAether) {
-		@Nullable BlockPos growPos = MagicArmor.DoEarthGrow(world, center); 
+		@Nullable BlockPos growPos = ElementalArmor.DoEarthGrow(world, center); 
 		if (growPos != null) {
 			AetherInfuserTileEntity.DoChargeEffect(world,
 					new Vector3d(center.getX() + .5, center.getY() + 1, center.getZ() + .5),
