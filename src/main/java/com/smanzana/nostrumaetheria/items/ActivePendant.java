@@ -14,6 +14,8 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.Inventories;
 
@@ -223,11 +225,11 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 	}
 
 	@Override
-	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		if (stack.isEmpty())
 			return;
 		
-		if (summary.getReagentCost() <= 0) {
+		if (summary.getReagentCost() <= 0 || SpellCasting.CalculateSpellReagentFree(spell, caster, summary)) {
 			return;
 		}
 		

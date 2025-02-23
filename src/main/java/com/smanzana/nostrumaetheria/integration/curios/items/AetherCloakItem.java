@@ -21,6 +21,8 @@ import com.smanzana.nostrummagica.item.ISpellEquipment;
 import com.smanzana.nostrummagica.item.armor.ICapeProvider;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
@@ -353,7 +355,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 
 	@Override
-	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		if (stack.isEmpty()) {
 			return;
 		}
@@ -364,7 +366,10 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 		
 		summary.addEfficiency(.25f);
 		
-		if (isAetherCaster(stack) && summary.getReagentCost() > 0f) {
+		// Note: this assumes weight <= 0 is no reagent, but that's not actually inforced.
+		// It would be better if there was a 'getReagents()' public method and this checke if there were any so the determining
+		// factors of that could live completely in SpellCasting.
+		if (isAetherCaster(stack) && summary.getReagentCost() > 0f && !SpellCasting.CalculateSpellReagentFree(spell, caster, summary)) {
 			// Attempt to spend aether to cover reagent cost
 			// 100 aether for full cast
 			final int cost = (int) Math.ceil(100 * summary.getReagentCost());

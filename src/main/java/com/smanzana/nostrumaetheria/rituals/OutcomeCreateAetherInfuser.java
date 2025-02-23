@@ -6,6 +6,7 @@ import com.smanzana.nostrumaetheria.blocks.AetherInfuser;
 import com.smanzana.nostrummagica.block.AltarBlock;
 import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.block.ChalkBlock;
+import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.ritual.outcome.IRitualOutcome;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
@@ -15,7 +16,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -26,7 +26,7 @@ public class OutcomeCreateAetherInfuser implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		if (!world.isRemote) {
 			AetherInfuser.CreateAetherInfuser(world, center);
 			// clear altar on server
@@ -58,5 +58,5 @@ public class OutcomeCreateAetherInfuser implements IRitualOutcome {
 	public String getName() {
 		return "create_aether_infuser";
 	}
-	
+
 }
