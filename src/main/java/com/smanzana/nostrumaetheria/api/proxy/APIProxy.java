@@ -10,18 +10,18 @@ import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public abstract class APIProxy {
 	
-    public static ItemGroup creativeTab;
+    public static CreativeModeTab creativeTab;
 	
 	// These are NostrumResearchTab, but using that type would cause a circular dependency
 	public static Object AetherResearchTab = null;
@@ -59,7 +59,7 @@ public abstract class APIProxy {
 	 * @param pos
 	 * @return
 	 */
-	public static boolean isBlockLoaded(World world, BlockPos pos) {
+	public static boolean isBlockLoaded(Level world, BlockPos pos) {
 		if (handler != null) {
 			return handler.handleIsBlockLoaded(world, pos);
 		}
@@ -77,7 +77,7 @@ public abstract class APIProxy {
 	 * @param ignore
 	 * @return
 	 */
-	public static int drawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nonnull ItemStack ignore) {
+	public static int drawFromInventory(@Nullable Level world, @Nullable Entity entity, Container inventory, int amount, @Nonnull ItemStack ignore) {
 		if (handler != null) {
 			return handler.handleDrawFromInventory(world, entity, inventory, amount, ignore);
 		}
@@ -92,7 +92,7 @@ public abstract class APIProxy {
 	 * @param amount
 	 * @return
 	 */
-	public static int pushToInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount) {
+	public static int pushToInventory(@Nullable Level world, @Nullable Entity entity, Container inventory, int amount) {
 		if (handler != null) {
 			return handler.handlePushToInventory(world, entity, inventory, amount);
 		}
@@ -104,7 +104,7 @@ public abstract class APIProxy {
 		return createHandlerComponent(null, null, listener, defaultAether, defaultMaxAether);
 	}
 	
-	public static IAetherHandlerComponent createHandlerComponent(RegistryKey<World> dimension, BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
+	public static IAetherHandlerComponent createHandlerComponent(ResourceKey<Level> dimension, BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
 		if (handler != null) {
 			return handler.handleCreateHandlerComponent(dimension, pos, listener, defaultAether, defaultMaxAether);
 		}
@@ -141,14 +141,14 @@ public abstract class APIProxy {
 		}
 	}
 	
-	public static PlayerEntity getClientPlayer() {
+	public static Player getClientPlayer() {
 		if (handler != null) {
 			return handler.handleGetClientPlayer();
 		}
 		return null;
 	}
 	
-	public static boolean hasAetherVision(PlayerEntity player) {
+	public static boolean hasAetherVision(Player player) {
 		if (handler != null) {
 			return handler.handleHasAetherVision(player);
 		}
@@ -163,14 +163,14 @@ public abstract class APIProxy {
 	}
 	
 	protected abstract boolean handleIsEnabled();
-	protected abstract IAetherHandlerComponent handleCreateHandlerComponent(@Nullable RegistryKey<World> dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether);
+	protected abstract IAetherHandlerComponent handleCreateHandlerComponent(@Nullable ResourceKey<Level> dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether);
 	protected abstract void handleSyncTEAether(AetherTileEntity te);
-	protected abstract boolean handleIsBlockLoaded(World world, BlockPos pos);
-	protected abstract int handleDrawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nonnull ItemStack ignore);
-	protected abstract int handlePushToInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount);
+	protected abstract boolean handleIsBlockLoaded(Level world, BlockPos pos);
+	protected abstract int handleDrawFromInventory(@Nullable Level world, @Nullable Entity entity, Container inventory, int amount, @Nonnull ItemStack ignore);
+	protected abstract int handlePushToInventory(@Nullable Level world, @Nullable Entity entity, Container inventory, int amount);
 	protected abstract void handleAddRepairerRecipe(IAetherRepairerRecipe recipe);
 	protected abstract void handleAddUnravelerRecipe(IAetherUnravelerRecipe recipe);
-	protected abstract PlayerEntity handleGetClientPlayer();
-	protected abstract boolean handleHasAetherVision(PlayerEntity player);
+	protected abstract Player handleGetClientPlayer();
+	protected abstract boolean handleHasAetherVision(Player player);
 	protected abstract IAetherBurnable handleMakeBurnable(int burnTicks, float aether);
 }

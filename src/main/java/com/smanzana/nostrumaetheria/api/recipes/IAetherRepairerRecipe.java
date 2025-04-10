@@ -2,7 +2,7 @@ package com.smanzana.nostrumaetheria.api.recipes;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * A "Recipe" for something that can be added to the repairer.

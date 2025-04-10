@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.event.LivingAetherDrawEvent;
@@ -26,28 +26,28 @@ import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.passive.SheepEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
+import top.theillusivec4.curios.api.SlotContext;
 
 public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreTagged, ISpellEquipment, ICapeProvider {
 	
@@ -236,8 +236,8 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
 		// Handled by NostrumCurio class
 //		if (I18n.contains("item.aether_cloak.desc")) {
@@ -260,34 +260,34 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 		final boolean castUpgrade = isAetherCaster(stack);
 
 		if (castUpgrade) {
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.spender").mergeStyle(TextFormatting.DARK_GREEN));
+			tooltip.add(new TranslatableComponent("item.aether_cloak.spender").withStyle(ChatFormatting.DARK_GREEN));
 		}
 		if (displayTrimmed) {
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.trimmed").mergeStyle(TextFormatting.DARK_GRAY));
+			tooltip.add(new TranslatableComponent("item.aether_cloak.trimmed").withStyle(ChatFormatting.DARK_GRAY));
 		}
 		if (displayRunes) {
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.runed").mergeStyle(TextFormatting.DARK_GRAY));
+			tooltip.add(new TranslatableComponent("item.aether_cloak.runed").withStyle(ChatFormatting.DARK_GRAY));
 		}
 		if (displayWings) {
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.wings").mergeStyle(TextFormatting.DARK_GRAY));
+			tooltip.add(new TranslatableComponent("item.aether_cloak.wings").withStyle(ChatFormatting.DARK_GRAY));
 		}
 		if (colorOutside != COLOR_DEFAULT_OUTSIDE) {
-			String name = I18n.format(colorOutside.getTranslationKey());
+			String name = I18n.get(colorOutside.getName());
 			name = name.toLowerCase();
 			name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.color.outside", name).mergeStyle(TextFormatting.DARK_BLUE));
+			tooltip.add(new TranslatableComponent("item.aether_cloak.color.outside", name).withStyle(ChatFormatting.DARK_BLUE));
 		}
 		if (colorInside != COLOR_DEFAULT_INSIDE) {
-			String name = I18n.format(colorInside.getTranslationKey());
+			String name = I18n.get(colorInside.getName());
 			name = name.toLowerCase();
 			name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.color.inside", name).mergeStyle(TextFormatting.DARK_BLUE));
+			tooltip.add(new TranslatableComponent("item.aether_cloak.color.inside", name).withStyle(ChatFormatting.DARK_BLUE));
 		}
 		if (colorRunes != COLOR_DEFAULT_RUNES) {
-			String name = I18n.format(colorRunes.getTranslationKey());
+			String name = I18n.get(colorRunes.getName());
 			name = name.toLowerCase();
 			name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-			tooltip.add(new TranslationTextComponent("item.aether_cloak.color.runes", name).mergeStyle(TextFormatting.DARK_BLUE));
+			tooltip.add(new TranslatableComponent("item.aether_cloak.color.runes", name).withStyle(ChatFormatting.DARK_BLUE));
 		}
 	}
 	
@@ -296,7 +296,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 			return 0;
 		}
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
 			return 0;
 		}
@@ -309,9 +309,9 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 			return;
 		}
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
 		nbt.putFloat(NBT_AETHER_PROGRESS, progress);
@@ -319,8 +319,8 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	@Override
-	public void onEquipped(ItemStack itemstack, LivingEntity player) {
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+	public void onEquipped(ItemStack itemstack, SlotContext slot) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(slot.entity());
 		if (attr == null) {
 			return;
 		}
@@ -332,8 +332,8 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	 * This method is called when the bauble is unequipped by a player
 	 */
 	@Override
-	public void onUnequipped(ItemStack itemstack, LivingEntity player) {	
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+	public void onUnequipped(ItemStack itemstack, SlotContext slot) {	
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(slot.entity());
 		if (attr == null) {
 			return;
 		}
@@ -345,8 +345,9 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	 * can this bauble be placed in a bauble slot
 	 */
 	@Override
-	public boolean canEquip(ItemStack itemstack, LivingEntity player) {
-		if (player.world.isRemote && player != NostrumMagica.instance.proxy.getPlayer()) {
+	public boolean canEquip(ItemStack itemstack, SlotContext slot) {
+		final LivingEntity player = slot.entity();
+		if (player.level.isClientSide && player != NostrumMagica.instance.proxy.getPlayer()) {
 			return true;
 		}
 		
@@ -374,7 +375,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 			// 100 aether for full cast
 			final int cost = (int) Math.ceil(100 * summary.getReagentCost());
 			if (this.getAether(stack) >= cost) {
-				if ((!(caster instanceof PlayerEntity) || !((PlayerEntity) caster).isCreative()) && !caster.world.isRemote) {
+				if ((!(caster instanceof Player) || !((Player) caster).isCreative()) && !caster.level.isClientSide) {
 					int taken = this.deductAether(stack, cost);
 					if (taken > 0) {
 						growFromAether(stack, -taken);
@@ -386,25 +387,25 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	@Override
-	public void onWornTick(ItemStack stack, LivingEntity player) {
+	public void onWornTick(ItemStack stack, SlotContext slot) {
 		;
 	}
 	
 	public static void onAetherDraw(LivingAetherDrawEvent event) {
 		// Aether cloak contributes aether after inventory items if it has any
 		if (event.phase == Phase.BEFORE_LATE) {
-			if (event.getAmtRemaining() > 0 && event.getEntity() instanceof PlayerEntity) {
-				PlayerEntity player = (PlayerEntity) event.getEntity();
+			if (event.getAmtRemaining() > 0 && event.getEntity() instanceof Player) {
+				Player player = (Player) event.getEntity();
 				
-				IInventory inv = NostrumMagica.instance.curios.getCurios(player);
+				Container inv = NostrumMagica.instance.curios.getCurios(player);
 				if (inv != null) {
-					for (int i = 0; i < inv.getSizeInventory(); i++) {
-						ItemStack stack = inv.getStackInSlot(i);
+					for (int i = 0; i < inv.getContainerSize(); i++) {
+						ItemStack stack = inv.getItem(i);
 						if (stack.isEmpty() || !(stack.getItem() instanceof AetherCloakItem))
 							continue;
 						
 						AetherCloakItem cloak = (AetherCloakItem) stack.getItem();
-						CompoundNBT nbt = stack.getTag();
+						CompoundTag nbt = stack.getTag();
 						if (nbt != null) {
 							final int taken = cloak.deductAether(stack, event.getAmtRemaining());
 							
@@ -434,9 +435,9 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 			
 			IAetherHandlerComponent comp = this.getAetherHandler(stack);
 			int currentMax = Math.min(comp.getMaxAether(null) + whole, MAX_AETHER_MAX);
-			CompoundNBT nbt = stack.getTag();
+			CompoundTag nbt = stack.getTag();
 			if (nbt == null) {
-				nbt = new CompoundNBT();
+				nbt = new CompoundTag();
 			}
 			nbt.putFloat(NBT_AETHER_PROGRESS, adv);
 			stack.setTag(nbt);
@@ -446,7 +447,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public DyeColor getRuneColor(ItemStack stack) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_DISPLAY_COLOR_RUNES)) {
 			return COLOR_DEFAULT_RUNES;
 		}
@@ -456,9 +457,9 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public void setRuneColor(ItemStack stack, DyeColor color) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
 		nbt.putInt(NBT_DISPLAY_COLOR_RUNES, color.ordinal());
@@ -466,7 +467,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public DyeColor getOutsideColor(ItemStack stack) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_DISPLAY_COLOR_OUTSIDE)) {
 			return COLOR_DEFAULT_OUTSIDE;
 		}
@@ -476,9 +477,9 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public void setOutsideColor(ItemStack stack, DyeColor color) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
 		nbt.putInt(NBT_DISPLAY_COLOR_OUTSIDE, color.ordinal());
@@ -486,7 +487,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 
 	public DyeColor getInsideColor(ItemStack stack) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_DISPLAY_COLOR_INSIDE)) {
 			return COLOR_DEFAULT_INSIDE;
 		}
@@ -496,9 +497,9 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public void setInsideColor(ItemStack stack, DyeColor color) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
 		nbt.putInt(NBT_DISPLAY_COLOR_INSIDE, color.ordinal());
@@ -506,7 +507,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public boolean getDisplayWings(ItemStack stack) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_DISPLAY_WINGS)) {
 			return false;
 		}
@@ -514,9 +515,9 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public void setDisplayWings(ItemStack stack, boolean display) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
 		nbt.putBoolean(NBT_DISPLAY_WINGS, display);
@@ -524,7 +525,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public boolean getDisplayTrimmed(ItemStack stack) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_DISPLAY_TRIMMED)) {
 			return false;
 		}
@@ -532,9 +533,9 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public void setDisplayTrimmed(ItemStack stack, boolean trimmed) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
 		nbt.putBoolean(NBT_DISPLAY_TRIMMED, trimmed);
@@ -542,7 +543,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public boolean getDisplayRunes(ItemStack stack) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_DISPLAY_RUNES)) {
 			return false;
 		}
@@ -550,9 +551,9 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public void setDisplayRunes(ItemStack stack, boolean display) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
 		nbt.putBoolean(NBT_DISPLAY_RUNES, display);
@@ -560,7 +561,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public boolean isAetherCaster(ItemStack stack) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null || !nbt.contains(NBT_AETHER_SPENDER)) {
 			return false;
 		}
@@ -568,9 +569,9 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 	
 	public void setAetherCaster(ItemStack stack, boolean caster) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
 		nbt.putBoolean(NBT_AETHER_SPENDER, caster);
@@ -583,17 +584,17 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	}
 
 	@Override
-	protected boolean shouldShowAether(ItemStack stack, PlayerEntity playerIn, boolean advanced) {
+	protected boolean shouldShowAether(ItemStack stack, Player playerIn, boolean advanced) {
 		return true;
 	}
 
 	@Override
-	protected boolean shouldAutoFill(ItemStack stack, World worldIn, Entity entityIn) {
+	protected boolean shouldAutoFill(ItemStack stack, Level worldIn, Entity entityIn) {
 		return false;
 	}
 
 	@Override
-	public boolean canBeDrawnFrom(@Nullable ItemStack stack, @Nullable World worldIn, Entity entityIn) {
+	public boolean canBeDrawnFrom(@Nullable ItemStack stack, @Nullable Level worldIn, Entity entityIn) {
 		return false;
 	}
 
@@ -645,7 +646,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void preRender(Entity entity, int model, ItemStack stack, MatrixStack matrixStackIn, float headYaw, float partialTicks) {
+	public void preRender(Entity entity, int model, ItemStack stack, PoseStack matrixStackIn, float headYaw, float partialTicks) {
 		if (model == 2) {
 			// Decor needs to be scaled just a litle to not z fight
 			matrixStackIn.scale(1.001f, 1.001f, 1.001f);
@@ -667,12 +668,12 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 			return ColorUtil.dyeToARGB(getOutsideColor(stack));
 		} else {
 			final int glowPeriod = 20 * 8;
-			final float brightnessMod = (float) Math.sin(((float) entity.ticksExisted % (float) glowPeriod) / (float) glowPeriod
+			final float brightnessMod = (float) Math.sin(((float) entity.tickCount % (float) glowPeriod) / (float) glowPeriod
 					* Math.PI * 2) // -1 to 1
 					* .25f // -.25 to .25
 					+ .5f; // .25 to .75
 			
-			float[] colors = SheepEntity.getDyeRgb(getRuneColor(stack));
+			float[] colors = Sheep.getColorArray(getRuneColor(stack));
 			return ColorUtil.colorToARGB(colors[0] * brightnessMod,
 					colors[1] * brightnessMod,
 					colors[2] * brightnessMod);
@@ -684,18 +685,6 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 		return null;
 	}
 
-	@Override
-	public boolean hasRender(ItemStack stack, LivingEntity living) {
-		return false;
-	}
-
-	@Override
-	public void doRender(ItemStack stack, MatrixStack matrixStackIn, int index, IRenderTypeBuffer bufferIn, int packedLightIn,
-			LivingEntity player, float limbSwing, float limbSwingAmount,
-			float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-		;
-	}
-	
 	@OnlyIn(Dist.CLIENT)
 	public static class AetherCloakModels {
 		private static final ResourceLocation CapeModelTrimmedOutside = new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_trimmed_outside");
@@ -704,8 +693,8 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 		private static final ResourceLocation CapeModelFullOutside = new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_outside");
 		private static final ResourceLocation CapeModelFullInside = new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_inside");
 		private static final ResourceLocation CapeModelFullDecor = new ResourceLocation(NostrumAetheria.MODID, "entity/cloak_medium_decor");
-		private static final RenderType CapeRenderTypeCutout = RenderType.getCutoutMipped(); // block texture atlas and vertex format
-		private static final RenderType CapeRenderTypeTranslucent = RenderType.getTranslucent(); // block texture atlas and vertex format
+		private static final RenderType CapeRenderTypeCutout = RenderType.cutoutMipped(); // block texture atlas and vertex format
+		private static final RenderType CapeRenderTypeTranslucent = RenderType.translucent(); // block texture atlas and vertex format
 		
 		private static final ResourceLocation[] CapeModelsTrimmed = new ResourceLocation[] {
 			CapeModelTrimmedInside,

@@ -17,18 +17,18 @@ import com.smanzana.nostrumaetheria.api.event.LivingAetherDrawEvent.Phase;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -45,17 +45,17 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	
 	protected abstract int getDefaultMaxAether(ItemStack stack);
 	
-	protected abstract boolean shouldShowAether(@Nonnull ItemStack stack, PlayerEntity playerIn, boolean advanced);
+	protected abstract boolean shouldShowAether(@Nonnull ItemStack stack, Player playerIn, boolean advanced);
     
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		if (shouldShowAether(stack, APIProxy.getClientPlayer(), flagIn.isAdvanced())) {
 			IAetherHandlerComponent comp = getAetherHandler(stack);
 			int aether = comp.getAether(null);
 			int maxAether = comp.getMaxAether(null);
-			tooltip.add(new TranslationTextComponent("item.info.aether", String.format("%.2f", (float) aether * .01f), String.format("%.2f", (float) maxAether * .01f))
-					.mergeStyle(TextFormatting.DARK_PURPLE));
+			tooltip.add(new TranslatableComponent("item.info.aether", String.format("%.2f", (float) aether * .01f), String.format("%.2f", (float) maxAether * .01f))
+					.withStyle(ChatFormatting.DARK_PURPLE));
 		}
 	}
 	
@@ -112,13 +112,13 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	private void commitHandler(ItemStack stack) {
 		StackHandlerItem handlerItem = GetOrCreateCachedHandlerItem(stack);
 		if (handlerItem.dirty) {
-			CompoundNBT nbt = stack.getTag();
+			CompoundTag nbt = stack.getTag();
 			if (nbt == null) {
-				nbt = new CompoundNBT();
+				nbt = new CompoundTag();
 				stack.setTag(nbt);
 			}
 			
-			nbt.put(NBT_AETHER_HANDLER, handlerItem.component.writeToNBT(new CompoundNBT()));
+			nbt.put(NBT_AETHER_HANDLER, handlerItem.component.writeToNBT(new CompoundTag()));
 			nbt.putBoolean(NBT_CLIENT_DIRTY, true);
 			handlerItem.dirty = false;
 		}
@@ -179,9 +179,9 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 		}
 		
 		UUID id;
-		CompoundNBT nbt;
+		CompoundTag nbt;
 		if (!stack.hasTag()) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		} else {
 			nbt = stack.getTag();
 		}
@@ -205,7 +205,7 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	 * @param stack
 	 * @return
 	 */
-	protected abstract boolean shouldAutoFill(ItemStack stack, World worldIn, Entity entityIn);
+	protected abstract boolean shouldAutoFill(ItemStack stack, Level worldIn, Entity entityIn);
 	
 	/**
 	 * Return whether this item can have aether taked from it as part of automatic inventory fillups.
@@ -215,9 +215,9 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 	 * @param stack
 	 * @return
 	 */
-	public abstract boolean canBeDrawnFrom(@Nonnull ItemStack stack, @Nullable World worldIn, Entity entityIn);
+	public abstract boolean canBeDrawnFrom(@Nonnull ItemStack stack, @Nullable Level worldIn, Entity entityIn);
 	
-	protected void onFirstTick(ItemStack stack, World worldIn, Entity entityIn) {
+	protected void onFirstTick(ItemStack stack, Level worldIn, Entity entityIn) {
 		getItemID(stack); // generates it if it's missing
 	}
 	
@@ -225,18 +225,18 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 		;
 	}
 	
-	protected int getMaxAutoFill(ItemStack stack, World worldIn, Entity entityIn) {
+	protected int getMaxAutoFill(ItemStack stack, Level worldIn, Entity entityIn) {
 		return 2 * (20 * 1); // per second
 	}
 	
 	@Override
-	public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+	public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		if (!stack.hasTag()) {
 			// First time ticking!
 			onFirstTick(stack, worldIn, entityIn);
 		}
 		
-		if (!worldIn.isRemote && entityIn.ticksExisted % 20 == 0 && shouldAutoFill(stack, worldIn, entityIn)) {
+		if (!worldIn.isClientSide && entityIn.tickCount % 20 == 0 && shouldAutoFill(stack, worldIn, entityIn)) {
 			final IAetherHandlerComponent comp = getAetherHandler(stack);
 			final int aether = comp.getAether(null);
 			final int maxAether = comp.getMaxAether(null);
@@ -249,9 +249,9 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 				toDraw = event.getAmtRemaining();
 				
 				if (toDraw > 0) {
-					IInventory inv = null;
-					if (entityIn instanceof PlayerEntity) {
-						inv = ((PlayerEntity) entityIn).inventory;
+					Container inv = null;
+					if (entityIn instanceof Player) {
+						inv = ((Player) entityIn).getInventory();
 					}
 					// else....
 					
@@ -278,19 +278,19 @@ public abstract class AetherItem extends Item implements IAetherHandlerItem {
 		
 		// Check for un-forwarded aether handler changes
 		StackHandlerItem handlerItem = GetOrCreateCachedHandlerItem(stack);
-		if (!worldIn.isRemote && handlerItem.dirty) {
+		if (!worldIn.isClientSide && handlerItem.dirty) {
 			SaveItem(stack);
 		}
 		
 		// On client side, check for dirty nbt
-		if (worldIn.isRemote && stack.hasTag() && stack.getTag().getBoolean(NBT_CLIENT_DIRTY)) {
+		if (worldIn.isClientSide && stack.hasTag() && stack.getTag().getBoolean(NBT_CLIENT_DIRTY)) {
 			// Clear dirty flag (on client side. Will be overwritten with next update)
-			CompoundNBT tag = stack.getTag();
+			CompoundTag tag = stack.getTag();
 			tag.putBoolean(NBT_CLIENT_DIRTY, false);
 			stack.setTag(tag);
 			
 			// Update local copy
-			if (!Minecraft.getInstance().isIntegratedServerRunning()) {
+			if (!Minecraft.getInstance().isLocalServer()) {
 				StackHandlerCache.remove(getItemID(stack));
 				GetOrCreateCachedHandlerItem(stack); // Creates it and loads from NBT :)
 			}

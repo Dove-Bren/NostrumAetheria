@@ -2,9 +2,9 @@ package com.smanzana.nostrumaetheria.api.aether;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 /**
  * Optional version of AetherHandler that has world position information, which can be
@@ -14,7 +14,7 @@ import net.minecraft.world.World;
  */
 public interface IWorldAetherHandler extends IAetherHandler {
 
-	public @Nullable RegistryKey<World> getDimension();
+	public @Nullable ResourceKey<Level> getDimension();
 	
 	public @Nullable BlockPos getPosition();
 	

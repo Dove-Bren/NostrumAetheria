@@ -1,38 +1,38 @@
 package com.smanzana.nostrumaetheria.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.component.AetherHandlerComponent;
 import com.smanzana.nostrumaetheria.tiles.AetherRelayEntity;
+import com.smanzana.nostrummagica.client.render.tile.BlockEntityRendererBase;
 import com.smanzana.nostrummagica.util.Curves;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 
-public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
+public class AetherRelayRenderer extends BlockEntityRendererBase<AetherRelayEntity> {
 
-	public AetherRelayRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+	public AetherRelayRenderer(BlockEntityRendererProvider.Context rendererDispatcherIn) {
 		super(rendererDispatcherIn);
 	}
 	
-	private void addVertex(MatrixStack matrixStackIn, IVertexBuilder buffer, int combinedLightIn, float red, float green, float blue, float alpha, Vector3d point, boolean repeat) {
-		buffer.pos(matrixStackIn.getLast().getMatrix(), (float) point.x, (float) point.y, (float) point.z).color(red, green, blue, alpha).lightmap(combinedLightIn).endVertex();
+	private void addVertex(PoseStack matrixStackIn, VertexConsumer buffer, int combinedLightIn, float red, float green, float blue, float alpha, Vec3 point, boolean repeat) {
+		buffer.vertex(matrixStackIn.last().pose(), (float) point.x, (float) point.y, (float) point.z).color(red, green, blue, alpha).uv2(combinedLightIn).endVertex();
 		if (repeat) {
 			this.addVertex(matrixStackIn, buffer, combinedLightIn, red, green, blue, alpha, point, false);
 		}
 	}
 	
-	protected void renderLine(MatrixStack matrixStackIn, IVertexBuilder buffer, int combinedLightIn, double totalTicks, float[] notColor, float[] dotDelta,
-			Vector3d offset, float dotPos, int intervals, float dotLength) {
+	protected void renderLine(PoseStack matrixStackIn, VertexConsumer buffer, int combinedLightIn, double totalTicks, float[] notColor, float[] dotDelta,
+			Vec3 offset, float dotPos, int intervals, float dotLength) {
 		// TODO have some capability system to turn this on or off
 		
 		// TODO use whether there's a TE there to change color or something
@@ -43,9 +43,9 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 		final float dotI = dotPos * (intervals + 1);
 		final float perI = (1f / dotLength);
 		
-		final Vector3d dist = offset.scale(.25);
-		final Vector3d control1 = dist.add(dist.rotateYaw((float) (Math.PI * .5)));
-		final Vector3d control2 = offset.subtract(dist).subtract(dist.rotateYaw((float) (Math.PI * .5)));
+		final Vec3 dist = offset.scale(.25);
+		final Vec3 control1 = dist.add(dist.yRot((float) (Math.PI * .5)));
+		final Vec3 control2 = offset.subtract(dist).subtract(dist.yRot((float) (Math.PI * .5)));
 		
 		// Point debugging
 //		for (Vector3d point : new Vector3d[]{origin, control1, control2, offset}) {
@@ -57,7 +57,7 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 		
 		for (int i = 0; i <= intervals; i++) {
 			float prog = (float) i / (float) intervals;
-			Vector3d point = Curves.bezier(prog, Vector3d.ZERO, control1, control2, offset);
+			Vec3 point = Curves.bezier(prog, Vec3.ZERO, control1, control2, offset);
 			
 			float dotAmt = Math.max(0f, 1f - (perI * Math.abs(dotI - (float) i)));
 			if (dotAmt == 0f) {
@@ -79,7 +79,7 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 	}
 	
 	@Override
-	public void render(AetherRelayEntity te, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+	public void render(AetherRelayEntity te, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		
 		// Link positions do not change often (especially at render-scale).
 		// Additionally, all points on the curve are unchanging.
@@ -91,7 +91,7 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 		}
 		
 		final Minecraft mc = Minecraft.getInstance();
-		PlayerEntity player = mc.player;
+		Player player = mc.player;
 		boolean debug = player != null && (player.isCreative() || player.isSpectator());
 		final boolean show = debug || APIProxy.hasAetherVision(player);
 		
@@ -102,7 +102,7 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 		if (debug) {
 			AetherHandlerComponent relay = (AetherHandlerComponent) handler;
 			final String str = relay.getAether(null) + "/" + relay.getMaxAether(null);
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 //			matrixStackIn.translate(.5f, 0, .5f);
 //			matrixStackIn.rotate(Vector3f.YP.rotationDegrees(180f));
 //			matrixStackIn.scale(1f, -1f, 1f);
@@ -112,9 +112,9 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 //			
 //			mc.fontRenderer.drawString(matrixStackIn, str, 0, 0, 0xFFFFFFFF);
 			matrixStackIn.translate(.5f, (float)AetherRelay.height/8f, .5f);
-			RenderFuncs.drawNameplate(matrixStackIn, bufferIn, str, mc.fontRenderer, combinedLightIn, 0, false, this.renderDispatcher.renderInfo);
+			RenderFuncs.drawNameplate(matrixStackIn, bufferIn, str, mc.font, combinedLightIn, 0, false, this.context.getBlockEntityRenderDispatcher().camera);
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 
 		final int intervals = 50;
@@ -138,19 +138,19 @@ public class AetherRelayRenderer extends TileEntityRenderer<AetherRelayEntity> {
 		
 		final float[] dotDelta = {dotColor[0] - notColor[0], dotColor[1] - notColor[1], dotColor[2] - notColor[2], dotColor[3] - notColor[3]};
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(.5f, (AetherRelay.height/16f), .5f);
 
-		final double time = te.getWorld().getGameTime() + partialTicks;
+		final double time = te.getLevel().getGameTime() + partialTicks;
 		final float pos = (float) ((time % period) / period);
-		final IVertexBuilder buffer = bufferIn.getBuffer(AetheriaRenderTypes.RELAY_LINES);
+		final VertexConsumer buffer = bufferIn.getBuffer(AetheriaRenderTypes.RELAY_LINES);
 		
 		for (BlockPos linked : te.getLinkLocations()) {
-			final Vector3d offset = Vector3d.copy(linked.toImmutable().subtract(te.getPos()));
+			final Vec3 offset = Vec3.atLowerCornerOf(linked.immutable().subtract(te.getBlockPos()));
 			renderLine(matrixStackIn, buffer, combinedLightIn, time, notColor, dotDelta, offset, pos, intervals, dotLength);
 		}
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 	}
 	

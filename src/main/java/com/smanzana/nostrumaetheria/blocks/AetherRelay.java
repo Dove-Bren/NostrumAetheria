@@ -3,51 +3,56 @@ package com.smanzana.nostrumaetheria.blocks;
 import java.util.Random;
 
 import com.smanzana.nostrumaetheria.tiles.AetherRelayEntity;
+import com.smanzana.nostrumaetheria.tiles.AetheriaTileEntities;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 
-public class AetherRelay extends Block implements ILoreTagged {
+public class AetherRelay extends BaseEntityBlock implements ILoreTagged {
 	
-	public static enum RelayMode implements IStringSerializable {
+	public static enum RelayMode implements StringRepresentable {
 		INOUT,
 		IN,
 		OUT,
 		;
 
 		@Override
-		public String getString() {
+		public String getSerializedName() {
 			return this.name().toLowerCase();
 		}
 		
@@ -72,55 +77,54 @@ public class AetherRelay extends Block implements ILoreTagged {
 	private static final double lowWidth = 8 - width;
 	private static final double highWidth = 8 + width;
 	protected static final VoxelShape RELAY_AABBs[] = new VoxelShape[] {
-			Block.makeCuboidShape(lowWidth, (16-height), lowWidth, highWidth, 16, highWidth), //down
-			Block.makeCuboidShape(lowWidth, 0.0D, lowWidth, highWidth, height, highWidth), //up
-			Block.makeCuboidShape(lowWidth, lowWidth, (16-height), highWidth, highWidth, 16), //north
-			Block.makeCuboidShape(lowWidth, lowWidth, 0, highWidth, highWidth, height), //south
-			Block.makeCuboidShape((16-height), lowWidth, lowWidth, 16, highWidth, highWidth), //east
-			Block.makeCuboidShape(0, lowWidth, lowWidth, height, highWidth, highWidth), //west
+			Block.box(lowWidth, (16-height), lowWidth, highWidth, 16, highWidth), //down
+			Block.box(lowWidth, 0.0D, lowWidth, highWidth, height, highWidth), //up
+			Block.box(lowWidth, lowWidth, (16-height), highWidth, highWidth, 16), //north
+			Block.box(lowWidth, lowWidth, 0, highWidth, highWidth, height), //south
+			Block.box((16-height), lowWidth, lowWidth, 16, highWidth, highWidth), //east
+			Block.box(0, lowWidth, lowWidth, height, highWidth, highWidth), //west
 	};
 	
 	public AetherRelay() {
-		super(Block.Properties.create(Material.GLASS)
-				.hardnessAndResistance(0.5f, 2.0f)
+		super(Block.Properties.of(Material.GLASS)
+				.strength(0.5f, 2.0f)
 				.sound(SoundType.GLASS)
-				.harvestTool(ToolType.AXE)
-				.setLightLevel((state) -> 4)
+				.lightLevel((state) -> 4)
 				);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP).with(RELAY_MODE, RelayMode.INOUT));
+		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.UP).setValue(RELAY_MODE, RelayMode.INOUT));
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING, RELAY_MODE);
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		return RELAY_AABBs[state.get(FACING).ordinal()];
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		return RELAY_AABBs[state.getValue(FACING).ordinal()];
 	}
 	
-	public boolean canPlaceAt(IWorldReader world, BlockPos pos, Direction facing) {
-		BlockPos blockpos = pos.offset(facing.getOpposite());
+	public boolean canPlaceAt(LevelReader world, BlockPos pos, Direction facing) {
+		BlockPos blockpos = pos.relative(facing.getOpposite());
 		BlockState wallState = world.getBlockState(blockpos);
-		return wallState.isSolidSide(world, blockpos, facing);// || facing.equals(Direction.UP) && this.canPlaceOn(worldIn, blockpos);
+		return wallState.isFaceSturdy(world, blockpos, facing);// || facing.equals(Direction.UP) && this.canPlaceOn(worldIn, blockpos);
 	}
 
 	@Override
-	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
-		return canPlaceAt(worldIn, pos, state.get(FACING));
+	public boolean canSurvive(BlockState state, LevelReader worldIn, BlockPos pos) {
+		return canPlaceAt(worldIn, pos, state.getValue(FACING));
 	}
 
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(FACING, context.getFace());
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return this.defaultBlockState().setValue(FACING, context.getClickedFace());
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		
-		if (!worldIn.isRemote) {
+		if (!worldIn.isClientSide) {
 //			// request an update
 //			worldIn.notifyBlockUpdate(pos, worldIn.getBlockState(pos), worldIn.getBlockState(pos), 2);
 //			
@@ -133,57 +137,62 @@ public class AetherRelay extends Block implements ILoreTagged {
 			
 			// If using a geogem, link to its position.
 			// If no hand, switch modes
-			ItemStack heldItem = player.getHeldItem(handIn);
+			ItemStack heldItem = player.getItemInHand(handIn);
 			if (heldItem.isEmpty()) {
-				TileEntity te = worldIn.getTileEntity(pos);
+				BlockEntity te = worldIn.getBlockEntity(pos);
 				if (te != null) {
 					AetherRelayEntity ent = (AetherRelayEntity) te;
-					ent.setMode(state.get(RELAY_MODE).next());
+					ent.setMode(state.getValue(RELAY_MODE).next());
 					NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 				}
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else if (heldItem.getItem() instanceof PositionCrystal) {
 				BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
-				if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.getDimensionKey())) {
-					TileEntity te = worldIn.getTileEntity(pos);
+				if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.dimension())) {
+					BlockEntity te = worldIn.getBlockEntity(pos);
 					if (te != null) {
 						AetherRelayEntity ent = (AetherRelayEntity) te;
 						ent.addLink(player, heldPos, player.isCreative());
 						NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 					}
 				}
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 		}
 		
-		return ActionResultType.FAIL;
+		return InteractionResult.FAIL;
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.MODEL;
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return new AetherRelayEntity(state.get(FACING), state.get(RELAY_MODE));
-	}
-	
-	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-		TileEntity tileentity = worldIn.getTileEntity(pos);
-		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new AetherRelayEntity(pos, state, state.getValue(FACING), state.getValue(RELAY_MODE));
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+		return TickableBlockEntity.createTickerHelper(type, AetheriaTileEntities.Relay);
+	}
+	
+	public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
+		BlockEntity tileentity = worldIn.getBlockEntity(pos);
+		return tileentity == null ? false : tileentity.triggerEvent(id, param);
+	}
+	
+	@Override
+	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			destroy(worldIn, pos, state);
-			worldIn.removeTileEntity(pos);
+			worldIn.removeBlockEntity(pos);
 		}
 	}
 	
-	private void destroy(World world, BlockPos pos, BlockState state) {
-		TileEntity ent = world.getTileEntity(pos);
+	private void destroy(Level world, BlockPos pos, BlockState state) {
+		BlockEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof AetherRelayEntity))
 			return;
 		
@@ -193,12 +202,12 @@ public class AetherRelay extends Block implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
 		
 	}
 	
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		return facing.getOpposite() == stateIn.get(FACING) && !stateIn.isValidPosition(worldIn, currentPos) ? Blocks.AIR.getDefaultState() : stateIn;
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
+		return facing.getOpposite() == stateIn.getValue(FACING) && !stateIn.canSurvive(worldIn, currentPos) ? Blocks.AIR.defaultBlockState() : stateIn;
 	}
 	
 	@Override

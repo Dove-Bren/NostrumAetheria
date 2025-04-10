@@ -8,20 +8,21 @@ import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.blocks.AetherBoilerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
 
-import net.minecraft.block.AbstractFurnaceBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.AbstractFurnaceTileEntity;
-import net.minecraft.tileentity.FurnaceTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.block.AbstractFurnaceBlock;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -49,28 +50,28 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	
 	protected BoilerBurnMode mode;
 	
-	public AetherBoilerBlockEntity() {
-		super(AetheriaTileEntities.Boiler, 1, 0, 500);
+	public AetherBoilerBlockEntity(BlockPos pos, BlockState state) {
+		super(AetheriaTileEntities.Boiler, pos, state, 1, 0, 500);
 		mode = BoilerBurnMode.FOCUS_AETHER;
 	}
 	
-	protected @Nullable FurnaceTileEntity getNearbyFurnace() {
-		TileEntity te = world.getTileEntity(pos.up());
-		if (te != null && te instanceof FurnaceTileEntity) {
-			return (FurnaceTileEntity) te;
+	protected @Nullable FurnaceBlockEntity getNearbyFurnace() {
+		BlockEntity te = level.getBlockEntity(worldPosition.above());
+		if (te != null && te instanceof FurnaceBlockEntity) {
+			return (FurnaceBlockEntity) te;
 		}
 		return null;
 	}
 	
 	protected void fuelNearbyFurnace() {
-		FurnaceTileEntity furnace = getNearbyFurnace();
+		FurnaceBlockEntity furnace = getNearbyFurnace();
 		if (furnace != null) {
 			try {
-				ObfuscationReflectionHelper.setPrivateValue(AbstractFurnaceTileEntity.class, furnace, 20, "field_214018_j");// "burnTime");
+				ObfuscationReflectionHelper.setPrivateValue(AbstractFurnaceBlockEntity.class, furnace, 20, "litTime");// "burnTime");
 			} catch (Exception e) {
 				
 			}
-			this.world.setBlockState(this.pos.up(), this.world.getBlockState(this.pos.up()).with(AbstractFurnaceBlock.LIT, Boolean.valueOf(true)), 3);
+			this.level.setBlock(this.worldPosition.above(), this.level.getBlockState(this.worldPosition.above()).setValue(AbstractFurnaceBlock.LIT, Boolean.valueOf(true)), 3);
 		}
 	}
 	
@@ -79,11 +80,11 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	 * @param furnace
 	 * @return
 	 */
-	protected static final boolean FurnaceHasWork(@Nullable FurnaceTileEntity furnace) {
-		if (furnace != null && furnace instanceof AbstractFurnaceTileEntity) {
+	protected static final boolean FurnaceHasWork(@Nullable FurnaceBlockEntity furnace) {
+		if (furnace != null && furnace instanceof AbstractFurnaceBlockEntity) {
 			if (Furnace_CanSmeltMethod == null) {
 				try {
-				Furnace_CanSmeltMethod = ObfuscationReflectionHelper.findMethod(AbstractFurnaceTileEntity.class, "func_214008_b", IRecipe.class); // "canSmelt"
+				Furnace_CanSmeltMethod = ObfuscationReflectionHelper.findMethod(AbstractFurnaceBlockEntity.class, "canBurn", Recipe.class); // "canSmelt"
 				if (Furnace_CanSmeltMethod != null) {
 					Furnace_CanSmeltMethod.setAccessible(true);
 				}
@@ -94,7 +95,7 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 			
 			if (Furnace_CanSmeltMethod != null) {
 				try {
-					IRecipe<?> irecipe = furnace.getWorld().getRecipeManager().getRecipe(IRecipeType.SMELTING, furnace, furnace.getWorld()).orElse(null);
+					Recipe<?> irecipe = furnace.getLevel().getRecipeManager().getRecipeFor(RecipeType.SMELTING, furnace, furnace.getLevel()).orElse(null);
 					return (boolean) Furnace_CanSmeltMethod.invoke(furnace, irecipe);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -137,9 +138,9 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 
 						@Override
 						public ItemStack getStackInSlot(int slot) {
-							FurnaceTileEntity furnace = getNearbyFurnace();
+							FurnaceBlockEntity furnace = getNearbyFurnace();
 							if (furnace != null) {
-								return furnace.getStackInSlot(2);
+								return furnace.getItem(2);
 							}
 							return ItemStack.EMPTY;
 						}
@@ -151,12 +152,12 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 
 						@Override
 						public ItemStack extractItem(int slot, int amount, boolean simulate) {
-							FurnaceTileEntity furnace = getNearbyFurnace();
+							FurnaceBlockEntity furnace = getNearbyFurnace();
 							if (furnace != null) {
 								if (simulate) {
-									return furnace.getStackInSlot(2);
+									return furnace.getItem(2);
 								} else {
-									return furnace.removeStackFromSlot(2);
+									return furnace.removeItemNoUpdate(2);
 								}
 							}
 							return null;
@@ -194,8 +195,8 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 
 	@Override
 	protected void onBurningChange(boolean newBurning) {
-		BlockState state = world.getBlockState(pos);
-		world.setBlockState(pos, AetheriaBlocks.boiler.getDefaultState().with(AetherBoilerBlock.ON, newBurning).with(AetherBoilerBlock.FACING, state.get(AetherBoilerBlock.FACING)));
+		BlockState state = level.getBlockState(worldPosition);
+		level.setBlockAndUpdate(worldPosition, AetheriaBlocks.boiler.defaultBlockState().setValue(AetherBoilerBlock.ON, newBurning).setValue(AetherBoilerBlock.FACING, state.getValue(AetherBoilerBlock.FACING)));
 	}
 	
 	@Override
@@ -233,8 +234,8 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundTag save(CompoundTag nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.putString(NBT_BOILER_MODE, this.mode.name());
 		
@@ -242,10 +243,10 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
-		if (nbt.contains(NBT_BOILER_MODE, NBT.TAG_STRING)) {
+		if (nbt.contains(NBT_BOILER_MODE, Tag.TAG_STRING)) {
 			BoilerBurnMode readMode = BoilerBurnMode.FOCUS_AETHER;
 			try {
 				readMode = BoilerBurnMode.valueOf(nbt.getString(NBT_BOILER_MODE));

@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.items.ActivePendant;
 import com.smanzana.nostrumaetheria.items.AetheriaItems;
@@ -15,15 +15,15 @@ import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -39,15 +39,15 @@ public class ActivePendantGui {
 	private static final int GUI_HOTBAR_INV_HOFFSET = 8;
 	private static final int GUI_HOTBAR_INV_VOFFSET = 151;
 
-	public static class ActivePendantContainer extends Container {
+	public static class ActivePendantContainer extends AbstractContainerMenu {
 		
 		public static final String ID = "active_pendant";
 		
 		protected final ItemStack pendant;
-		protected final IInventory pendantInvWrapper;
+		protected final Container pendantInvWrapper;
 		protected boolean valid = true;
 		
-		public ActivePendantContainer(int windowId, PlayerInventory playerInv, ItemStack pendant) {
+		public ActivePendantContainer(int windowId, Inventory playerInv, ItemStack pendant) {
 			super(AetheriaContainers.ActivePendant, windowId);
 			this.pendant = pendant;
 			// Preemptively make sure an ID has been generated
@@ -55,12 +55,12 @@ public class ActivePendantGui {
 			ItemStack inv[] = new ItemStack[] {ActivePendant.lyonGetReagents(pendant)};
 			pendantInvWrapper = new Inventories.ItemStackArrayWrapper(inv) {
 				@Override
-				public boolean isItemValidForSlot(int index, ItemStack stack) {
+				public boolean canPlaceItem(int index, ItemStack stack) {
 					return index == 0 && (stack.isEmpty() || stack.getItem() instanceof ReagentItem);
 				}
 				
 				@Override
-				public void markDirty() {
+				public void setChanged() {
 					// Update backing pendant item
 					ActivePendant.lyonSetReagents(pendant, inv[0]);
 				}
@@ -71,7 +71,7 @@ public class ActivePendantGui {
 				for (int x = 0; x < 9; x++) {
 					this.addSlot(new Slot(playerInv, x + y * 9 + 9, GUI_PLAYER_INV_HOFFSET + (x * 18), GUI_PLAYER_INV_VOFFSET + (y * 18)) {
 						@Override
-						public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
+						public ItemStack onTake(Player playerIn, ItemStack stack) {
 							if (!stack.isEmpty() && stack.getItem() instanceof ActivePendant) {
 								if (Objects.equals(ActivePendant.lyonGetID(stack), ActivePendant.lyonGetID(pendant))) {
 									//playerIn.closeScreen(); // Assumes just one player is looking
@@ -88,7 +88,7 @@ public class ActivePendantGui {
 			for (int x = 0; x < 9; x++) {
 				this.addSlot(new Slot(playerInv, x, GUI_HOTBAR_INV_HOFFSET + x * 18, GUI_HOTBAR_INV_VOFFSET) {
 					@Override
-					public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
+					public ItemStack onTake(Player playerIn, ItemStack stack) {
 						if (!stack.isEmpty() && stack.getItem() instanceof ActivePendant) {
 							if (Objects.equals(ActivePendant.lyonGetID(stack), ActivePendant.lyonGetID(pendant))) {
 								//playerIn.closeScreen(); // Assumes just one player is looking
@@ -102,15 +102,15 @@ public class ActivePendantGui {
 			
 			this.addSlot(new Slot(pendantInvWrapper, 0, GUI_PENDANT_INV_HOFFSET, GUI_PENDANT_INV_VOFFSET) {
 				@Override
-				public boolean isItemValid(@Nonnull ItemStack stack) {
-					return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
+				public boolean mayPlace(@Nonnull ItemStack stack) {
+					return this.container.canPlaceItem(this.getSlotIndex(), stack);
 				}
 			});
 		}
 		
-		public static final ActivePendantContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+		public static final ActivePendantContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buffer) {
 			final int slot = buffer.readVarInt();
-			ItemStack stack = playerInv.getStackInSlot(slot);
+			ItemStack stack = playerInv.getItem(slot);
 			if (stack.isEmpty() || !(stack.getItem() instanceof ActivePendant)) {
 				stack = new ItemStack(AetheriaItems.activePendant);
 			}
@@ -119,7 +119,7 @@ public class ActivePendantGui {
 		
 		public static final IPackedContainerProvider Make(int slot) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
-				ItemStack stack = playerInv.getStackInSlot(slot);
+				ItemStack stack = playerInv.getItem(slot);
 				if (stack.isEmpty() || !(stack.getItem() instanceof ActivePendant)) {
 					stack = new ItemStack(AetheriaItems.activePendant);
 				}
@@ -130,27 +130,27 @@ public class ActivePendantGui {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
+		public ItemStack quickMoveStack(Player playerIn, int fromSlot) {
 			ItemStack prev = ItemStack.EMPTY;	
-			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
+			Slot slot = (Slot) this.slots.get(fromSlot);
 			
-			if (slot != null && slot.getHasStack()) {
-				ItemStack cur = slot.getStack();
+			if (slot != null && slot.hasItem()) {
+				ItemStack cur = slot.getItem();
 				prev = cur.copy();
 				
-				if (slot.inventory == this.pendantInvWrapper) {
+				if (slot.container == this.pendantInvWrapper) {
 					// Trying to take out the reagent
-					if (playerIn.inventory.addItemStackToInventory(cur)) {
-						slot.putStack(ItemStack.EMPTY);
+					if (playerIn.inventory.add(cur)) {
+						slot.set(ItemStack.EMPTY);
 						cur = slot.onTake(playerIn, cur);
 					} else {
 						prev = ItemStack.EMPTY;
 					}
 				} else {
 					// shift-click in player inventory
-					if (slot.isItemValid(cur)) {
+					if (slot.mayPlace(cur)) {
 						ItemStack leftover = Inventories.addItem(pendantInvWrapper, cur);
-						slot.putStack(leftover.isEmpty() ? ItemStack.EMPTY : leftover);
+						slot.set(leftover.isEmpty() ? ItemStack.EMPTY : leftover);
 						if (!leftover.isEmpty() && leftover.getCount() == prev.getCount()) {
 							prev = ItemStack.EMPTY;
 						}
@@ -163,12 +163,12 @@ public class ActivePendantGui {
 		}
 		
 		@Override
-		public boolean canDragIntoSlot(Slot slotIn) {
+		public boolean canDragTo(Slot slotIn) {
 			return true;
 		}
 		
 		@Override
-		public boolean canInteractWith(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return valid;
 		}
 		
@@ -182,12 +182,12 @@ public class ActivePendantGui {
 
 		//private ActivePendantContainer container;
 		
-		public ActivePendantGuiContainer(ActivePendantContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public ActivePendantGuiContainer(ActivePendantContainer container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			//this.container = container;
 			
-			this.xSize = GUI_TEXT_WIDTH;
-			this.ySize = GUI_TEXT_HEIGHT;
+			this.imageWidth = GUI_TEXT_WIDTH;
+			this.imageHeight = GUI_TEXT_HEIGHT;
 		}
 		
 		@Override
@@ -196,17 +196,17 @@ public class ActivePendantGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
-			int horizontalMargin = (width - xSize) / 2;
-			int verticalMargin = (height - ySize) / 2;
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+			int horizontalMargin = (width - imageWidth) / 2;
+			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bindTexture(TEXT);
+			mc.getTextureManager().bind(TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
 			
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			;
 		}
 		

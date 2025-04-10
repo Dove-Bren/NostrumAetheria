@@ -1,7 +1,7 @@
 package com.smanzana.nostrumaetheria.proxy;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -21,7 +21,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public PlayerEntity getPlayer() {
+	public Player getPlayer() {
 		Minecraft mc = Minecraft.getInstance();
 		return mc.player;
 	}

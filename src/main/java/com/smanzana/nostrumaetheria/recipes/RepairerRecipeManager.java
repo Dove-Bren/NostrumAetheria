@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public final class RepairerRecipeManager {
 	

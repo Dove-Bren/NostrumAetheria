@@ -2,8 +2,8 @@ package com.smanzana.nostrumaetheria.api.item;
 
 import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
 
 /**
  * Item may provide functionallity when aether from an aether infuser is used on it

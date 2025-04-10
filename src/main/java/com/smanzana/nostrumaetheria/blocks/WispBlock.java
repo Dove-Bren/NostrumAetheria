@@ -3,39 +3,44 @@ package com.smanzana.nostrumaetheria.blocks;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.client.gui.container.WispBlockGui;
+import com.smanzana.nostrumaetheria.tiles.AetheriaTileEntities;
 import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class WispBlock extends Block {
+public class WispBlock extends BaseEntityBlock {
 	
-	protected static final VoxelShape SELECT_AABB = Block.makeCuboidShape(3.2, 14.4, 3.2, 12.8, 20.8, 12.8);
-	protected static final VoxelShape COLLIDE_AABB = Block.makeCuboidShape(3.2, 0, 3.2, 12.8, 20.8, 12.8);
+	protected static final VoxelShape SELECT_AABB = Block.box(3.2, 14.4, 3.2, 12.8, 20.8, 12.8);
+	protected static final VoxelShape COLLIDE_AABB = Block.box(3.2, 0, 3.2, 12.8, 20.8, 12.8);
 	
 	public WispBlock() {
-		super(Block.Properties.create(Material.GLASS)
-				.hardnessAndResistance(3.0f, 10.0f)
+		super(Block.Properties.of(Material.GLASS)
+				.strength(3.0f, 10.0f)
 				.sound(SoundType.GLASS)
-				.notSolid()
+				.noOcclusion()
 				);
 	}
 	
@@ -45,73 +50,72 @@ public class WispBlock extends Block {
 //	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		
-		ItemStack heldItem = playerIn.getHeldItem(hand);
+		ItemStack heldItem = playerIn.getItemInHand(hand);
 		
 		// Automatically handle scrolls and reagents
-		if (!playerIn.isSneaking() && !heldItem.isEmpty()) {
-			WispBlockTileEntity te = (WispBlockTileEntity) worldIn.getTileEntity(pos);
+		if (!playerIn.isShiftKeyDown() && !heldItem.isEmpty()) {
+			WispBlockTileEntity te = (WispBlockTileEntity) worldIn.getBlockEntity(pos);
 			if (heldItem.getItem() instanceof SpellScroll
 					&& te.getScroll() == null
 					&& SpellScroll.GetSpell(heldItem) != null) {
 				// Take scroll
 				te.setScroll(heldItem.copy());
 				heldItem.shrink(1);
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else if (heldItem.getItem() instanceof ReagentItem) {
 				
 				if (te.getReagent().isEmpty()) {
 					te.setReagent(heldItem.split(heldItem.getCount()));
-					return ActionResultType.SUCCESS;
+					return InteractionResult.SUCCESS;
 				} else if (ReagentItem.FindType(heldItem) == ReagentItem.FindType(te.getReagent())) {
 					int avail = Math.max(0, Math.min(64, 64 - te.getReagent().getCount()));
 					if (avail != 0) {
 						int take = Math.min(avail, heldItem.getCount());
 						heldItem.shrink(take);
 						te.getReagent().grow(take);
-						return ActionResultType.SUCCESS;
+						return InteractionResult.SUCCESS;
 					}
 				}
 			}
 		}
 		
-		WispBlockTileEntity te = (WispBlockTileEntity) worldIn.getTileEntity(pos);
+		WispBlockTileEntity te = (WispBlockTileEntity) worldIn.getBlockEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(playerIn, WispBlockGui.WispBlockContainer.Make(te));
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.INVISIBLE;
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return new WispBlockTileEntity();
-	}
-	
-	@SuppressWarnings("deprecation")
-	@Override
-	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
-		super.eventReceived(state, worldIn, pos, eventID, eventParam);
-		TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity == null ? false : tileentity.receiveClientEvent(eventID, eventParam);
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new WispBlockTileEntity(pos, state);
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
-		return BlockRenderType.INVISIBLE;
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+		return TickableBlockEntity.createTickerHelper(type, AetheriaTileEntities.WispBlockEnt);
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int eventID, int eventParam) {
+		super.triggerEvent(state, worldIn, pos, eventID, eventParam);
+		BlockEntity tileentity = worldIn.getBlockEntity(pos);
+        return tileentity == null ? false : tileentity.triggerEvent(eventID, eventParam);
+	}
+	
+	@Override
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return SELECT_AABB;
 	}
 	
 	@Override
-	public VoxelShape getCollisionShape(BlockState blockState, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getCollisionShape(BlockState blockState, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return COLLIDE_AABB;
 	}
 	
@@ -132,16 +136,16 @@ public class WispBlock extends Block {
 //	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			destroy(worldIn, pos, state);
-			worldIn.removeTileEntity(pos);
+			worldIn.removeBlockEntity(pos);
 			//super.onReplaced(world, pos, state);
 		}
 	}
 	
-	private void destroy(World world, BlockPos pos, BlockState state) {
-		TileEntity ent = world.getTileEntity(pos);
+	private void destroy(Level world, BlockPos pos, BlockState state) {
+		BlockEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof WispBlockTileEntity))
 			return;
 		
@@ -152,7 +156,7 @@ public class WispBlock extends Block {
 			x = pos.getX() + .5;
 			y = pos.getY() + .5;
 			z = pos.getZ() + .5;
-			world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
+			world.addFreshEntity(new ItemEntity(world, x, y, z, item.copy()));
 		}
 		
 		item = table.getReagent();
@@ -161,14 +165,14 @@ public class WispBlock extends Block {
 			x = pos.getX() + .5;
 			y = pos.getY() + .5;
 			z = pos.getZ() + .5;
-			world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
+			world.addFreshEntity(new ItemEntity(world, x, y, z, item.copy()));
 		}
 		
 		table.deactivate();
 	}
 	
-	public static @Nonnull ItemStack getScroll(World world, BlockPos pos) {
-		TileEntity ent = world.getTileEntity(pos);
+	public static @Nonnull ItemStack getScroll(Level world, BlockPos pos) {
+		BlockEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof WispBlockTileEntity))
 			return ItemStack.EMPTY;
 		
@@ -176,8 +180,8 @@ public class WispBlock extends Block {
 		return table.getScroll();
 	}
 	
-	public int getWispCount(World world, BlockPos pos) {
-		TileEntity ent = world.getTileEntity(pos);
+	public int getWispCount(Level world, BlockPos pos) {
+		BlockEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof WispBlockTileEntity))
 			return 0;
 		
@@ -185,8 +189,8 @@ public class WispBlock extends Block {
 		return table.getWispCount();
 	}
 	
-	public int getMaxWisps(World world, BlockPos pos) {
-		TileEntity ent = world.getTileEntity(pos);
+	public int getMaxWisps(Level world, BlockPos pos) {
+		BlockEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof WispBlockTileEntity))
 			return 0;
 		

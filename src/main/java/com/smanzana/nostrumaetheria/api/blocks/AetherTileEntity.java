@@ -13,36 +13,36 @@ import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 import com.smanzana.nostrumaetheria.api.component.OptionalAetherHandlerComponent;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public abstract class AetherTileEntity extends TileEntity implements IAetherHandlerProvider, IAetherComponentListener {
+public abstract class AetherTileEntity extends BlockEntity implements IAetherHandlerProvider, IAetherComponentListener {
 
 	private static final String NBT_HANDLER = "aether_handler";
 	
 	protected OptionalAetherHandlerComponent compWrapper;
 	protected final IAetherStatTracker statTracker;
 	
-	public AetherTileEntity(TileEntityType<?> type, int defaultAether, int defaultMaxAether) {
-		super(type);
+	public AetherTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int defaultAether, int defaultMaxAether) {
+		super(type, pos, state);
 		compWrapper = createComponent(defaultAether, defaultMaxAether);
 		statTracker = createTracker();
 	}
 	
-	public AetherTileEntity(TileEntityType<?> type) {
-		this(type, 0, 0);
+	public AetherTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		this(type, pos, state, 0, 0);
 	}
 	
 	protected OptionalAetherHandlerComponent createComponent(int defaultAether, int defaultMaxAether) {
-		return new OptionalAetherHandlerComponent(world, pos, this, defaultAether, defaultMaxAether);
+		return new OptionalAetherHandlerComponent(level, worldPosition, this, defaultAether, defaultMaxAether);
 	}
 	
 	protected IAetherStatTracker createTracker() {
@@ -58,10 +58,10 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 					continue;
 				}
 				
-				BlockPos neighbor = pos.offset(dir);
+				BlockPos neighbor = worldPosition.relative(dir);
 				
 				// First check for a TileEntity
-				TileEntity te = world.getTileEntity(neighbor);
+				BlockEntity te = level.getBlockEntity(neighbor);
 				if (te != null && te instanceof IAetherHandler) {
 					connections.add(new AetherFlowConnection((IAetherHandler) te, dir.getOpposite()));
 					continue;
@@ -72,10 +72,10 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 				}
 				
 				// See if block boasts being able to get us a handler
-				BlockState attachedState = world.getBlockState(neighbor);
+				BlockState attachedState = level.getBlockState(neighbor);
 				Block attachedBlock = attachedState.getBlock();
 				if (attachedBlock instanceof IAetherCapableBlock) {
-					connections.add(new AetherFlowConnection(((IAetherCapableBlock) attachedBlock).getAetherHandler(world, attachedState, neighbor, dir), dir.getOpposite()));
+					connections.add(new AetherFlowConnection(((IAetherCapableBlock) attachedBlock).getAetherHandler(level, attachedState, neighbor, dir), dir.getOpposite()));
 					continue;
 				}
 			}
@@ -84,31 +84,31 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	
 	@Override
 	public void dirty() {
-		this.markDirty();
+		this.setChanged();
 	}
 	
 	@Override
 	public void onAetherFlowTick(int diff, boolean added, boolean taken) {
-		if (this.world != null) {
+		if (this.level != null) {
 			final int aether = (this.compWrapper.isPresent() ? this.compWrapper.getHandlerIfPresent().getAether(null) : 0);
-			statTracker.reportTotal(world.getGameTime(), aether);
+			statTracker.reportTotal(level.getGameTime(), aether);
 			
 			if (added) {
-				statTracker.reportInput(world.getGameTime(), diff);
+				statTracker.reportInput(level.getGameTime(), diff);
 			} else {
-				statTracker.reportOutput(world.getGameTime(), diff);
+				statTracker.reportOutput(level.getGameTime(), diff);
 			}
 		}
 	}
 	
 	@Override
-	public void validate() {
-		super.validate();
+	public void clearRemoved() {
+		super.clearRemoved();
 	}
 	
 	@Override
-	public void remove() {
-		super.remove();
+	public void setRemoved() {
+		super.setRemoved();
 		
 		// Clean up connections
 		IAetherHandlerComponent comp = compWrapper.getHandlerIfPresent();
@@ -127,8 +127,8 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 //	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT compound) {
-		super.write(compound);
+	public CompoundTag save(CompoundTag compound) {
+		super.save(compound);
 		
 		compound.put(NBT_HANDLER, compWrapper.toNBT());
 		
@@ -136,8 +136,8 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT compound) {
-		super.read(state, compound);
+	public void load(CompoundTag compound) {
+		super.load(compound);
 		
 		compWrapper.loadNBT(compound.get(NBT_HANDLER));
 	}
@@ -160,18 +160,18 @@ public abstract class AetherTileEntity extends TileEntity implements IAetherHand
 	}
 	
 	@Override
-	public void setWorldAndPos(World world, BlockPos pos) {
-		super.setWorldAndPos(world, pos);
+	public void setLevel(Level world) {
+		super.setLevel(world);
 		
-		this.compWrapper.getHandlerIfPresent().setPosition(this.world, this.pos);
+		this.compWrapper.getHandlerIfPresent().setPosition(this.level, this.worldPosition);
 	}
 	
-	@Override
-	public void setPos(BlockPos pos) {
-		super.setPos(pos);
-		
-		if (this.compWrapper.isPresent() && this.world != null) {
-			this.compWrapper.getHandlerIfPresent().setPosition(this.world, this.pos);
-		}
-	}
+//	@Override
+//	public void setPosition(BlockPos pos) {
+//		super.setPosition(pos);
+//		
+//		if (this.compWrapper.isPresent() && this.level != null) {
+//			this.compWrapper.getHandlerIfPresent().setPosition(this.level, this.worldPosition);
+//		}
+//	}
 }

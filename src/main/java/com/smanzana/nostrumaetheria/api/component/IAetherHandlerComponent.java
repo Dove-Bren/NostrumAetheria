@@ -5,10 +5,10 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.IWorldAetherHandler;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public interface IAetherHandlerComponent extends IWorldAetherHandler, IAetherFlowHandler {
 	
@@ -97,11 +97,11 @@ public interface IAetherHandlerComponent extends IWorldAetherHandler, IAetherFlo
 	
 	public void tick();
 	
-	public CompoundNBT writeToNBT(CompoundNBT compound);
+	public CompoundTag writeToNBT(CompoundTag compound);
 	
-	public void readFromNBT(CompoundNBT compound);
+	public void readFromNBT(CompoundTag compound);
 	
 	public void setAether(int aether);
 
-	public void setPosition(World world, BlockPos pos);
+	public void setPosition(Level world, BlockPos pos);
 }

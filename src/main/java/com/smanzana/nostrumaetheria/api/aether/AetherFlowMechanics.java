@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConnection;
 
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 
 public final class AetherFlowMechanics {
 	

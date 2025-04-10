@@ -1,8 +1,8 @@
 package com.smanzana.nostrumaetheria.api.aether.stats;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.IntNBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraftforge.common.util.Constants.NBT;
 
 /**
@@ -56,36 +56,36 @@ public class AetherStatInstance {
 	private static final String NBT_INPUT_LIST = "input_list";
 	private static final String NBT_OUTPUT_LIST = "output_list";
 	
-	public CompoundNBT toNBT() {
-		CompoundNBT tag = new CompoundNBT();
+	public CompoundTag toNBT() {
+		CompoundTag tag = new CompoundTag();
 		
 		tag.putInt(NBT_INTERVALS, TOTAL_INTERVALS);
-		ListNBT list = new ListNBT();
+		ListTag list = new ListTag();
 		for (int i = 0; i < TOTAL_INTERVALS; i++) {
-			list.add(IntNBT.valueOf(aetherTotalHistory[i]));
+			list.add(IntTag.valueOf(aetherTotalHistory[i]));
 		}
 		tag.put(NBT_TOTAL_LIST, list);
 		
-		list = new ListNBT();
+		list = new ListTag();
 		for (int i = 0; i < TOTAL_INTERVALS; i++) {
-			list.add(IntNBT.valueOf(aetherInHistory[i]));
+			list.add(IntTag.valueOf(aetherInHistory[i]));
 		}
 		tag.put(NBT_INPUT_LIST, list);
 		
-		list = new ListNBT();
+		list = new ListTag();
 		for (int i = 0; i < TOTAL_INTERVALS; i++) {
-			list.add(IntNBT.valueOf(aetherOutHistory[i]));
+			list.add(IntTag.valueOf(aetherOutHistory[i]));
 		}
 		tag.put(NBT_OUTPUT_LIST, list);
 		
 		return tag;
 	}
 	
-	public void readFromNBT(CompoundNBT tag) {
+	public void readFromNBT(CompoundTag tag) {
 		final int count = tag.getInt(NBT_INTERVALS);
-		final ListNBT totalList = tag.getList(NBT_TOTAL_LIST, NBT.TAG_INT);
-		final ListNBT inputList = tag.getList(NBT_INPUT_LIST, NBT.TAG_INT);
-		final ListNBT outputList = tag.getList(NBT_OUTPUT_LIST, NBT.TAG_INT);
+		final ListTag totalList = tag.getList(NBT_TOTAL_LIST, NBT.TAG_INT);
+		final ListTag inputList = tag.getList(NBT_INPUT_LIST, NBT.TAG_INT);
+		final ListTag outputList = tag.getList(NBT_OUTPUT_LIST, NBT.TAG_INT);
 		for (int i = 0; i < TOTAL_INTERVALS; i++) {
 			final int total;
 			final int input;

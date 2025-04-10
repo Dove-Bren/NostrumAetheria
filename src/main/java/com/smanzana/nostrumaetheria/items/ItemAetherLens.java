@@ -23,33 +23,33 @@ import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.potion.Potions;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.Tags;
@@ -72,16 +72,16 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	public static final String ID_NO_SPAWN = ID_PREFIX + "no_spawn";
 	
 	public static enum LensType {
-		SPREAD(ID_SPREAD, true, 1, 0, () -> Ingredient.fromTag(Tags.Items.GEMS_DIAMOND)),
-		CHARGE(ID_CHARGE, true, 1, 0, () -> Ingredient.fromTag(NostrumTags.Items.CrystalSmall)),
-		GROW(ID_GROW, false, 20, 10, () -> Ingredient.fromItems(Items.BONE_BLOCK)),
+		SPREAD(ID_SPREAD, true, 1, 0, () -> Ingredient.of(Tags.Items.GEMS_DIAMOND)),
+		CHARGE(ID_CHARGE, true, 1, 0, () -> Ingredient.of(NostrumTags.Items.CrystalSmall)),
+		GROW(ID_GROW, false, 20, 10, () -> Ingredient.of(Items.BONE_BLOCK)),
 		SWIFTNESS(ID_SWIFTNESS, false, 1, 0, () -> new NostrumPotions.PotionIngredient(Potions.SWIFTNESS)), // aether taken per entity
-		ELEVATOR(ID_ELEVATOR, false, 1, 0, () -> Ingredient.fromItems(Blocks.DISPENSER)), // aether taken per entity
+		ELEVATOR(ID_ELEVATOR, false, 1, 0, () -> Ingredient.of(Blocks.DISPENSER)), // aether taken per entity
 		HEAL(ID_HEAL, false, 5, 0, () -> new NostrumPotions.PotionIngredient(Potions.HEALING)), // aether taken per entity
-		BORE(ID_BORE, false, 20, 50, () -> Ingredient.fromItems(Items.DIAMOND_PICKAXE)),
+		BORE(ID_BORE, false, 20, 50, () -> Ingredient.of(Items.DIAMOND_PICKAXE)),
 		BORE_REVERSED(ID_BORE_REVERSED, false, 20, 50, () -> Ingredient.EMPTY),
 		MANA_REGEN(ID_MANA_REGEN, false, 20, 0, () -> new NostrumPotions.PotionIngredient(NostrumPotions.MANAREGEN.getType())),
-		NO_SPAWN(ID_NO_SPAWN, true, 1, 0, () -> Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_EMERALD)),
+		NO_SPAWN(ID_NO_SPAWN, true, 1, 0, () -> Ingredient.of(Tags.Items.STORAGE_BLOCKS_EMERALD)),
 		;
 		
 		private final String unlocName; // unlocalized name fragment
@@ -204,22 +204,22 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
-		if (I18n.hasKey("item." + type.getUnlocSuffix() + ".desc")) {
+		if (I18n.exists("item." + type.getUnlocSuffix() + ".desc")) {
 			// Format with placeholders for blue and red formatting
-			String translation = I18n.format("item." + type.getUnlocSuffix() + ".desc", TextFormatting.GRAY, TextFormatting.BLUE, TextFormatting.DARK_RED);
+			String translation = I18n.get("item." + type.getUnlocSuffix() + ".desc", ChatFormatting.GRAY, ChatFormatting.BLUE, ChatFormatting.DARK_RED);
 			if (translation.trim().isEmpty())
 				return;
 			String lines[] = translation.split("\\|");
 			for (String line : lines) {
-				tooltip.add(new StringTextComponent(line));
+				tooltip.add(new TextComponent(line));
 			}
 		}
 		
 		if (type.isMasterOnly()) {
-			tooltip.add(new TranslationTextComponent("item.lens.master").mergeStyle(TextFormatting.DARK_RED));
+			tooltip.add(new TranslatableComponent("item.lens.master").withStyle(ChatFormatting.DARK_RED));
 		}
 	}
 	
@@ -234,7 +234,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 
 	@Override
 	public int acceptAetherInfuse(ItemStack stack, BlockPos pos, IAetherInfuserTileEntity source, int maxAether) {
-		final ServerWorld world = (ServerWorld) source.getInfuserWorld();
+		final ServerLevel world = (ServerLevel) source.getInfuserWorld();
 		int cost = 0;
 		
 		switch (type) {
@@ -270,12 +270,12 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		return maxAether - cost;
 	}
 	
-	protected int doGrow(ServerWorld world, BlockPos center, int maxAether) {
+	protected int doGrow(ServerLevel world, BlockPos center, int maxAether) {
 		@Nullable BlockPos growPos = ElementalArmor.DoEarthGrow(world, center); 
 		if (growPos != null) {
 			AetherInfuserTileEntity.DoChargeEffect(world,
-					new Vector3d(center.getX() + .5, center.getY() + 1, center.getZ() + .5),
-					new Vector3d(growPos.getX() + .5, growPos.getY() + .5, growPos.getZ() + .5),
+					new Vec3(center.getX() + .5, center.getY() + 1, center.getZ() + .5),
+					new Vec3(growPos.getX() + .5, growPos.getY() + .5, growPos.getZ() + .5),
 					1, 0x6622FF44);
 			
 			return LensType.GROW.getAetherPerTick();
@@ -283,40 +283,40 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		return 0;
 	}
 	
-	protected int doSwiftness(ServerWorld world, BlockPos center, int maxAether) {
+	protected int doSwiftness(ServerLevel world, BlockPos center, int maxAether) {
 		final double MAX_DIST_SQ = 900;
 		int cost = 0;
 		
 		List<LivingEntity> entities = Entities.GetEntities(world, (e) -> {
 			return e.isAlive()
-					&& e.getDistanceSq(center.getX() + .5, center.getY() + .5, center.getZ() + .5) < MAX_DIST_SQ
-					&& (e.getActivePotionEffect(Effects.SPEED) == null
-						|| e.getActivePotionEffect(Effects.SPEED).getDuration() < 20);
+					&& e.distanceToSqr(center.getX() + .5, center.getY() + .5, center.getZ() + .5) < MAX_DIST_SQ
+					&& (e.getEffect(MobEffects.MOVEMENT_SPEED) == null
+						|| e.getEffect(MobEffects.MOVEMENT_SPEED).getDuration() < 20);
 		});
 		
 		for (LivingEntity ent : entities) {
-			ent.addPotionEffect(new EffectInstance(Effects.SPEED, 40, 0, false, false));
+			ent.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 0, false, false));
 			cost += 2;
 			AetherInfuserTileEntity.DoChargeEffect(ent, 1, 0xFF77AA22);
 		}
 		return cost;
 	}
 	
-	protected int doElevator(ServerWorld world, BlockPos center, int maxAether) {
+	protected int doElevator(ServerLevel world, BlockPos center, int maxAether) {
 		final double HORZ_DIST_RADIUS = 2.5;
 		final double MAX_HEIGHT = 30;
 		int cost = 0;
 		for (LivingEntity ent : Entities.GetEntities(world, (e) -> {
 			return e.isAlive()
-					&& e.getPosY() >= center.getY() && e.getPosY() < center.getY() + MAX_HEIGHT
-					&& Math.abs(e.getPosX() - (center.getX() + .5)) < HORZ_DIST_RADIUS
-					&& Math.abs(e.getPosZ() - (center.getZ() + .5)) < HORZ_DIST_RADIUS;
+					&& e.getY() >= center.getY() && e.getY() < center.getY() + MAX_HEIGHT
+					&& Math.abs(e.getX() - (center.getX() + .5)) < HORZ_DIST_RADIUS
+					&& Math.abs(e.getZ() - (center.getZ() + .5)) < HORZ_DIST_RADIUS;
 		})) {
-			if (!ent.isSneaking() && !ent.isOnGround()) {
+			if (!ent.isShiftKeyDown() && !ent.isOnGround()) {
 				cost += 1;
-				Vector3d motion = ent.getMotion();
-				ent.setMotion(motion.x, Math.min(.3, motion.y + .1), motion.z);
-				ent.velocityChanged = true;
+				Vec3 motion = ent.getDeltaMovement();
+				ent.setDeltaMovement(motion.x, Math.min(.3, motion.y + .1), motion.z);
+				ent.hurtMarked = true;
 				AetherInfuserTileEntity.DoChargeEffect(ent, 1, 0xFF77AA22);
 			}
 			ent.fallDistance = 0;
@@ -324,15 +324,15 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		return cost;
 	}
 	
-	protected int doHeal(ServerWorld world, BlockPos center, int maxAether) {
+	protected int doHeal(ServerLevel world, BlockPos center, int maxAether) {
 		final double MAX_DIST_SQ = 900;
 		int cost = 0;
 		for (LivingEntity ent : Entities.GetEntities(world, (e) -> {
 			return e.isAlive()
-					&& (e instanceof PlayerEntity 
+					&& (e instanceof Player 
 							|| (e instanceof ITameableEntity && ((ITameableEntity) e).getOwner() != null)
-							|| (e instanceof TameableEntity) && ((TameableEntity) e).getOwnerId() != null)
-					&& e.getDistanceSq(center.getX() + .5, center.getY() + .5, center.getZ() + .5) < MAX_DIST_SQ
+							|| (e instanceof TamableAnimal) && ((TamableAnimal) e).getOwnerUUID() != null)
+					&& e.distanceToSqr(center.getX() + .5, center.getY() + .5, center.getZ() + .5) < MAX_DIST_SQ
 					&& e.getHealth() < e.getMaxHealth();
 		})) {
 			ent.heal(.25f);
@@ -342,15 +342,15 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		return cost;
 	}
 	
-	protected @Nonnull List<ItemStack> pushToNearbyInventories(@Nonnull List<ItemStack> items, ServerWorld world, BlockPos center) {
+	protected @Nonnull List<ItemStack> pushToNearbyInventories(@Nonnull List<ItemStack> items, ServerLevel world, BlockPos center) {
 		if (items.isEmpty()) {
 			return items;
 		}
 		
 		// We'll look in the 4 neighbors for inventory handlers and try to empty our list
 		for (Direction dir : Direction.Plane.HORIZONTAL) {
-			final BlockPos pos = center.offset(dir);
-			final @Nullable TileEntity te = world.getTileEntity(pos);
+			final BlockPos pos = center.relative(dir);
+			final @Nullable BlockEntity te = world.getBlockEntity(pos);
 			
 			if (te != null) {
 				LazyOptional<IItemHandler> cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite());
@@ -364,12 +364,12 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 							items.add(leftover);
 						}
 					}
-				} else if (te instanceof IInventory) {
+				} else if (te instanceof Container) {
 					List<ItemStack> toInsert = items;
 					items = new ArrayList<>(toInsert.size());
 					
 					for (ItemStack insert : toInsert) {
-						ItemStack leftover = Inventories.addItem((IInventory) te, insert);
+						ItemStack leftover = Inventories.addItem((Container) te, insert);
 						if (leftover != null && !leftover.isEmpty()) {
 							items.add(leftover);
 						}
@@ -385,18 +385,18 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		return items;
 	}
 	
-	protected boolean doBoreInternal(ServerWorld world, BlockPos center, int maxAether, boolean down) {
-		BlockPos.Mutable cursor = new BlockPos.Mutable().setPos(
-				down ? center.down().down() : center.up().up().up()
+	protected boolean doBoreInternal(ServerLevel world, BlockPos center, int maxAether, boolean down) {
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos().set(
+				down ? center.below().below() : center.above().above().above()
 				);
-		while (cursor.getY() >= 0 && cursor.getY() < world.getHeight()) {
-			if (world.isAirBlock(cursor)) {
+		while (cursor.getY() >= 0 && cursor.getY() < world.getMaxBuildHeight()) {
+			if (world.isEmptyBlock(cursor)) {
 				cursor.move(down ? Direction.DOWN : Direction.UP);
 				continue;
 			}
 			
 			final BlockState blockstate = world.getBlockState(cursor);
-			if (blockstate.getBlockHardness(world, cursor) < 0 || blockstate.getMaterial().isLiquid()) {
+			if (blockstate.getDestroySpeed(world, cursor) < 0 || blockstate.getMaterial().isLiquid()) {
 				cursor.move(down ? Direction.DOWN : Direction.UP);
 				continue;
 			}
@@ -404,14 +404,14 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 			break; // breakable!
 		}
 		
-		if (cursor.getY() < 0 || cursor.getY() >= world.getHeight()) {
+		if (cursor.getY() < 0 || cursor.getY() >= world.getMaxBuildHeight()) {
 			return false; // nothing to do
 		}
 		
 		List<ItemStack> drops = new ArrayList<>();
 		for (int x = -2; x <= 2; x++)
 		for (int z = -2; z <= 2; z++) {
-			final BlockPos pos = cursor.toImmutable().add(x, 0, z);
+			final BlockPos pos = cursor.immutable().offset(x, 0, z);
 			final BlockState state = world.getBlockState(pos);
 			drops.addAll(Block.getDrops(state, world, pos, null));
 			world.destroyBlock(pos, false);
@@ -424,30 +424,30 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		// Then drop any that remain
 		for (ItemStack stack : drops) {
 			// put drops right above bore altar
-			world.addEntity(new ItemEntity(world, center.getX() + .5, center.getY() + 1.2, center.getZ() + .5, stack));
+			world.addFreshEntity(new ItemEntity(world, center.getX() + .5, center.getY() + 1.2, center.getZ() + .5, stack));
 		}
 		
 		return true;
 	}
 	
-	protected int doBore(ServerWorld world, BlockPos center, int maxAether) {
+	protected int doBore(ServerLevel world, BlockPos center, int maxAether) {
 		return doBoreInternal(world, center, maxAether, true) ? LensType.BORE.getAetherPerTick() : 0;
 	}
 	
-	protected int doBoreReversed(ServerWorld world, BlockPos center, int maxAether) {
+	protected int doBoreReversed(ServerLevel world, BlockPos center, int maxAether) {
 		return doBoreInternal(world, center, maxAether, false) ? LensType.BORE_REVERSED.getAetherPerTick() : 0;
 	}
 	
-	protected int doManaRegen(ServerWorld world, BlockPos center, int maxAether) {
+	protected int doManaRegen(ServerLevel world, BlockPos center, int maxAether) {
 		final double MAX_DIST_SQ = 900;
 		final int MANA_PER_AETHER = 10;
 		int cost = 0;
 		for (LivingEntity ent : Entities.GetEntities(world, (e) -> {
 			return e.isAlive()
-					&& (e instanceof PlayerEntity || (e instanceof IMagicEntity))
-					&& e.getDistanceSq(center.getX() + .5, center.getY() + .5, center.getZ() + .5) < MAX_DIST_SQ;
+					&& (e instanceof Player || (e instanceof IMagicEntity))
+					&& e.distanceToSqr(center.getX() + .5, center.getY() + .5, center.getZ() + .5) < MAX_DIST_SQ;
 		})) {
-			if (ent instanceof PlayerEntity) {
+			if (ent instanceof Player) {
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
 				if (attr.getMana() < attr.getMaxMana()) {
 					cost++;

@@ -2,12 +2,12 @@ package com.smanzana.nostrumaetheria.items;
 
 import com.smanzana.nostrumaetheria.api.item.IAetherVisionProvider;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
 
 /**
  * Item that, when held, gives aether vision
@@ -21,12 +21,12 @@ public class AetherSightTool extends Item implements IAetherVisionProvider {
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		return super.onItemUse(context);
+	public InteractionResult useOn(UseOnContext context) {
+		return super.useOn(context);
 	}
 
 	@Override
-	public boolean shouldProvideAetherVision(ItemStack stack, PlayerEntity player, EquipmentSlotType slot) {
+	public boolean shouldProvideAetherVision(ItemStack stack, Player player, EquipmentSlot slot) {
 		return true;
 	}
     

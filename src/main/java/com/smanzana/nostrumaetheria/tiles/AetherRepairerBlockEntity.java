@@ -9,32 +9,32 @@ import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.client.gui.container.IAutoContainerInventoryWrapper;
 import com.smanzana.nostrumaetheria.recipes.RepairerRecipeManager;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
-public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity implements ISidedInventory, IAutoContainerInventoryWrapper {
+public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity implements WorldlyContainer, IAutoContainerInventoryWrapper {
 	
 	private boolean on;
 	private boolean aetherTick;
 	
 	private @Nonnull ItemStack stack = ItemStack.EMPTY;
 	
-	public AetherRepairerBlockEntity(int aether, int maxAether) {
-		super(AetheriaTileEntities.Repairer, aether, maxAether);
+	public AetherRepairerBlockEntity(BlockPos pos, BlockState state, int aether, int maxAether) {
+		super(AetheriaTileEntities.Repairer, pos, state, aether, maxAether);
 		
 		this.setAutoSync(5);
 		this.handler.configureInOut(true, false);
 	}
 	
-	public AetherRepairerBlockEntity() {
-		this(0, 500);
+	public AetherRepairerBlockEntity(BlockPos pos, BlockState state) {
+		this(pos, state, 0, 500);
 	}
 	
 	public ItemStack getItem() {
@@ -49,12 +49,12 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	private static final String NBT_ITEM = "item";
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundTag save(CompoundTag nbt) {
+		nbt = super.save(nbt);
 		
 		if (!stack.isEmpty()) {
-			CompoundNBT tag = new CompoundNBT();
-			tag = stack.write(tag);
+			CompoundTag tag = new CompoundTag();
+			tag = stack.save(tag);
 			nbt.put(NBT_ITEM, tag);
 		}
 		
@@ -62,39 +62,39 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null)
 			return;
 			
-		if (!nbt.contains(NBT_ITEM, NBT.TAG_COMPOUND)) {
+		if (!nbt.contains(NBT_ITEM, Tag.TAG_COMPOUND)) {
 			stack = ItemStack.EMPTY;
 		} else {
-			CompoundNBT tag = nbt.getCompound(NBT_ITEM);
-			stack = ItemStack.read(tag);
+			CompoundTag tag = nbt.getCompound(NBT_ITEM);
+			stack = ItemStack.of(tag);
 		}
 	}
 	
 	private void forceUpdate() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
+		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		setChanged();
 	}
 
 	@Override
-	public int getSizeInventory() {
+	public int getContainerSize() {
 		return 1;
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int index) {
+	public ItemStack getItem(int index) {
 		if (index > 0)
 			return ItemStack.EMPTY;
 		return this.stack;
 	}
 
 	@Override
-	public ItemStack decrStackSize(int index, int count) {
+	public ItemStack removeItem(int index, int count) {
 		if (index > 0)
 			return ItemStack.EMPTY;
 		ItemStack ret = this.stack.split(count);
@@ -105,7 +105,7 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
+	public ItemStack removeItemNoUpdate(int index) {
 		if (index > 0)
 			return ItemStack.EMPTY;
 		ItemStack ret = this.stack;
@@ -115,7 +115,7 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack) {
+	public void setItem(int index, ItemStack stack) {
 		if (index > 0)
 			return;
 		this.stack = stack;
@@ -123,27 +123,27 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 
 	@Override
-	public int getInventoryStackLimit() {
+	public int getMaxStackSize() {
 		return 1;
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(PlayerEntity player) {
+	public void startOpen(Player player) {
 		;
 	}
 
 	@Override
-	public void closeInventory(PlayerEntity player) {
+	public void stopOpen(Player player) {
 		;
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack) {
+	public boolean canPlaceItem(int index, ItemStack stack) {
 		if (index != 0) {
 			return false;
 		}
@@ -185,7 +185,7 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 	
 	@Override
-	public void clear() {
+	public void clearContent() {
 		this.stack = ItemStack.EMPTY;
 		forceUpdate();
 	}
@@ -196,15 +196,15 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 
 	@Override
-	public boolean canInsertItem(int index, ItemStack itemStackIn, Direction direction) {
-		if (index != 0 || direction == Direction.DOWN || !this.isItemValidForSlot(0, itemStackIn))
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction) {
+		if (index != 0 || direction == Direction.DOWN || !this.canPlaceItem(0, itemStackIn))
 			return false;
 		
 		return stack.isEmpty();
 	}
 
 	@Override
-	public boolean canExtractItem(int index, ItemStack stack, Direction direction) {
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
 		return index == 0
 				&& direction == Direction.DOWN
 				&& !stack.isEmpty()
@@ -214,7 +214,7 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	@Override
 	public void tick() {
 		// If we have an item, try to repair it
-		if (!world.isRemote && this.ticksExisted % 20 == 0) {
+		if (!level.isClientSide && this.ticksExisted % 20 == 0) {
 			if (!stack.isEmpty()) {
 				@Nullable IAetherRepairerRecipe recipe = RepairerRecipeManager.instance().findRecipe(stack);
 				if (recipe != null) {
@@ -228,7 +228,7 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 			}
 			
 			if (aetherTick != on) {
-				world.setBlockState(pos, AetheriaBlocks.repairer.getDefaultState().with(AetherRepairerBlock.ON, aetherTick));
+				level.setBlockAndUpdate(worldPosition, AetheriaBlocks.repairer.defaultBlockState().setValue(AetherRepairerBlock.ON, aetherTick));
 			}
 			
 			on = aetherTick;
@@ -239,10 +239,10 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	}
 	
 	@Override
-	public void setWorldAndPos(World world, BlockPos pos) {
-		super.setWorldAndPos(world, pos);
+	public void setLevel(Level world) {
+		super.setLevel(world);
 		
-		if (!world.isRemote) {
+		if (!world.isClientSide) {
 			this.handler.setAutoFill(true);
 		}
 	}

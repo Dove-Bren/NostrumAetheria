@@ -13,15 +13,15 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -37,7 +37,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellEqu
 	
 	public PassivePendant() {
 		super(AetheriaItems.PropUnstackable()
-				.maxDamage(MAX_CHARGES));
+				.durability(MAX_CHARGES));
 	}
     
     @Override
@@ -63,10 +63,10 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellEqu
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		tooltip.add(new TranslationTextComponent("item.info.aen.desc"));
+	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+		tooltip.add(new TranslatableComponent("item.info.aen.desc"));
 		int charges = getWholeCharges(stack);
-		tooltip.add(new TranslationTextComponent("item.info.pendant.charges", charges).mergeStyle(TextFormatting.GREEN));
+		tooltip.add(new TranslatableComponent("item.info.pendant.charges", charges).withStyle(ChatFormatting.GREEN));
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellEqu
 		
 		int charges = getWholeCharges(stack);
 		if (charges > 0) {
-			if ((!(caster instanceof PlayerEntity) || !((PlayerEntity) caster).isCreative()) && !caster.world.isRemote) {
+			if ((!(caster instanceof Player) || !((Player) caster).isCreative()) && !caster.level.isClientSide) {
 				spendCharge(stack);
 			}
 			summary.addReagentCost(-1f);
@@ -124,18 +124,18 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellEqu
 	private void setDurability(ItemStack pendant) {
 		int count = getWholeCharges(pendant);
 		float max = MAX_CHARGES;
-		pendant.setDamage((int) (max - count));
+		pendant.setDamageValue((int) (max - count));
 	}
 	
 	@Override
-	public void onCreated(ItemStack stack, World worldIn, PlayerEntity playerIn) {
-		super.onCreated(stack, worldIn, playerIn);
+	public void onCraftedBy(ItemStack stack, Level worldIn, Player playerIn) {
+		super.onCraftedBy(stack, worldIn, playerIn);
 		// Update durability to be correct as soon as it's created
 		setDurability(stack);
 	}
 	
 	@Override
-	protected void onFirstTick(ItemStack stack, World worldIn, Entity entityIn) {
+	protected void onFirstTick(ItemStack stack, Level worldIn, Entity entityIn) {
 		super.onFirstTick(stack, worldIn, entityIn);
 		setDurability(stack);
 	}
@@ -146,17 +146,17 @@ public class PassivePendant extends AetherItem implements ILoreTagged, ISpellEqu
 	}
 
 	@Override
-	protected boolean shouldShowAether(ItemStack stack, PlayerEntity playerIn, boolean advanced) {
+	protected boolean shouldShowAether(ItemStack stack, Player playerIn, boolean advanced) {
 		return false;
 	}
 
 	@Override
-	protected boolean shouldAutoFill(ItemStack stack, World worldIn, Entity entityIn) {
+	protected boolean shouldAutoFill(ItemStack stack, Level worldIn, Entity entityIn) {
 		return true;
 	}
 
 	@Override
-	public boolean canBeDrawnFrom(ItemStack stack, World worldIn, Entity entityIn) {
+	public boolean canBeDrawnFrom(ItemStack stack, Level worldIn, Entity entityIn) {
 		return false;
 	}
 	

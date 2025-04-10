@@ -2,7 +2,7 @@ package com.smanzana.nostrumaetheria.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 import com.smanzana.nostrummagica.client.gui.container.AutoContainer;
@@ -14,15 +14,15 @@ import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -56,7 +56,7 @@ public class WispBlockGui {
 		
 		// Kept just to report to server which TE is doing crafting
 		protected BlockPos pos;
-		protected PlayerEntity player;
+		protected Player player;
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
@@ -64,15 +64,15 @@ public class WispBlockGui {
 		protected Slot scrollSlot;
 		protected Slot reagentSlot;
 		
-		public WispBlockContainer(int windowId, PlayerInventory playerInv, WispBlockTileEntity table) {
+		public WispBlockContainer(int windowId, Inventory playerInv, WispBlockTileEntity table) {
 			super(AetheriaContainers.WispBlock, windowId, table);
 			this.player = playerInv.player;
-			this.pos = table.getPos();
+			this.pos = table.getBlockPos();
 			this.table = table;
 			this.scrollSlot = new Slot(table, 0, SCROLL_SLOT_INPUT_HOFFSET, SCROLL_SLOT_INPUT_VOFFSET) {
 				
 				@Override
-				public boolean isItemValid(@Nonnull ItemStack stack) {
+				public boolean mayPlace(@Nonnull ItemStack stack) {
 					return stack.isEmpty() ||
 							(stack.getItem() instanceof SpellScroll && SpellScroll.GetSpell(stack) != null);
 				}
@@ -126,7 +126,7 @@ public class WispBlockGui {
 			this.reagentSlot = new Slot(table, 1, REAGENT_SLOT_INPUT_HOFFSET, REAGENT_SLOT_INPUT_VOFFSET) {
 				
 				@Override
-				public boolean isItemValid(@Nonnull ItemStack stack) {
+				public boolean mayPlace(@Nonnull ItemStack stack) {
 					return stack.isEmpty() || stack.getItem() instanceof ReagentItem;
 				}
 //				
@@ -190,7 +190,7 @@ public class WispBlockGui {
 			
 		}
 		
-		public static final WispBlockContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+		public static final WispBlockContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buffer) {
 			return new WispBlockContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}
 		
@@ -203,40 +203,40 @@ public class WispBlockGui {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
+		public ItemStack quickMoveStack(Player playerIn, int fromSlot) {
 			ItemStack prev = ItemStack.EMPTY;	
-			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
+			Slot slot = (Slot) this.slots.get(fromSlot);
 			
-			if (slot != null && slot.getHasStack()) {
-				ItemStack cur = slot.getStack();
+			if (slot != null && slot.hasItem()) {
+				ItemStack cur = slot.getItem();
 				prev = cur.copy();
 				
 				if (slot == this.scrollSlot) {
 					// Trying to take our scroll
-					if (playerIn.inventory.addItemStackToInventory(cur)) {
-						scrollSlot.putStack(ItemStack.EMPTY);
+					if (playerIn.inventory.add(cur)) {
+						scrollSlot.set(ItemStack.EMPTY);
 						scrollSlot.onTake(playerIn, cur);
 					} else {
 						prev = ItemStack.EMPTY;
 					}
 				} else if (slot == this.reagentSlot) {
 					// Trying to take our reagent
-					if (playerIn.inventory.addItemStackToInventory(cur)) {
-						reagentSlot.putStack(ItemStack.EMPTY);
+					if (playerIn.inventory.add(cur)) {
+						reagentSlot.set(ItemStack.EMPTY);
 						reagentSlot.onTake(playerIn, cur);
 					} else {
 						prev = ItemStack.EMPTY;
 					}
 				} else {
 					// Trying to add an item
-					if (!scrollSlot.getHasStack()
-							&& scrollSlot.isItemValid(cur)) {
+					if (!scrollSlot.hasItem()
+							&& scrollSlot.mayPlace(cur)) {
 						ItemStack stack = cur.split(1);
-						scrollSlot.putStack(stack);
-					} else if (!reagentSlot.getHasStack()
-							&& reagentSlot.isItemValid(cur)) {
+						scrollSlot.set(stack);
+					} else if (!reagentSlot.hasItem()
+							&& reagentSlot.mayPlace(cur)) {
 						ItemStack stack = cur.split(cur.getMaxStackSize());
-						reagentSlot.putStack(stack);
+						reagentSlot.set(stack);
 					} else {
 						prev = ItemStack.EMPTY;
 					}
@@ -248,21 +248,21 @@ public class WispBlockGui {
 		}
 		
 		@Override
-		public boolean canDragIntoSlot(Slot slotIn) {
+		public boolean canDragTo(Slot slotIn) {
 			return slotIn != scrollSlot && slotIn != reagentSlot;
 		}
 		
 		@Override
-		public boolean canInteractWith(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return true;
 		}
 		
 		public void setScroll(ItemStack item) {
-			scrollSlot.putStack(item);
+			scrollSlot.set(item);
 		}
 		
 		public void setReagent(ItemStack item) {
-			reagentSlot.putStack(item);
+			reagentSlot.set(item);
 		}
 
 	}
@@ -272,12 +272,12 @@ public class WispBlockGui {
 
 		private WispBlockContainer container;
 		
-		public WispBlockGuiContainer(WispBlockContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public WispBlockGuiContainer(WispBlockContainer container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			this.container = container;
 			
-			this.xSize = GUI_WIDTH;
-			this.ySize = GUI_HEIGHT;
+			this.imageWidth = GUI_WIDTH;
+			this.imageHeight = GUI_HEIGHT;
 		}
 		
 		@Override
@@ -286,9 +286,9 @@ public class WispBlockGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
-			int horizontalMargin = (width - xSize) / 2;
-			int verticalMargin = (height - ySize) / 2;
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+			int horizontalMargin = (width - imageWidth) / 2;
+			int verticalMargin = (height - imageHeight) / 2;
 			@Nonnull ItemStack scroll = container.table.getScroll();
 			int color = 0xFFFFFFFF;
 			
@@ -302,7 +302,7 @@ public class WispBlockGui {
 			float G = (float) ((color & 0x0000FF00) >> 8) / 256f;
 			float B = (float) ((color & 0x000000FF) >> 0) / 256f;
 			
-			mc.getTextureManager().bindTexture(TEXT);
+			mc.getTextureManager().bind(TEXT);
 			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
@@ -345,9 +345,9 @@ public class WispBlockGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
-			int horizontalMargin = (width - xSize) / 2;
-			int verticalMargin = (height - ySize) / 2;
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
+			int horizontalMargin = (width - imageWidth) / 2;
+			int verticalMargin = (height - imageHeight) / 2;
 			/*
 			 * horizontalMargin + PROGRESS_GUI_HOFFSET,
 						verticalMargin + PROGRESS_GUI_VOFFSET,
@@ -357,7 +357,7 @@ public class WispBlockGui {
 					&& mouseX <= horizontalMargin + PROGRESS_GUI_HOFFSET + PROGRESS_WIDTH
 					&& mouseY >= verticalMargin + PROGRESS_GUI_VOFFSET
 					&& mouseY <= verticalMargin + PROGRESS_GUI_VOFFSET + PROGRESS_HEIGHT) {
-				this.renderTooltip(matrixStackIn, new StringTextComponent(((int) (container.table.getPartialReagent() * 100.0)) + "%"), mouseX - horizontalMargin, mouseY - verticalMargin);
+				this.renderTooltip(matrixStackIn, new TextComponent(((int) (container.table.getPartialReagent() * 100.0)) + "%"), mouseX - horizontalMargin, mouseY - verticalMargin);
 			}
 		}
 		

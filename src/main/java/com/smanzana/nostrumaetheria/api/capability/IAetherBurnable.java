@@ -1,6 +1,12 @@
 package com.smanzana.nostrumaetheria.api.capability;
 
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
+
 public interface IAetherBurnable {
+	
+	public static final Capability<IAetherBurnable> CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	/**
 	 * Return how long this should burn in a regular base small aether furnace.

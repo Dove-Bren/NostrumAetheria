@@ -7,11 +7,11 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrumaetheria.blocks.AetherBatteryBlock.Size;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 
 public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 
@@ -19,14 +19,14 @@ public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 	
 	private Size size;
 	
-	public AetherBatteryEntity(Size size) {
-		super(AetheriaTileEntities.Battery, 0, size.capacity);
+	public AetherBatteryEntity(BlockPos pos, BlockState state, Size size) {
+		super(AetheriaTileEntities.Battery, pos, state, 0, size.capacity);
 		this.size = size;
 		this.setAutoSync(5);
 	}
 	
-	public AetherBatteryEntity() {
-		this(Size.SMALL);
+	public AetherBatteryEntity(BlockPos pos, BlockState state) {
+		this(pos, state, Size.SMALL);
 	}
 	
 	public Size getSize() {
@@ -50,7 +50,7 @@ public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 		
 		// First, try to flow down.
 		if (handler.getSideEnabled(Direction.DOWN)) {
-			TileEntity te = world.getTileEntity(pos.down());
+			BlockEntity te = level.getBlockEntity(worldPosition.below());
 			if (te != null && te instanceof AetherBatteryEntity) {
 				AetherBatteryEntity other = (AetherBatteryEntity) te;
 				final int startAether = myAether;
@@ -69,10 +69,10 @@ public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 					continue;
 				}
 				
-				BlockPos neighbor = pos.offset(dir);
+				BlockPos neighbor = worldPosition.relative(dir);
 				
 				// First check for a TileEntity
-				TileEntity te = world.getTileEntity(neighbor);
+				BlockEntity te = level.getBlockEntity(neighbor);
 				if (te != null && te instanceof AetherBatteryEntity) {
 					AetherBatteryEntity other = (AetherBatteryEntity) te;
 					batteries[dir.ordinal()] = other;
@@ -141,16 +141,16 @@ public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundTag save(CompoundTag nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.putString(NBT_SIZE, this.size.name());
 		return nbt;
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		try {
 			this.size = Size.valueOf(nbt.getString(NBT_SIZE));

@@ -16,12 +16,12 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.util.Inventories;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class WispBlockTileEntity extends AetherTickingTileEntity implements IAutoContainerInventoryWrapper {
 
@@ -49,8 +49,8 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	
 	private int ticksExisted;
 	
-	public WispBlockTileEntity() {
-		super(AetheriaTileEntities.WispBlockEnt, 0, MAX_AETHER);
+	public WispBlockTileEntity(BlockPos pos, BlockState state) {
+		super(AetheriaTileEntities.WispBlockEnt, pos, state, 0, MAX_AETHER);
 		scroll = ItemStack.EMPTY;
 		reagent = ItemStack.EMPTY;
 		reagentPartial = 0f;
@@ -69,11 +69,11 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 		if (!item.isEmpty() && !this.scroll.isEmpty())
 			return false;
 		
-		if (!isItemValidForSlot(0, item)) {
+		if (!canPlaceItem(0, item)) {
 			return false;
 		}
 		
-		this.setInventorySlotContents(0, item);
+		this.setItem(0, item);
 		return true;
 	}
 	
@@ -85,11 +85,11 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 		if (!item.isEmpty() && !this.reagent.isEmpty())
 			return false;
 		
-		if (!isItemValidForSlot(1, item)) {
+		if (!canPlaceItem(1, item)) {
 			return false;
 		}
 		
-		this.setInventorySlotContents(1, item);
+		this.setItem(1, item);
 		return true;
 	}
 	
@@ -98,7 +98,7 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 	
 	public int getWispCount() {
-		return this.world.isRemote ? this.numWisps : this.wisps.size();
+		return this.level.isClientSide ? this.numWisps : this.wisps.size();
 	}
 	
 	public int getMaxWisps() {
@@ -106,9 +106,9 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 	
 	private void dirtyAndUpdate() {
-		if (world != null) {
-			world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-			markDirty();
+		if (level != null) {
+			level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+			setChanged();
 		}
 	}
 	
@@ -117,7 +117,7 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 		this.activated = false;
 		
 		for (WispEntity wisp : this.wisps) {
-			wisp.remove();
+			wisp.discard();
 		}
 		wisps.clear();
 		
@@ -136,17 +136,17 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 		// Try to find a safe place to spawn the wisp
 		int attempts = 20;
 		do {
-			spawnPos = this.pos.add(
+			spawnPos = this.worldPosition.offset(
 					NostrumMagica.rand.nextInt(10) - 5,
 					NostrumMagica.rand.nextInt(5),
 					NostrumMagica.rand.nextInt(10) - 5);
-		} while (!world.isAirBlock(spawnPos) && attempts-- >= 0);
+		} while (!level.isEmptyBlock(spawnPos) && attempts-- >= 0);
 		
-		if (world.isAirBlock(spawnPos)) {
-			WispEntity wisp = new SentinelWispEntity(AetheriaEntityTypes.sentinelWisp, this.world, this.pos);
-			wisp.setPosition(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
+		if (level.isEmptyBlock(spawnPos)) {
+			WispEntity wisp = new SentinelWispEntity(AetheriaEntityTypes.sentinelWisp, this.level, this.worldPosition);
+			wisp.setPos(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
 			this.wisps.add(wisp);
-			this.world.addEntity(wisp);
+			this.level.addFreshEntity(wisp);
 			//this.dirtyAndUpdate();
 		}
 	}
@@ -156,7 +156,7 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 		super.tick();
 		ticksExisted++;
 		
-		if (world.isRemote) {
+		if (level.isClientSide) {
 			return;
 		}
 		
@@ -239,11 +239,11 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundTag save(CompoundTag nbt) {
+		nbt = super.save(nbt);
 		
 		if (nbt == null)
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		
 		if (reagentPartial != 0f)
 			nbt.putFloat(NBT_PARTIAL, reagentPartial);
@@ -267,8 +267,8 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null)
 			return;
@@ -283,22 +283,22 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 	
 	@Override
-	public void setWorldAndPos(World world, BlockPos pos) {
-		super.setWorldAndPos(world, pos);
+	public void setLevel(Level world) {
+		super.setLevel(world);
 		
-		if (!world.isRemote) {
+		if (!world.isClientSide) {
 			this.compWrapper.setAutoFill(true);
 		}
 	}
 	
 	@Override
-	public int getSizeInventory() {
+	public int getContainerSize() {
 		return 2;
 	}
 	
 	@Override
-	public ItemStack getStackInSlot(int index) {
-		if (index < 0 || index >= getSizeInventory())
+	public ItemStack getItem(int index) {
+		if (index < 0 || index >= getContainerSize())
 			return ItemStack.EMPTY;
 		
 		if (index == 0) {
@@ -309,12 +309,12 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 	
 	@Override
-	public ItemStack decrStackSize(int index, int count) {
-		if (index < 0 || index >= getSizeInventory()) {
+	public ItemStack removeItem(int index, int count) {
+		if (index < 0 || index >= getContainerSize()) {
 			return ItemStack.EMPTY;
 		}
 		
-		ItemStack inSlot = getStackInSlot(index);
+		ItemStack inSlot = getItem(index);
 		if (inSlot.isEmpty()) {
 			return ItemStack.EMPTY;
 		}
@@ -330,7 +330,7 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 		}
 		
 		if (inSlot.isEmpty()) {
-			setInventorySlotContents(index, inSlot);
+			setItem(index, inSlot);
 		}
 		
 		this.dirtyAndUpdate();
@@ -338,8 +338,8 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
-		if (index < 0 || index >= getSizeInventory())
+	public ItemStack removeItemNoUpdate(int index) {
+		if (index < 0 || index >= getContainerSize())
 			return ItemStack.EMPTY;
 		
 		ItemStack stack;
@@ -356,8 +356,8 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack) {
-		if (!isItemValidForSlot(index, stack))
+	public void setItem(int index, ItemStack stack) {
+		if (!canPlaceItem(index, stack))
 			return;
 		
 		if (index == 0) {
@@ -370,26 +370,26 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 	
 	@Override
-	public int getInventoryStackLimit() {
+	public int getMaxStackSize() {
 		return 64;
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(PlayerEntity player) {
+	public void startOpen(Player player) {
 	}
 
 	@Override
-	public void closeInventory(PlayerEntity player) {
+	public void stopOpen(Player player) {
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack) {
-		if (index < 0 || index >= getSizeInventory())
+	public boolean canPlaceItem(int index, ItemStack stack) {
+		if (index < 0 || index >= getContainerSize())
 			return false;
 		
 		if (index == 0) {
@@ -415,7 +415,7 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 		} else if (id == 1) {
 			return this.activated ? 1 : 0;
 		} else if (id == 2) {
-			return world.isRemote ? numWisps : wisps.size();
+			return level.isClientSide ? numWisps : wisps.size();
 		}
 		return 0;
 	}
@@ -437,9 +437,9 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 
 	@Override
-	public void clear() {
-		for (int i = 0; i < getSizeInventory(); i++) {
-			removeStackFromSlot(i);
+	public void clearContent() {
+		for (int i = 0; i < getContainerSize(); i++) {
+			removeItemNoUpdate(i);
 		}
 	}
 

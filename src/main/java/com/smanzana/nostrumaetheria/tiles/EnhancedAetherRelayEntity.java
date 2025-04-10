@@ -2,22 +2,22 @@ package com.smanzana.nostrumaetheria.tiles;
 
 import com.smanzana.nostrumaetheria.blocks.AetherRelay.RelayMode;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class EnhancedAetherRelayEntity extends AetherRelayEntity {
 
 		private static final int AETHER_BUFFER_AMT = 0;
 		private static final int MAX_LINK_RANGE = 25;
 		
-		public EnhancedAetherRelayEntity() {
-			this(Direction.UP);
+		public EnhancedAetherRelayEntity(BlockPos pos, BlockState state) {
+			this(pos, state, Direction.UP);
 		}
 		
-		public EnhancedAetherRelayEntity(Direction facing) {
-			super(AetheriaTileEntities.EnhancedRelay, facing, RelayMode.INOUT);
+		public EnhancedAetherRelayEntity(BlockPos pos, BlockState state, Direction facing) {
+			super(AetheriaTileEntities.EnhancedRelay, pos, state, facing, RelayMode.INOUT);
 			this.handler.setMaxAether(AETHER_BUFFER_AMT);
 			this.handler.setShouldPropagate(true);
 			handler.enableSide(getSide().getOpposite(), false);
@@ -36,17 +36,17 @@ public class EnhancedAetherRelayEntity extends AetherRelayEntity {
 		
 		@Override
 		protected boolean canLinkTo(BlockPos pos) {
-			return this.pos.manhattanDistance(pos) <= MAX_LINK_RANGE; // Override to use our range
+			return this.worldPosition.distManhattan(pos) <= MAX_LINK_RANGE; // Override to use our range
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
-			return super.write(compound);
+		public CompoundTag save(CompoundTag compound) {
+			return super.save(compound);
 		}
 		
 		@Override
-		public void read(BlockState state, CompoundNBT compound) {
-			super.read(state, compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 		}
 		
 		@Override

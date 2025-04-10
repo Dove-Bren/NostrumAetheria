@@ -2,7 +2,7 @@ package com.smanzana.nostrumaetheria.api.aether;
 
 import com.smanzana.nostrumaetheria.api.aether.AetherFlowMechanics.AetherIterateContext;
 
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 
 public interface IAetherFlowHandler extends IAetherHandler {
 	

@@ -13,8 +13,8 @@ import com.smanzana.nostrumaetheria.proxy.AetheriaAPIProxy;
 import com.smanzana.nostrumaetheria.proxy.ClientProxy;
 import com.smanzana.nostrumaetheria.proxy.CommonProxy;
 
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
@@ -41,10 +41,10 @@ public class NostrumAetheria
     	
     	APIProxy.handler = new AetheriaAPIProxy();
     	
-    	APIProxy.creativeTab = new ItemGroup(MODID){
+    	APIProxy.creativeTab = new CreativeModeTab(MODID){
 	    	@Override
 	    	@OnlyIn(Dist.CLIENT)
-	        public ItemStack createIcon(){
+	        public ItemStack makeIcon(){
 	    		return new ItemStack(AetheriaBlocks.infiteAetherBlock);
 	        }
 	    };

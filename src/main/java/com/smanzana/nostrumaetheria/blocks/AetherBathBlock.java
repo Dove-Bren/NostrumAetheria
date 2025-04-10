@@ -5,89 +5,73 @@ import java.util.Random;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.tiles.AetherBathTileEntity;
+import com.smanzana.nostrumaetheria.tiles.AetheriaTileEntities;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class AetherBathBlock extends Block implements ILoreTagged {
+public class AetherBathBlock extends BaseEntityBlock implements ILoreTagged {
 	
-	protected static final VoxelShape ALTAR_AABB = Block.makeCuboidShape(3.2D, 0.0D, 3.2D, 12.8D, 14.4D, 12.8D);
+	protected static final VoxelShape ALTAR_AABB = Block.box(3.2D, 0.0D, 3.2D, 12.8D, 14.4D, 12.8D);
 	
 	public AetherBathBlock() {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(3.5f, 10.0f)
+		super(Block.Properties.of(Material.STONE)
+				.strength(3.5f, 10.0f)
 				.sound(SoundType.STONE)
-				.setLightLevel((state) -> 1)
-				.notSolid()
+				.lightLevel((state) -> 1)
+				.noOcclusion()
 				);
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return ALTAR_AABB;
 	}
 	
-//	@Override
-//	public boolean isVisuallyOpaque() {
-//		return false;
-//	}
-	
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//        return false;
-//    }
-	
-//	@Override
-//	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-//		return true;
-//	}
-//	
-//	@Override
-//	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
-//		return false;
-//	}
-	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.MODEL;
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		AetherBathTileEntity ent = new AetherBathTileEntity();
-		
-		return ent;
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new AetherBathTileEntity(pos, state);
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+		return TickableBlockEntity.createTickerHelper(type, AetheriaTileEntities.Bath);
+	}
+	
+	@Override
+	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
-			TileEntity te = world.getTileEntity(pos);
+			BlockEntity te = world.getBlockEntity(pos);
 			if (te != null) {
 				AetherBathTileEntity altar = (AetherBathTileEntity) te;
 				if (!altar.getItem().isEmpty()) {
@@ -96,66 +80,65 @@ public class AetherBathBlock extends Block implements ILoreTagged {
 							pos.getY() + .5,
 							pos.getZ() + .5,
 							altar.getItem());
-					world.addEntity(item);
+					world.addFreshEntity(item);
 				}
 			}
 			
-	        world.removeTileEntity(pos);
+	        world.removeBlockEntity(pos);
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
-	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
-		super.eventReceived(state, worldIn, pos, eventID, eventParam);
-		TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity == null ? false : tileentity.receiveClientEvent(eventID, eventParam);
+	public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int eventID, int eventParam) {
+		super.triggerEvent(state, worldIn, pos, eventID, eventParam);
+		BlockEntity tileentity = worldIn.getBlockEntity(pos);
+        return tileentity == null ? false : tileentity.triggerEvent(eventID, eventParam);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-		if (worldIn.isRemote) {
-			return ActionResultType.SUCCESS;
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+		if (worldIn.isClientSide) {
+			return InteractionResult.SUCCESS;
 		}
 		
-		TileEntity te = worldIn.getTileEntity(pos);
+		BlockEntity te = worldIn.getBlockEntity(pos);
 		if (te == null)
-			return ActionResultType.FAIL;
+			return InteractionResult.FAIL;
 		
-		final @Nonnull ItemStack heldItem = player.getHeldItem(hand);
+		final @Nonnull ItemStack heldItem = player.getItemInHand(hand);
 		
 		AetherBathTileEntity altar = (AetherBathTileEntity) te;
 		if (altar.getItem().isEmpty()) {
 			// Accepting items
-			if (!heldItem.isEmpty() && altar.isItemValidForSlot(0, heldItem)) {
+			if (!heldItem.isEmpty() && altar.canPlaceItem(0, heldItem)) {
 				altar.setItem(heldItem.split(1));
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else
-				return ActionResultType.FAIL;
+				return InteractionResult.FAIL;
 		} else {
 			// Has an item
 			if (heldItem.isEmpty()) {
-				if (!player.inventory.addItemStackToInventory(altar.getItem())) {
-					worldIn.addEntity(
+				if (!player.getInventory().add(altar.getItem())) {
+					worldIn.addFreshEntity(
 							new ItemEntity(worldIn,
 									pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5,
 									altar.getItem())
 							);
 				}
 				altar.setItem(ItemStack.EMPTY);
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else
-				return ActionResultType.FAIL;
+				return InteractionResult.FAIL;
 		}
 		
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
 		super.animateTick(stateIn, worldIn, pos, rand);
 		
-		TileEntity te = worldIn.getTileEntity(pos);
+		BlockEntity te = worldIn.getBlockEntity(pos);
 		if (te == null) {
 			return;
 		}

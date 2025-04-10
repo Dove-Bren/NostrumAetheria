@@ -2,7 +2,7 @@ package com.smanzana.nostrumaetheria.recipes;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 
-import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -17,8 +17,8 @@ public class AetheriaCrafting {
 	@ObjectHolder(AetherCloakToggleRecipe.Serializer.ID) public static AetherCloakToggleRecipe.Serializer aetherCloakToggleSerializer;
 	
 	@SubscribeEvent
-	public static void registerSerializers(RegistryEvent.Register<IRecipeSerializer<?>> event) {
-		final IForgeRegistry<IRecipeSerializer<?>> registry = event.getRegistry();
+	public static void registerSerializers(RegistryEvent.Register<RecipeSerializer<?>> event) {
+		final IForgeRegistry<RecipeSerializer<?>> registry = event.getRegistry();
 		
 		registry.register(new AetherCloakColorRecipe.Serializer().setRegistryName(AetherCloakColorRecipe.Serializer.ID));
 		registry.register(new AetherCloakToggleRecipe.Serializer().setRegistryName(AetherCloakToggleRecipe.Serializer.ID));

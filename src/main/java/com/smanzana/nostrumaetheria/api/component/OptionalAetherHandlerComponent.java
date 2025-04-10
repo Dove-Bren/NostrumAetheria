@@ -4,12 +4,12 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class OptionalAetherHandlerComponent {
 	
@@ -21,14 +21,14 @@ public class OptionalAetherHandlerComponent {
 	private final @Nullable IAetherHandlerComponent component;
 	
 	public OptionalAetherHandlerComponent(IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
-		this((RegistryKey<World>) null, null, listener, defaultAether, defaultMaxAether);
+		this((ResourceKey<Level>) null, null, listener, defaultAether, defaultMaxAether);
 	}
 	
-	public OptionalAetherHandlerComponent(@Nullable World world, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
-		this(() -> APIProxy.createHandlerComponent(world == null ? null : world.getDimensionKey(), pos, listener, defaultAether, defaultMaxAether));
+	public OptionalAetherHandlerComponent(@Nullable Level world, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
+		this(() -> APIProxy.createHandlerComponent(world == null ? null : world.dimension(), pos, listener, defaultAether, defaultMaxAether));
 	}
 	
-	public OptionalAetherHandlerComponent(@Nullable RegistryKey<World> dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
+	public OptionalAetherHandlerComponent(@Nullable ResourceKey<Level> dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
 		this(() -> APIProxy.createHandlerComponent(dimension, pos, listener, defaultAether, defaultMaxAether));
 	}
 	
@@ -109,22 +109,22 @@ public class OptionalAetherHandlerComponent {
 		return (component.getAether(null) >= amount);
 	}
 	
-	public INBT toNBT() {
+	public Tag toNBT() {
 		if (component == null) {
-			return StringNBT.valueOf("ABSENT");
+			return StringTag.valueOf("ABSENT");
 		} else {
-			return component.writeToNBT(new CompoundNBT());
+			return component.writeToNBT(new CompoundTag());
 		}
 	}
 	
-	public void loadNBT(INBT nbt) {
+	public void loadNBT(Tag nbt) {
 		if (component == null) {
-			if (!(nbt instanceof StringNBT) || !((StringNBT) nbt).getString().equals("ABSENT")) {
+			if (!(nbt instanceof StringTag) || !((StringTag) nbt).getAsString().equals("ABSENT")) {
 				System.out.println("Attempted to load an optional aether handler but currently disabled. Did the aether mod get removed??");
 			}
 		} else {
-			if (nbt instanceof CompoundNBT) {
-				component.readFromNBT((CompoundNBT) nbt);
+			if (nbt instanceof CompoundTag) {
+				component.readFromNBT((CompoundTag) nbt);
 			}
 		}
 	}

@@ -19,20 +19,20 @@ import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.Inventories;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -53,7 +53,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 	
 	public ActivePendant() {
 		super(AetheriaItems.PropUnstackable()
-				.maxDamage(MAX_CHARGES));
+				.durability(MAX_CHARGES));
 	}
     
     @Override
@@ -79,10 +79,10 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		tooltip.add(new TranslationTextComponent("item.info.lyon.desc"));
+	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+		tooltip.add(new TranslatableComponent("item.info.lyon.desc"));
 		int charges = lyonGetWholeCharges(stack);
-		tooltip.add(new TranslationTextComponent("item.info.pendant.charges", charges).mergeStyle(TextFormatting.GREEN));
+		tooltip.add(new TranslatableComponent("item.info.pendant.charges", charges).withStyle(ChatFormatting.GREEN));
 	}
 
 	@Override
@@ -136,9 +136,9 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 			points = (float) MAX_POINTS;
 		}
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null)
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		
 		nbt.putFloat(NBT_PENDANT_POINTS, points);
 		stack.setTag(nbt);
@@ -150,9 +150,9 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 		if (stack.isEmpty() || !stack.hasTag())
 			return 0;
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		return nbt.getFloat(NBT_PENDANT_POINTS);
 	}
@@ -162,7 +162,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 			return ItemStack.EMPTY;
 		}
 		
-		return ItemStack.read(stack.getTag().getCompound(NBT_PENDANT_REAGENTS));
+		return ItemStack.of(stack.getTag().getCompound(NBT_PENDANT_REAGENTS));
 	}
 	
 	public static void lyonSetReagents(ItemStack stack, @Nonnull ItemStack reagent) {
@@ -170,9 +170,9 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 			return;
 		}
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		if (reagent == null) {
 			nbt.remove(NBT_PENDANT_REAGENTS);
@@ -206,9 +206,9 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 		}
 		
 		UUID id;
-		CompoundNBT nbt;
+		CompoundTag nbt;
 		if (!stack.hasTag()) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		} else {
 			nbt = stack.getTag();
 		}
@@ -235,7 +235,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 		
 		int charges = lyonGetWholeCharges(stack);
 		if (charges > 0) {
-			if ((!(caster instanceof PlayerEntity) || !((PlayerEntity) caster).isCreative()) && !caster.world.isRemote) {
+			if ((!(caster instanceof Player) || !((Player) caster).isCreative()) && !caster.level.isClientSide) {
 				lyonSpendCharge(stack);
 			}
 			summary.addReagentCost(-1f);
@@ -245,19 +245,19 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 	private static void setDurability(ItemStack pendant) {
 		int count = lyonGetWholeCharges(pendant);
 		float max = MAX_CHARGES;
-		pendant.setDamage((int) (max - count));
+		pendant.setDamageValue((int) (max - count));
 	}
 	
 	@Override
-	public void onCreated(ItemStack stack, World worldIn, PlayerEntity playerIn) {
-		super.onCreated(stack, worldIn, playerIn);
+	public void onCraftedBy(ItemStack stack, Level worldIn, Player playerIn) {
+		super.onCraftedBy(stack, worldIn, playerIn);
 		// Update durability to be correct as soon as it's created
 		setDurability(stack);
 		
 	}
 	
 	@Override
-	public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+	public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		if (!stack.hasTag()) {
 			// First time ticking!
 			lyonGetID(stack); // generates it if it's missing
@@ -265,11 +265,11 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 		}
 		
 		super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
-		if (!worldIn.isRemote && entityIn.ticksExisted % (int) ((float) 20 / REAGENT_PER_SECOND) == 0) {
-			if (entityIn instanceof PlayerEntity) {
-				PlayerEntity player = (PlayerEntity) entityIn;
-				if (player.openContainer != null && player.openContainer instanceof ActivePendantContainer) {
-					ActivePendantContainer gui = (ActivePendantContainer) player.openContainer;
+		if (!worldIn.isClientSide && entityIn.tickCount % (int) ((float) 20 / REAGENT_PER_SECOND) == 0) {
+			if (entityIn instanceof Player) {
+				Player player = (Player) entityIn;
+				if (player.containerMenu != null && player.containerMenu instanceof ActivePendantContainer) {
+					ActivePendantContainer gui = (ActivePendantContainer) player.containerMenu;
 					if (Objects.equals(lyonGetID(gui.getPendant()), lyonGetID(stack))) {
 						return; // open in a container!
 					}
@@ -302,16 +302,16 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		int pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, Hand.MAIN_HAND);
-		ItemStack inHand = playerIn.getHeldItemMainhand();
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
+		int pos = Inventories.getPlayerHandSlotIndex(playerIn.getInventory(), InteractionHand.MAIN_HAND);
+		ItemStack inHand = playerIn.getMainHandItem();
 		if (inHand.isEmpty()) {
-			inHand = playerIn.getHeldItemOffhand();
-			pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, Hand.OFF_HAND);
+			inHand = playerIn.getOffhandItem();
+			pos = Inventories.getPlayerHandSlotIndex(playerIn.getInventory(), InteractionHand.OFF_HAND);
 		}
 		NostrumMagica.instance.proxy.openContainer(playerIn, ActivePendantGui.ActivePendantContainer.Make(pos));
 		
-		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getHeldItem(hand));
+		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, playerIn.getItemInHand(hand));
 	}
 	
 }

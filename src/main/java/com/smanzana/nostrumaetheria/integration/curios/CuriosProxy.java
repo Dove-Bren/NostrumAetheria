@@ -25,11 +25,11 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.Ingredients;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
@@ -82,16 +82,16 @@ public class CuriosProxy {
 		RitualRecipe recipe;
 		
 		// Try to use silver, but use iron if no silver is in the modpack
-		Ingredient silver = NostrumTags.Items.SilverIngot.getAllElements().isEmpty()
-				? Ingredient.fromTag(Tags.Items.INGOTS_IRON)
-				: Ingredient.fromTag(NostrumTags.Items.SilverIngot);
+		Ingredient silver = NostrumTags.Items.SilverIngot.getValues().isEmpty()
+				? Ingredient.of(Tags.Items.INGOTS_IRON)
+				: Ingredient.of(NostrumTags.Items.SilverIngot);
 		
 		recipe = RitualRecipe.createTier3("shield_ring_small",
 				new ItemStack(AetheriaCurios.ringShieldSmall),
 				EMagicElement.EARTH,
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
-				Ingredient.fromItems(NostrumCurios.ringSilver),
-				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(NostrumSpellShapes.Self)), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
+				Ingredient.of(NostrumCurios.ringSilver),
+				new Ingredient[] {Ingredient.of(NostrumTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(NostrumSpellShapes.Self)), Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.of(NostrumTags.Items.CrystalSmall)},
 				new ResearchRequirement("shield_rings"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.ringShieldSmall)));
 		registry.register(recipe);
@@ -100,8 +100,8 @@ public class CuriosProxy {
 				new ItemStack(AetheriaCurios.ringShieldLarge),
 				EMagicElement.EARTH,
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
-				Ingredient.fromItems(AetheriaCurios.ringShieldSmall),
-				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), silver, Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
+				Ingredient.of(AetheriaCurios.ringShieldSmall),
+				new Ingredient[] {Ingredient.of(NostrumTags.Items.CrystalSmall), silver, Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.of(NostrumTags.Items.CrystalSmall)},
 				new ResearchRequirement("shield_rings"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.ringShieldLarge)));
 		registry.register(recipe);
@@ -110,8 +110,8 @@ public class CuriosProxy {
 				new ItemStack(AetheriaCurios.eludeCape),
 				EMagicElement.WIND,
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
-				Ingredient.fromTag(ItemTags.WOOL),
-				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(NostrumSpellShapes.OnDamage)), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
+				Ingredient.of(ItemTags.WOOL),
+				new Ingredient[] {Ingredient.of(NostrumTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(NostrumSpellShapes.OnDamage)), Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.of(NostrumTags.Items.CrystalSmall)},
 				new ResearchRequirement("elude_capes"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.eludeCape)));
 		registry.register(recipe);
@@ -120,8 +120,8 @@ public class CuriosProxy {
 				new ItemStack(AetheriaCurios.aetherCloak),
 				EMagicElement.ICE,
 				new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL, ReagentType.SKY_ASH},
-				Ingredient.fromItems(AetheriaBlocks.smallBattery),
-				new Ingredient[] {Ingredient.fromItems(AetheriaItems.aetherGem), Ingredient.fromItems(AetheriaCurios.eludeCape), Ingredient.fromTag(NostrumTags.Items.CrystalLarge), Ingredient.fromItems(AetheriaItems.aetherGem)},
+				Ingredient.of(AetheriaBlocks.smallBattery),
+				new Ingredient[] {Ingredient.of(AetheriaItems.aetherGem), Ingredient.of(AetheriaCurios.eludeCape), Ingredient.of(NostrumTags.Items.CrystalLarge), Ingredient.of(AetheriaItems.aetherGem)},
 				new ResearchRequirement("aether_cloaks"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.aetherCloak)));
 		registry.register(recipe);
@@ -132,8 +132,8 @@ public class CuriosProxy {
 				casterCloak,
 				EMagicElement.FIRE,
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
-				Ingredient.fromItems(AetheriaCurios.aetherCloak),
-				new Ingredient[] {Ingredient.fromItems(AetheriaItems.passivePendant), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.EMPTY, Ingredient.fromItems(AetheriaItems.passivePendant)},
+				Ingredient.of(AetheriaCurios.aetherCloak),
+				new Ingredient[] {Ingredient.of(AetheriaItems.passivePendant), Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.EMPTY, Ingredient.of(AetheriaItems.passivePendant)},
 				new ResearchRequirement("aether_cloaks"),
 				new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
 					if (!item.isEmpty() && item.getItem() instanceof AetherCloakItem) {
@@ -146,8 +146,8 @@ public class CuriosProxy {
 				new ItemStack(AetheriaCurios.sightPendant),
 				null,
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
-				Ingredient.fromItems(AetheriaItems.aetherSightTool),
-				new Ingredient[] {Ingredient.fromTag(Tags.Items.INGOTS_GOLD)},
+				Ingredient.of(AetheriaItems.aetherSightTool),
+				new Ingredient[] {Ingredient.of(Tags.Items.INGOTS_GOLD)},
 				new ResearchRequirement("aether_sight_pendant"),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.sightPendant)));
 		registry.register(recipe);
@@ -188,7 +188,7 @@ public class CuriosProxy {
 		registerCurioResearch();
 	}
 	
-	public IInventory getCurios(PlayerEntity player) {
+	public Container getCurios(Player player) {
 		if (!enabled) {
 			return null;
 		}

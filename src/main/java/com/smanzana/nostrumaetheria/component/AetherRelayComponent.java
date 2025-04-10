@@ -14,13 +14,15 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConnection;
 
 public class AetherRelayComponent extends AetherHandlerComponent {
 	
@@ -34,7 +36,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	
 	protected final int range;
 	protected Direction side;
-	protected World worldObj;
+	protected Level worldObj;
 	protected BlockPos pos;
 	
 	private Set<BlockPos> links;
@@ -72,7 +74,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 		this.side = side;
 	}
 	
-	public void setPosition(World world, BlockPos pos) {
+	public void setPosition(Level world, BlockPos pos) {
 		this.worldObj = world;
 		this.pos = pos;
 	}
@@ -81,11 +83,11 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 		return pos;
 	}
 	
-	protected World getWorld() {
+	protected Level getWorld() {
 		return worldObj;
 	}
 	
-	private static IAetherHandler getHandlerAt(World world, BlockPos pos, Direction side) {
+	private static IAetherHandler getHandlerAt(Level world, BlockPos pos, Direction side) {
 		return IAetherHandler.GetHandlerAt(world, pos, side);
 	}
 	
@@ -145,7 +147,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	 */
 	public void link(AetherRelayComponent relay) {
 		repairLinks();
-		if (links.add(relay.getPos().toImmutable())) {
+		if (links.add(relay.getPos().immutable())) {
 			this.linkCache.add(relay);
 			this.addAetherConnection(relay, null);
 			
@@ -160,7 +162,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	 * @param relay
 	 */
 	public void unlink(AetherRelayComponent relay) {
-		if (links.remove(relay.getPos().toImmutable())) {
+		if (links.remove(relay.getPos().immutable())) {
 			linkCache.remove(relay);
 			missingLinks.remove(relay.getPos());
 			this.removeAetherConnection(relay, null);
@@ -196,14 +198,14 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	}
 	
 	public void autoLink() {
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		
 		for (int i = -range; i <= range; i++) {
 			int innerRadius = range - Math.abs(i);
 			for (int j = -innerRadius; j <= innerRadius; j++) {
 				int yRadius = innerRadius - Math.abs(j);
 				for (int k = -yRadius; k <= yRadius; k++) {
-					cursor.setPos(pos.getX() + i, pos.getY() + j, pos.getZ() + k);
+					cursor.set(pos.getX() + i, pos.getY() + j, pos.getZ() + k);
 					if (!APIProxy.isBlockLoaded(worldObj, pos)) {
 						continue;
 					}
@@ -225,7 +227,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	 * Return the attached aether handler. That is, the aether handler corresponding to the block we're affixed to.
 	 */
 	protected @Nullable IAetherHandler getAttached() {
-		BlockPos pos = this.pos.offset(side.getOpposite());
+		BlockPos pos = this.pos.relative(side.getOpposite());
 		return getHandlerAt(worldObj, pos, side);
 	}
 	
@@ -320,12 +322,12 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
+	public CompoundTag writeToNBT(CompoundTag nbt) {
 		nbt = super.writeToNBT(nbt);
 		
-		ListNBT list = new ListNBT();
+		ListTag list = new ListTag();
 		for (BlockPos link : links) {
-			list.add(NBTUtil.writeBlockPos(link));
+			list.add(NbtUtils.writeBlockPos(link));
 		}
 		nbt.put(NBT_LINK, list);
 		
@@ -333,15 +335,15 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 	}
 	
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
+	public void readFromNBT(CompoundTag nbt) {
 		super.readFromNBT(nbt);
 		
 		links.clear();
 		linkCache.clear();
 		missingLinks.clear();
-		ListNBT list = nbt.getList(NBT_LINK, NBT.TAG_COMPOUND);
+		ListTag list = nbt.getList(NBT_LINK, NBT.TAG_COMPOUND);
 		for (int i = 0; i < list.size(); i++) {
-			BlockPos pos = NBTUtil.readBlockPos(list.getCompound(i));
+			BlockPos pos = NbtUtils.readBlockPos(list.getCompound(i));
 			if (links.add(pos)) { // prevents dupes :)
 				missingLinks.add(pos);
 			}

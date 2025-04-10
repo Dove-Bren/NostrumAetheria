@@ -1,29 +1,29 @@
 package com.smanzana.nostrumaetheria.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrumaetheria.tiles.AetherBathTileEntity;
+import com.smanzana.nostrummagica.client.render.tile.BlockEntityRendererBase;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.world.item.ItemStack;
 
-public class AetherBathRenderer extends TileEntityRenderer<AetherBathTileEntity> {
+public class AetherBathRenderer extends BlockEntityRendererBase<AetherBathTileEntity> {
 
-	public AetherBathRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+	public AetherBathRenderer(BlockEntityRendererProvider.Context rendererDispatcherIn) {
 		super(rendererDispatcherIn);
 	}
 	
-	private void renderPoolFilm(MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, float red, float green, float blue, float alpha, float radius) {
+	private void renderPoolFilm(PoseStack matrixStackIn, VertexConsumer buffer, int packedLightIn, float red, float green, float blue, float alpha, float radius) {
 		final int points = 8;
 		
-		matrixStackIn.push();
-		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(90f));
+		matrixStackIn.pushPose();
+		matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(90f));
 		RenderFuncs.drawEllipse(radius, radius, points, matrixStackIn, buffer, packedLightIn, red, green, blue, alpha);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 //		GlStateManager.disableBlend();
 //		GlStateManager.enableBlend();
@@ -50,7 +50,7 @@ public class AetherBathRenderer extends TileEntityRenderer<AetherBathTileEntity>
 	}
 	
 	@Override
-	public void render(AetherBathTileEntity te, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+	public void render(AetherBathTileEntity te, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
 		int aether = te.getHandler().getAether(null);
 		if (aether > 0) {
@@ -69,20 +69,20 @@ public class AetherBathRenderer extends TileEntityRenderer<AetherBathTileEntity>
 				levelOffset = .9f;
 			}
 			final double glowPeriod = 20 * 5;
-			final float glow = (float) Math.sin(Math.PI * 2 * ((double) te.getWorld().getGameTime() % glowPeriod) / glowPeriod);
+			final float glow = (float) Math.sin(Math.PI * 2 * ((double) te.getLevel().getGameTime() % glowPeriod) / glowPeriod);
 			final float alpha = .5f + (.025f * glow);
 			
 			final double wavePeriod = 20 * 8;
-			final float wave = (float) Math.sin(Math.PI * 2 * ((double) te.getWorld().getGameTime() % wavePeriod) / wavePeriod);
+			final float wave = (float) Math.sin(Math.PI * 2 * ((double) te.getLevel().getGameTime() % wavePeriod) / wavePeriod);
 			final float waveHeight = wave * .002f;
 			
-			final IVertexBuilder buffer = bufferIn.getBuffer(AetheriaRenderTypes.AETHER_FLAT_TRIS);
+			final VertexConsumer buffer = bufferIn.getBuffer(AetheriaRenderTypes.AETHER_FLAT_TRIS);
 			
 			//(te.getWorld().getTotalWorldTime() % 300) + partialTicks
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(.5f, levelOffset + waveHeight, .5);
 			renderPoolFilm(matrixStackIn, buffer, combinedLightIn, .83f, .81f, .5f, alpha, radius);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		ItemStack item = te.getItem();
@@ -90,18 +90,18 @@ public class AetherBathRenderer extends TileEntityRenderer<AetherBathTileEntity>
 			return;
 		
 		final double rotPeriod = 90 * 20;
-		float rot = (float)((double)(te.getWorld().getGameTime() % rotPeriod) / rotPeriod) * 360f;
+		float rot = (float)((double)(te.getLevel().getGameTime() % rotPeriod) / rotPeriod) * 360f;
 		float scale = .75f;
 		float yoffset = (float) (.1f * (-.5f + Math.sin(((double) System.currentTimeMillis()) / 1000.0))); // Copied from Altar
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(.5f, 1.25f + yoffset, .5f);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rot));
 		
 		matrixStackIn.scale(scale, scale, scale);
 		
 		RenderFuncs.RenderWorldItem(item, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 }

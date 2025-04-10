@@ -4,12 +4,12 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.blocks.IAetherCapableBlock;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 /**
  * Indicates that this class has the ability to store aether
@@ -74,9 +74,9 @@ public interface IAetherHandler {
 	 * @param side
 	 * @return
 	 */
-	public static @Nullable IAetherHandler GetHandlerAt(World world, BlockPos pos, @Nullable Direction side) {
+	public static @Nullable IAetherHandler GetHandlerAt(Level world, BlockPos pos, @Nullable Direction side) {
 		// First check for a TileEntity
-		TileEntity te = world.getTileEntity(pos);
+		BlockEntity te = world.getBlockEntity(pos);
 		if (te != null && te instanceof IAetherHandler) {
 			return (IAetherHandler) te;
 		}

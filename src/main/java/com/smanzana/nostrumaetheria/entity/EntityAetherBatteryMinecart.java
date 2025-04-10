@@ -5,51 +5,51 @@ import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrumaetheria.tiles.AetherPumpBlockEntity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.item.minecart.MinecartEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
-public class EntityAetherBatteryMinecart extends MinecartEntity {
+public class EntityAetherBatteryMinecart extends Minecart {
 	
 	// Most of this originally taken/sampled from Botania's mana cart
 	
 	public static final String ID = "aether_battery_minecart";
 	
-	private static final DataParameter<Integer> AETHER = EntityDataManager.createKey(EntityAetherBatteryMinecart.class, DataSerializers.VARINT);
+	private static final EntityDataAccessor<Integer> AETHER = SynchedEntityData.defineId(EntityAetherBatteryMinecart.class, EntityDataSerializers.INT);
 
-	public EntityAetherBatteryMinecart(EntityType<? extends EntityAetherBatteryMinecart> type, World worldIn) {
+	public EntityAetherBatteryMinecart(EntityType<? extends EntityAetherBatteryMinecart> type, Level worldIn) {
 		super(type, worldIn);
 	}
 	
-	public EntityAetherBatteryMinecart(EntityType<? extends EntityAetherBatteryMinecart> type, World worldIn, double x, double y, double z) {
+	public EntityAetherBatteryMinecart(EntityType<? extends EntityAetherBatteryMinecart> type, Level worldIn, double x, double y, double z) {
 		this(type, worldIn);
-		this.setPosition(x, y, z);
+		this.setPos(x, y, z);
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
+	protected void defineSynchedData() {
+		super.defineSynchedData();
 		
-		dataManager.register(AETHER, 0);
+		entityData.define(AETHER, 0);
 	}
 	
 	@Override
-	public BlockState getDisplayTile() {
-		return AetheriaBlocks.mediumBattery.getDefaultState();
+	public BlockState getDisplayBlockState() {
+		return AetheriaBlocks.mediumBattery.defaultBlockState();
 	}
 	
 	@Override
@@ -68,33 +68,33 @@ public class EntityAetherBatteryMinecart extends MinecartEntity {
 	}
 	
 	@Override
-	protected void applyDrag() {
-		this.setMotion(this.getMotion().mul(.98, 0, .98));
+	protected void applyNaturalSlowdown() {
+		this.setDeltaMovement(this.getDeltaMovement().multiply(.98, 0, .98));
 	}
 	
 	@Override
-	public ItemStack getPickedResult(RayTraceResult target) {
+	public ItemStack getPickedResult(HitResult target) {
 		return getCartItem();
 	}
 	
 	@Override
-	public void killMinecart(DamageSource source) {
+	public void destroy(DamageSource source) {
 		//super.killMinecart(source);
 		
-		this.remove();
-		if (this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
+		this.discard();
+		if (this.level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
 			ItemStack itemstack = new ItemStack(AetheriaItems.aetherBatteryMinecart, 1);
 
 			if (this.hasCustomName()) {
-				itemstack.setDisplayName(this.getName());
+				itemstack.setHoverName(this.getName());
 			}
 
-			this.entityDropItem(itemstack, 0.0F);
+			this.spawnAtLocation(itemstack, 0.0F);
         }
 	}
 	
 	@Override
-	public int getDefaultDisplayTileOffset() {
+	public int getDefaultDisplayOffset() {
 		return 4;
 	}
 	
@@ -107,16 +107,16 @@ public class EntityAetherBatteryMinecart extends MinecartEntity {
 	public void moveMinecartOnRail(BlockPos pos) {
 		super.moveMinecartOnRail(pos);
 		
-		if (world.isRemote) {
+		if (level.isClientSide) {
 			return;
 		}
 		
 		// Look for nearby pumps
 		for (Direction dir : new Direction[] {Direction.EAST, Direction.WEST, Direction.NORTH, Direction.SOUTH, Direction.UP}) {
-			final BlockPos at = pos.offset(dir);
-			BlockState state = world.getBlockState(at);
+			final BlockPos at = pos.relative(dir);
+			BlockState state = level.getBlockState(at);
 			if (state.getBlock() instanceof AetherPumpBlock) {
-				TileEntity te = world.getTileEntity(at);
+				BlockEntity te = level.getBlockEntity(at);
 				if (te != null && te instanceof AetherPumpBlockEntity) {
 					AetherPumpBlockEntity ent = (AetherPumpBlockEntity) te;
 					final Direction pumpDir = ((AetherPumpBlock) state.getBlock()).getFacing(state);
@@ -138,25 +138,25 @@ public class EntityAetherBatteryMinecart extends MinecartEntity {
 	}
 	
 	@Override
-	protected void writeAdditional(CompoundNBT nbt) {
-		super.writeAdditional(nbt);
+	protected void addAdditionalSaveData(CompoundTag nbt) {
+		super.addAdditionalSaveData(nbt);
 		
 		nbt.putInt("cart_aether", this.getAether());
 	}
 	
 	@Override
-	public void readAdditional(CompoundNBT nbt) {
-		super.readAdditional(nbt);
+	public void readAdditionalSaveData(CompoundTag nbt) {
+		super.readAdditionalSaveData(nbt);
 		
 		this.setAether(nbt.getInt("cart_aether"));
 	}
 	
 	public int getAether() {
-		return dataManager.get(AETHER);
+		return entityData.get(AETHER);
 	}
 	
 	public void setAether(int aether) {
-		dataManager.set(AETHER, aether);
+		entityData.set(AETHER, aether);
 	}
 	
 	public int getMaxAether() {
@@ -164,7 +164,7 @@ public class EntityAetherBatteryMinecart extends MinecartEntity {
 	}
 
 	@Override
-	public IPacket<?> createSpawnPacket() {
+	public Packet<?> getAddEntityPacket() {
 		// Have to override and use forge to use with non-living Entity types even though parent defines
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}

@@ -2,8 +2,8 @@ package com.smanzana.nostrumaetheria.api.recipes;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.NonNullList;
 
 /**
  * A "Recipe" for something that can be put in the unraveler and taken apart.

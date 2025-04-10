@@ -2,17 +2,16 @@ package com.smanzana.nostrumaetheria.items;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrumaetheria.api.capability.AetherBurnableWrapper;
 import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
-import com.smanzana.nostrumaetheria.capability.AetherBurnableCapability;
-import com.smanzana.nostrumaetheria.capability.AetherBurnableCapabilityProvider;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -59,11 +58,11 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, ICap
 		return InfoScreenTabs.INFO_ITEMS;
 	}
 	
-	private LazyOptional<IAetherBurnable> BurnableOptional = LazyOptional.of(() -> new AetherBurnableCapability(getBurnTicks(), getAetherYield()));
+	private LazyOptional<IAetherBurnable> BurnableOptional = LazyOptional.of(() -> new AetherBurnableWrapper(getBurnTicks(), getAetherYield()));
 	
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (cap == AetherBurnableCapabilityProvider.CAPABILITY) {
+		if (cap == IAetherBurnable.CAPABILITY) {
 			return BurnableOptional.cast();
 		}
 		
@@ -71,7 +70,7 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, ICap
 	}
 	
 	@Override
-	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
+	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
 		return this::getCapability;
 	}
 	

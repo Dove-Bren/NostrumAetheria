@@ -14,22 +14,22 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.util.TileEntities;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 
@@ -47,16 +47,16 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		
 //		private int idleTicks;
 		
-		public AetherRelayEntity() {
-			this(Direction.UP, RelayMode.INOUT);
+		public AetherRelayEntity(BlockPos pos, BlockState state) {
+			this(pos, state, Direction.UP, RelayMode.INOUT);
 		}
 		
-		public AetherRelayEntity(Direction facing, RelayMode mode) {
-			this(AetheriaTileEntities.Relay, facing, mode);
+		public AetherRelayEntity(BlockPos pos, BlockState state, Direction facing, RelayMode mode) {
+			this(AetheriaTileEntities.Relay, pos, state, facing, mode);
 		}
 		
-		protected AetherRelayEntity(TileEntityType<? extends AetherRelayEntity> type, Direction facing, RelayMode mode) {
-			super(type, 0, AETHER_BUFFER_AMT);
+		protected AetherRelayEntity(BlockEntityType<? extends AetherRelayEntity> type, BlockPos pos, BlockState state, Direction facing, RelayMode mode) {
+			super(type, pos, state, 0, AETHER_BUFFER_AMT);
 			
 			side = facing;
 			this.setMode(mode, false);
@@ -68,18 +68,18 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 			return this.links;
 		}
 		
-		public void addLink(@Nullable PlayerEntity player, BlockPos pos) {
+		public void addLink(@Nullable Player player, BlockPos pos) {
 			addLink(player, pos, false);
 		}
 		
-		public void addLink(@Nullable PlayerEntity player, BlockPos pos, boolean ignoreRange) {
+		public void addLink(@Nullable Player player, BlockPos pos, boolean ignoreRange) {
 			if (links.contains(pos)) {
 //				if (player != null) {
 //					player.sendMessage(new TranslationTextComponent("info.relay.already_linked"));
 //				}
 			} else if (!this.canLinkTo(pos)) {
 				if (player != null) {
-					player.sendMessage(new TranslationTextComponent("info.relay.too_far"), Util.DUMMY_UUID);
+					player.sendMessage(new TranslatableComponent("info.relay.too_far"), Util.NIL_UUID);
 				}
 			} else {
 				links.add(pos);
@@ -87,8 +87,8 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 				TileEntities.RefreshToClients(this);
 				
 				// And attach the other side, too
-				if (world != null && world.getTileEntity(pos) != null && world.getTileEntity(pos) instanceof AetherRelayEntity) {
-					((AetherRelayEntity) world.getTileEntity(pos)).addLink(player, this.pos, ignoreRange);
+				if (level != null && level.getBlockEntity(pos) != null && level.getBlockEntity(pos) instanceof AetherRelayEntity) {
+					((AetherRelayEntity) level.getBlockEntity(pos)).addLink(player, this.worldPosition, ignoreRange);
 				}
 			}
 		}
@@ -127,7 +127,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		}
 		
 		protected void setBlockStateFromMode(RelayMode mode) {
-			this.world.setBlockState(pos, this.getBlockState().with(AetherRelay.RELAY_MODE, mode), 3);
+			this.level.setBlock(worldPosition, this.getBlockState().setValue(AetherRelay.RELAY_MODE, mode), 3);
 		}
 		
 		protected List<IAetherHandler> getLinkHandlers(@Nullable List<IAetherHandler> list) {
@@ -135,7 +135,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 				list = new ArrayList<>();
 			}
 			for (BlockPos pos : this.getLinkLocations()) {
-				IAetherHandler handler = IAetherHandler.GetHandlerAt(world, pos, null);
+				IAetherHandler handler = IAetherHandler.GetHandlerAt(level, pos, null);
 				if (handler != null) {
 					list.add(handler);
 				}
@@ -144,12 +144,12 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		}
 		
 		protected boolean canLinkTo(BlockPos pos) {
-			return this.pos.manhattanDistance(pos) <= MAX_LINK_RANGE;
+			return this.worldPosition.distManhattan(pos) <= MAX_LINK_RANGE;
 		}
 		
 		@Override
-		public void validate() {
-			super.validate();
+		public void clearRemoved() {
+			super.clearRemoved();
 			
 //			if (this.world != null) {
 //				relayHandler.setPosition(world, pos.toImmutable());
@@ -157,63 +157,18 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		}
 		
 		@Override
-		public void setWorldAndPos(World world, BlockPos pos) {
-			super.setWorldAndPos(world, pos);
-			
-//			if (this.pos != null && !this.pos.equals(BlockPos.ZERO)) {
-//				relayHandler.setPosition(world, pos.toImmutable());
-//			}
-			// if this is too early for side, let's save it :(
-			
-//			if (!isInvalid()) {
-//				if (link == null) {
-//					autoLink();
-//				} else {
-//					// link up with the tile entity
-//					repairLink();
-//				}
-//			}
+		public void setLevel(Level world) {
+			super.setLevel(world);
 		}
 		
 		@Override
 		public void onLoad() {
 			super.onLoad();
-//			if (!world.isRemote) {
-//				world.getMinecraftServer().addScheduledTask(() -> {
-//					if (world != null && getPairedRelay() == null) {
-//						if (link == null) {
-//							autoLink();
-//						} else {
-//							// link up with the tile entity
-//							repairLink();
-//						}
-//					}
-//				});
-//			}
 		}
-		
-		@Override
-		public void updateContainingBlockInfo() {
-			super.updateContainingBlockInfo();
-			
-//			if (relayHandler != null && !relayHandler.hasLinks()) {
-//				relayHandler.autoLink();
-//			}
-		}
-		
-//		@Override
-//		public void onLinkChange() {
-//			this.markDirty();
-//			BlockState state = world.getBlockState(pos);
-//			world.notifyBlockUpdate(pos, state, state, 2);
-//		}
 		
 		@Override
 		public void onChunkUnloaded() {
 			super.onChunkUnloaded();
-			
-			// For any linked relays, let them know we're going away (but weren't destroyed)
-//			relayHandler.unloadRelay();
 		}
 		
 		public Direction getSide() {
@@ -221,30 +176,30 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		}
 		
 		@Override
-		public SUpdateTileEntityPacket getUpdatePacket() {
-			return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		public ClientboundBlockEntityDataPacket getUpdatePacket() {
+			return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 		}
 
 		@Override
-		public CompoundNBT getUpdateTag() {
-			return this.write(new CompoundNBT());
+		public CompoundTag getUpdateTag() {
+			return this.save(new CompoundTag());
 		}
 		
 		@Override
-		public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+		public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 			super.onDataPacket(net, pkt);
-			handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+			handleUpdateTag(pkt.getTag());
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT compound) {
-			super.write(compound);
+		public CompoundTag save(CompoundTag compound) {
+			super.save(compound);
 			
 			compound.putByte(NBT_SIDE, (byte) this.side.ordinal());
 			if (!this.links.isEmpty()) {
-				ListNBT list = new ListNBT();
+				ListTag list = new ListTag();
 				for (BlockPos link : links) {
-					list.add(NBTUtil.writeBlockPos(link));
+					list.add(NbtUtils.writeBlockPos(link));
 				}
 				compound.put(NBT_LINKS, list);
 			}
@@ -254,15 +209,15 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		}
 		
 		@Override
-		public void read(BlockState state, CompoundNBT compound) {
-			super.read(state, compound);
+		public void load(CompoundTag compound) {
+			super.load(compound);
 			
 			links.clear();
 			this.side = Direction.values()[compound.getByte(NBT_SIDE)];
 			if (compound.contains(NBT_LINKS)) {
-				ListNBT list = compound.getList(NBT_LINKS, NBT.TAG_COMPOUND);
+				ListTag list = compound.getList(NBT_LINKS, Tag.TAG_COMPOUND);
 				for (int i = 0; i < list.size(); i++) {
-					links.add(NBTUtil.readBlockPos(list.getCompound(i)));
+					links.add(NbtUtils.readBlockPos(list.getCompound(i)));
 				}
 			}
 			RelayMode modeToSet;
@@ -300,8 +255,8 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 					}
 					
 					if (count > 0) {
-						NostrumParticles.FILLED_ORB.spawn(world, new SpawnParams(
-								count, dest.getX() + .5, dest.getY() + .5, dest.getZ() + .5, 0, 30 * 1, 10, new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5)
+						NostrumParticles.FILLED_ORB.spawn(level, new SpawnParams(
+								count, dest.getX() + .5, dest.getY() + .5, dest.getZ() + .5, 0, 30 * 1, 10, new Vec3(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5)
 							).color(color));
 					}
 					
@@ -318,14 +273,14 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 //			}
 			
 			for (BlockPos pos : this.getLinkLocations()) {
-				IAetherHandler remoteHandler = IAetherHandler.GetHandlerAt(world, pos, null);
+				IAetherHandler remoteHandler = IAetherHandler.GetHandlerAt(level, pos, null);
 				if (remoteHandler != null) {
 					this.handler.addAetherConnection(remoteHandler, null);
 					
 					// Fixup relays that get placed but are being pointed to
-					TileEntity te = world.getTileEntity(pos);
+					BlockEntity te = level.getBlockEntity(pos);
 					if (te != null && te instanceof AetherRelayEntity) {
-						((AetherRelayEntity) te).addLink(null, getPos());
+						((AetherRelayEntity) te).addLink(null, getBlockPos());
 					}
 				}
 			}
@@ -358,7 +313,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 			handler.fillAether(AETHER_BUFFER_AMT);
 			
 			// Fill attached component
-			IAetherHandler otherHandler = IAetherHandler.GetHandlerAt(world, pos.offset(mySide.getOpposite()), mySide);
+			IAetherHandler otherHandler = IAetherHandler.GetHandlerAt(level, worldPosition.relative(mySide.getOpposite()), mySide);
 			if (otherHandler != null) {
 				// Avoid constantly pulling and putting back to a full component by finding out how much
 				// it needs first.
@@ -375,7 +330,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 			final Direction mySide = this.getSide();
 			
 			// Pull aether out of attached component and make it available for drawing
-			IAetherHandler otherHandler = IAetherHandler.GetHandlerAt(world, pos.offset(mySide.getOpposite()), mySide);
+			IAetherHandler otherHandler = IAetherHandler.GetHandlerAt(level, worldPosition.relative(mySide.getOpposite()), mySide);
 			if (otherHandler != null) {
 				final int room = this.handler.getMaxAether(mySide.getOpposite()) - this.handler.getAether(mySide.getOpposite());
 				if (room > 0) {
@@ -395,7 +350,7 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		
 		@Override
 		public void tick() {
-			if (this.world != null && !this.world.isRemote) {
+			if (this.level != null && !this.level.isClientSide) {
 				//if (ticksExisted > idleTicks) {
 					//idleTicks = ticksExisted + NostrumMagica.rand.nextInt(120) + 60;
 					idleVisualTick();
@@ -404,10 +359,10 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 			
 			super.tick();
 		
-			if (this.world != null && !this.world.isRemote()) {
+			if (this.level != null && !this.level.isClientSide()) {
 				// Possibly refresh connections
 				{
-					if (this.world != null && !this.world.isRemote()) {
+					if (this.level != null && !this.level.isClientSide()) {
 						// Refresh links every little while
 						if (this.ticksExisted % 5 == 0) {
 							refreshConnections();

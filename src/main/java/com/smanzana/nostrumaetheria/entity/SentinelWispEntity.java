@@ -8,26 +8,26 @@ import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class SentinelWispEntity extends WispEntity {
 
-	public SentinelWispEntity(EntityType<? extends SentinelWispEntity> type, World worldIn) {
+	public SentinelWispEntity(EntityType<? extends SentinelWispEntity> type, Level worldIn) {
 		super(type, worldIn);
 	}
 	
-	public SentinelWispEntity(EntityType<? extends SentinelWispEntity> type, World worldIn, BlockPos homePos) {
+	public SentinelWispEntity(EntityType<? extends SentinelWispEntity> type, Level worldIn, BlockPos homePos) {
 		this(type, worldIn);
-		this.setHomePosAndDistance(homePos, (int) MAX_WISP_DISTANCE_SQ);
+		this.restrictTo(homePos, (int) MAX_WISP_DISTANCE_SQ);
 		this.setHome(homePos);
 	}
 	
-	public static final AttributeModifierMap.MutableAttribute BuildSentinelAttributes(){
+	public static final AttributeSupplier.Builder BuildSentinelAttributes(){
 		return WispEntity.BuildAttributes();
 	}
 	
@@ -37,7 +37,7 @@ public class SentinelWispEntity extends WispEntity {
 		ItemStack scroll = ItemStack.EMPTY;
 		BlockPos homePos = this.getHome();
 		if (homePos != null) {
-			scroll = WispBlock.getScroll(world, homePos); // ENCAPSULATION LEAK
+			scroll = WispBlock.getScroll(level, homePos); // ENCAPSULATION LEAK
 		}
 		
 		

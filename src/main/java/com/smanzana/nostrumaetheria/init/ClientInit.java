@@ -22,18 +22,17 @@ import com.smanzana.nostrumaetheria.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrumaetheria.tiles.AetheriaTileEntities;
 import com.smanzana.nostrummagica.client.render.entity.RenderWisp;
 
-import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
@@ -48,51 +47,54 @@ public class ClientInit {
 	
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent event) {
-		TileEntityAetherDebugRenderer.registerFor(AetheriaTileEntities.InfiniteBlock);
-		TileEntityAetherDebugRenderer.registerFor(AetheriaTileEntities.Battery);
-		ClientRegistry.bindTileEntityRenderer(AetheriaTileEntities.Relay, (manager) -> new AetherRelayRenderer(manager));
-		ClientRegistry.bindTileEntityRenderer(AetheriaTileEntities.EnhancedRelay, (manager) -> new AetherRelayRenderer(manager));
-		ClientRegistry.bindTileEntityRenderer(AetheriaTileEntities.Battery,	(manager) -> new AetherBatteryRenderer(manager));
-		ClientRegistry.bindTileEntityRenderer(AetheriaTileEntities.Bath, (manager) -> new AetherBathRenderer(manager));
-		ClientRegistry.bindTileEntityRenderer(AetheriaTileEntities.AetherInfuserEnt, (manager) -> new TileEntityAetherInfuserRenderer(manager));
-		ClientRegistry.bindTileEntityRenderer(AetheriaTileEntities.WispBlockEnt, (manager) -> new TileEntityWispBlockRenderer(manager));
-		
-		ScreenManager.registerFactory(AetheriaContainers.ActivePendant, ActivePendantGui.ActivePendantGuiContainer::new);
-		ScreenManager.registerFactory(AetheriaContainers.Boiler, AetherBoilerGui.AetherBoilerGuiContainer::new);
-		ScreenManager.registerFactory(AetheriaContainers.Charger, AetherChargerGui.AetherChargerGuiContainer::new);
-		ScreenManager.registerFactory(AetheriaContainers.Furnace, AetherFurnaceGui.AetherFurnaceGuiContainer::new);
-		ScreenManager.registerFactory(AetheriaContainers.Repairer, AetherRepairerGui.AetherRepairerGuiContainer::new);
-		ScreenManager.registerFactory(AetheriaContainers.Unraveler, AetherUnravelerGui.AetherUnravelerGuiContainer::new);
-		ScreenManager.registerFactory(AetheriaContainers.WispBlock, WispBlockGui.WispBlockGuiContainer::new);
+		MenuScreens.register(AetheriaContainers.ActivePendant, ActivePendantGui.ActivePendantGuiContainer::new);
+		MenuScreens.register(AetheriaContainers.Boiler, AetherBoilerGui.AetherBoilerGuiContainer::new);
+		MenuScreens.register(AetheriaContainers.Charger, AetherChargerGui.AetherChargerGuiContainer::new);
+		MenuScreens.register(AetheriaContainers.Furnace, AetherFurnaceGui.AetherFurnaceGuiContainer::new);
+		MenuScreens.register(AetheriaContainers.Repairer, AetherRepairerGui.AetherRepairerGuiContainer::new);
+		MenuScreens.register(AetheriaContainers.Unraveler, AetherUnravelerGui.AetherUnravelerGuiContainer::new);
+		MenuScreens.register(AetheriaContainers.WispBlock, WispBlockGui.WispBlockGuiContainer::new);
 		
 		registerBlockRenderLayers();
-		registerEntityRenderers();
+	}
+	
+	@SubscribeEvent
+	public static final void registerTileEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+		TileEntityAetherDebugRenderer.registerFor(event, AetheriaTileEntities.InfiniteBlock);
+		TileEntityAetherDebugRenderer.registerFor(event, AetheriaTileEntities.Battery);
+		event.registerBlockEntityRenderer(AetheriaTileEntities.Relay, AetherRelayRenderer::new);
+		event.registerBlockEntityRenderer(AetheriaTileEntities.EnhancedRelay, AetherRelayRenderer::new);
+		event.registerBlockEntityRenderer(AetheriaTileEntities.Battery,	AetherBatteryRenderer::new);
+		event.registerBlockEntityRenderer(AetheriaTileEntities.Bath, AetherBathRenderer::new);
+		event.registerBlockEntityRenderer(AetheriaTileEntities.AetherInfuserEnt, TileEntityAetherInfuserRenderer::new);
+		event.registerBlockEntityRenderer(AetheriaTileEntities.WispBlockEnt, TileEntityWispBlockRenderer::new);
 	}
 	
 	private static final void registerBlockRenderLayers() {
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.bath, RenderType.getCutoutMipped());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.smallBattery, RenderType.getCutoutMipped());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.mediumBattery, RenderType.getCutoutMipped());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.largeBattery, RenderType.getCutoutMipped());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.giantBattery, RenderType.getCutoutMipped());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.boiler, RenderType.getSolid());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.charger, RenderType.getSolid());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.smallFurnace, RenderType.getSolid());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.mediumFurnace, RenderType.getSolid());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.largeFurnace, RenderType.getSolid());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.infuser, RenderType.getSolid());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.pump, RenderType.getCutoutMipped());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.relay, RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.repairer, RenderType.getSolid());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.unraveler, RenderType.getSolid());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.enhancedRelay, RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.infiteAetherBlock, RenderType.getSolid());
-		RenderTypeLookup.setRenderLayer(AetheriaBlocks.wispBlock, RenderType.getSolid()); // actually invisible
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.bath, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.smallBattery, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.mediumBattery, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.largeBattery, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.giantBattery, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.boiler, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.charger, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.smallFurnace, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.mediumFurnace, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.largeFurnace, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.infuser, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.pump, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.relay, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.repairer, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.unraveler, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.enhancedRelay, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.infiteAetherBlock, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.wispBlock, RenderType.solid()); // actually invisible
 	}
 	
-	private static final void registerEntityRenderers() {
-		RenderingRegistry.registerEntityRenderingHandler(AetheriaEntityTypes.batteryCart, (manager) -> new RenderAetherBatteryMinecart(manager));
-		RenderingRegistry.registerEntityRenderingHandler(AetheriaEntityTypes.sentinelWisp, (manager) -> new RenderWisp(manager));
+	@SubscribeEvent
+	public static final void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+		event.registerEntityRenderer(AetheriaEntityTypes.batteryCart, RenderAetherBatteryMinecart::new);
+		event.registerEntityRenderer(AetheriaEntityTypes.sentinelWisp, RenderWisp::new);
 	}
 	
 	@SubscribeEvent

@@ -2,7 +2,7 @@ package com.smanzana.nostrumaetheria.client.gui.container;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 
-import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -14,18 +14,18 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(NostrumAetheria.MODID)
 public class AetheriaContainers {
 
-	@ObjectHolder(ActivePendantGui.ActivePendantContainer.ID) public static ContainerType<ActivePendantGui.ActivePendantContainer> ActivePendant;
-	@ObjectHolder(AetherBoilerGui.AetherBoilerContainer.ID) public static ContainerType<AetherBoilerGui.AetherBoilerContainer> Boiler;
-	@ObjectHolder(AetherChargerGui.AetherChargerContainer.ID) public static ContainerType<AetherChargerGui.AetherChargerContainer> Charger;
-	@ObjectHolder(AetherFurnaceGui.AetherFurnaceContainer.ID) public static ContainerType<AetherFurnaceGui.AetherFurnaceContainer> Furnace;
-	@ObjectHolder(AetherRepairerGui.AetherRepairerContainer.ID) public static ContainerType<AetherRepairerGui.AetherRepairerContainer> Repairer;
-	@ObjectHolder(AetherUnravelerGui.AetherUnravelerContainer.ID) public static ContainerType<AetherUnravelerGui.AetherUnravelerContainer> Unraveler;
-	@ObjectHolder(WispBlockGui.WispBlockContainer.ID) public static ContainerType<WispBlockGui.WispBlockContainer> WispBlock;
+	@ObjectHolder(ActivePendantGui.ActivePendantContainer.ID) public static MenuType<ActivePendantGui.ActivePendantContainer> ActivePendant;
+	@ObjectHolder(AetherBoilerGui.AetherBoilerContainer.ID) public static MenuType<AetherBoilerGui.AetherBoilerContainer> Boiler;
+	@ObjectHolder(AetherChargerGui.AetherChargerContainer.ID) public static MenuType<AetherChargerGui.AetherChargerContainer> Charger;
+	@ObjectHolder(AetherFurnaceGui.AetherFurnaceContainer.ID) public static MenuType<AetherFurnaceGui.AetherFurnaceContainer> Furnace;
+	@ObjectHolder(AetherRepairerGui.AetherRepairerContainer.ID) public static MenuType<AetherRepairerGui.AetherRepairerContainer> Repairer;
+	@ObjectHolder(AetherUnravelerGui.AetherUnravelerContainer.ID) public static MenuType<AetherUnravelerGui.AetherUnravelerContainer> Unraveler;
+	@ObjectHolder(WispBlockGui.WispBlockContainer.ID) public static MenuType<WispBlockGui.WispBlockContainer> WispBlock;
 	
 	
 	@SubscribeEvent
-	public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event) {
-		final IForgeRegistry<ContainerType<?>> registry = event.getRegistry();
+	public static void registerContainers(final RegistryEvent.Register<MenuType<?>> event) {
+		final IForgeRegistry<MenuType<?>> registry = event.getRegistry();
 		
 		registry.register(IForgeContainerType.create(ActivePendantGui.ActivePendantContainer::FromNetwork).setRegistryName(ActivePendantGui.ActivePendantContainer.ID));
 		registry.register(IForgeContainerType.create(AetherBoilerGui.AetherBoilerContainer::FromNetwork).setRegistryName(AetherBoilerGui.AetherBoilerContainer.ID));

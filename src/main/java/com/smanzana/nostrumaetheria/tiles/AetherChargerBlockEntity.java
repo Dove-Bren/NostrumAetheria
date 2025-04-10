@@ -7,7 +7,8 @@ import com.smanzana.nostrumaetheria.blocks.AetherChargerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.client.gui.container.IAutoContainerInventoryWrapper;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -19,8 +20,8 @@ public class AetherChargerBlockEntity extends AetherBathTileEntity implements IA
 	private int clientAetherDisplay; // Client-only.
 	private int clientAetherMaxDisplay; // Client-only.
 	
-	public AetherChargerBlockEntity() {
-		super(AetheriaTileEntities.Charger, 0, 500);
+	public AetherChargerBlockEntity(BlockPos pos, BlockState state) {
+		super(AetheriaTileEntities.Charger, pos, state, 0, 500);
 	}
 	
 	@Override
@@ -74,10 +75,10 @@ public class AetherChargerBlockEntity extends AetherBathTileEntity implements IA
 	public void tick() {
 		super.tick();
 		
-		if (!world.isRemote && this.ticksExisted % 5 == 0) {
+		if (!level.isClientSide && this.ticksExisted % 5 == 0) {
 			if (aetherTick != on) {
-				BlockState state = world.getBlockState(pos);
-				world.setBlockState(pos, AetheriaBlocks.charger.getDefaultState().with(AetherChargerBlock.ON, aetherTick).with(AetherChargerBlock.FACING, state.get(AetherChargerBlock.FACING)));
+				BlockState state = level.getBlockState(worldPosition);
+				level.setBlockAndUpdate(worldPosition, AetheriaBlocks.charger.defaultBlockState().setValue(AetherChargerBlock.ON, aetherTick).setValue(AetherChargerBlock.FACING, state.getValue(AetherChargerBlock.FACING)));
 			}
 			
 			on = aetherTick;

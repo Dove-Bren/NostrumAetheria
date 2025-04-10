@@ -6,7 +6,7 @@ import com.smanzana.nostrumaetheria.api.proxy.AetheriaIDs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -37,13 +37,13 @@ public class AetheriaItems {
 	
 	public static Item.Properties PropBase() {
 		return new Item.Properties()
-				.group(APIProxy.creativeTab)
+				.tab(APIProxy.creativeTab)
 				;
 	}
 	
 	public static Item.Properties PropUnstackable() {
 		return PropBase()
-				.maxStackSize(1);
+				.stacksTo(1);
 	}
 	
 	public static Item.Properties PropEquipment() {

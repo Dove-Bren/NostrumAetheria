@@ -3,21 +3,21 @@ package com.smanzana.nostrumaetheria.client.render;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity;
 import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity.EffectSpark;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.render.tile.BlockEntityRendererBase;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
-public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherInfuserTileEntity> {
+public class TileEntityAetherInfuserRenderer extends BlockEntityRendererBase<AetherInfuserTileEntity> {
 
 	public static final float ORB_RADIUS = 2f;
 	
@@ -27,16 +27,16 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 	
 	private List<EffectSpark> sparks;
 	
-	public TileEntityAetherInfuserRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+	public TileEntityAetherInfuserRenderer(BlockEntityRendererProvider.Context rendererDispatcherIn) {
 		super(rendererDispatcherIn);
 		sparks = new ArrayList<>();
 	}
 	
-	private void renderOrb(MatrixStack matrixStackIn, IVertexBuilder buffer, int combinedLightIn, float opacity, boolean outside) {
+	private void renderOrb(PoseStack matrixStackIn, VertexConsumer buffer, int combinedLightIn, float opacity, boolean outside) {
 		final float mult = 2 * ORB_RADIUS * (outside ? 1 : -1);
 		
 		// outside
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(0, ORB_RADIUS - .5f, 0);
 		matrixStackIn.scale(mult, mult, mult);
 		
@@ -76,10 +76,10 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 //			}
 		}
 
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
-	private void renderSpark(MatrixStack matrixStackIn, IVertexBuilder buffer, int combinedLightIn, ActiveRenderInfo renderInfo, long ticks, float partialTicks, EffectSpark spark) {
+	private void renderSpark(PoseStack matrixStackIn, VertexConsumer buffer, int combinedLightIn, Camera renderInfo, long ticks, float partialTicks, EffectSpark spark) {
 		
 		// Translation
 		final float pitch = spark.getPitch(ticks, partialTicks);
@@ -108,15 +108,15 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		final float alphaInner = .01f + .2f * brightness;
 		final float alphaOuter = .01f + .2f * brightness;
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(offsetX, offsetY, offsetZ);
 		RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, renderInfo, radius, combinedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alphaOuter);
 		RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, renderInfo, smallRadius, combinedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alphaInner);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	@Override
-	public void render(AetherInfuserTileEntity te, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+	public void render(AetherInfuserTileEntity te, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		
 		final float ORB_PERIOD = 200f;
 		
@@ -131,21 +131,21 @@ public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherIn
 		final float maxOrbOpacity = .6f;
 		final float orbOpacity = maxOrbOpacity * (.75f + .25f * (float)Math.sin(t * 2 * Math.PI)) * te.getChargePerc();
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(.5f, 1f, .5f);
 		
-		final IVertexBuilder orbBuffer = bufferIn.getBuffer(AetheriaRenderTypes.INFUSER_ORB);
+		final VertexConsumer orbBuffer = bufferIn.getBuffer(AetheriaRenderTypes.INFUSER_ORB);
 		renderOrb(matrixStackIn, orbBuffer, combinedLightIn, orbOpacity, false);
 		renderOrb(matrixStackIn, orbBuffer, combinedLightIn, orbOpacity, true);
 		
-		final IVertexBuilder sparkBuffer = bufferIn.getBuffer(AetheriaRenderTypes.INFUSER_SPARK);
+		final VertexConsumer sparkBuffer = bufferIn.getBuffer(AetheriaRenderTypes.INFUSER_SPARK);
 		
 		//GlStateManager.alphaFunc(516, 0);
 //		GlStateManager.disableLighting();
 		for (EffectSpark spark : sparks) {
-			renderSpark(matrixStackIn, sparkBuffer, combinedLightIn, this.renderDispatcher.renderInfo, ticks, partialTicks, spark);
+			renderSpark(matrixStackIn, sparkBuffer, combinedLightIn, this.context.getBlockEntityRenderDispatcher().camera, ticks, partialTicks, spark);
 		}
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 }

@@ -5,10 +5,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurio;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import top.theillusivec4.curios.api.SlotContext;
 
 public class ShieldRingItem extends NostrumCurio {
 
@@ -23,21 +24,22 @@ public class ShieldRingItem extends NostrumCurio {
 	}
 
 	@Override
-	public void onWornTick(ItemStack stack, LivingEntity player) {
-		super.onWornTick(stack, player);
+	public void onWornTick(ItemStack stack, SlotContext slot) {
+		super.onWornTick(stack, slot);
 		
-		if (!player.world.isRemote) {
+		final LivingEntity player = slot.entity();
+		if (!player.level.isClientSide) {
 			int cost = (int) (shieldAmt * 10);
 			
 			// Check if we have enough aether and if the player is missing a shield
-			if (player.ticksExisted % 40 == 0 && NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.SHIELD_PHYSICAL) == null) {
-				IInventory inv = null;
-				if (player instanceof PlayerEntity) {
-					inv = ((PlayerEntity) player).inventory;
+			if (player.tickCount % 40 == 0 && NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.SHIELD_PHYSICAL) == null) {
+				Container inv = null;
+				if (player instanceof Player) {
+					inv = ((Player) player).getInventory();
 				}
 				
 				if (inv != null) {
-					int taken = APIProxy.drawFromInventory(player.world, player, inv, cost, stack);
+					int taken = APIProxy.drawFromInventory(player.level, player, inv, cost, stack);
 					if (taken > 0) {
 						// Apply shields! Amount depends on how much aether was consumed
 						double realAmt = shieldAmt * ((float) taken / (float) cost);

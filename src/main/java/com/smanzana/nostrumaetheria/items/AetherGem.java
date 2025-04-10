@@ -9,13 +9,13 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -30,7 +30,7 @@ public class AetherGem extends AetherItem implements ILoreTagged {
 	
 	public AetherGem() {
 		super(AetheriaItems.PropUnstackable()
-				.maxDamage(MAX_AETHER));
+				.durability(MAX_AETHER));
 	}
     
     @Override
@@ -56,9 +56,9 @@ public class AetherGem extends AetherItem implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		tooltip.add(new TranslationTextComponent("item.info.aether_gem.desc"));
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+		tooltip.add(new TranslatableComponent("item.info.aether_gem.desc"));
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 	}
 
 	@Override
@@ -74,24 +74,24 @@ public class AetherGem extends AetherItem implements ILoreTagged {
 	
 	private void setDurability(ItemStack pendant) {
 		int aether = getAether(pendant);
-		pendant.setDamage(MAX_AETHER - aether);
+		pendant.setDamageValue(MAX_AETHER - aether);
 	}
 	
 	@Override
-	public void onCreated(ItemStack stack, World worldIn, PlayerEntity playerIn) {
-		super.onCreated(stack, worldIn, playerIn);
+	public void onCraftedBy(ItemStack stack, Level worldIn, Player playerIn) {
+		super.onCraftedBy(stack, worldIn, playerIn);
 		// Update durability to be correct as soon as it's created
 		setDurability(stack);
 	}
 	
 	@Override
-	protected void onFirstTick(ItemStack stack, World worldIn, Entity entityIn) {
+	protected void onFirstTick(ItemStack stack, Level worldIn, Entity entityIn) {
 		super.onFirstTick(stack, worldIn, entityIn);
 		this.setDurability(stack);
 	}
 	
 	@Override
-	public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+	public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
 	}
 
@@ -101,17 +101,17 @@ public class AetherGem extends AetherItem implements ILoreTagged {
 	}
 
 	@Override
-	protected boolean shouldShowAether(ItemStack stack, PlayerEntity playerIn, boolean advanced) {
+	protected boolean shouldShowAether(ItemStack stack, Player playerIn, boolean advanced) {
 		return true;
 	}
 
 	@Override
-	protected boolean shouldAutoFill(ItemStack stack, World worldIn, Entity entityIn) {
+	protected boolean shouldAutoFill(ItemStack stack, Level worldIn, Entity entityIn) {
 		return false;
 	}
 
 	@Override
-	public boolean canBeDrawnFrom(ItemStack stack, World worldIn, Entity entityIn) {
+	public boolean canBeDrawnFrom(ItemStack stack, Level worldIn, Entity entityIn) {
 		return true;
 	}
 	

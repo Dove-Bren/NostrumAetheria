@@ -6,12 +6,12 @@ import javax.annotation.Nonnull;
 
 import com.google.gson.JsonObject;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.conditions.ILootCondition;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -26,7 +26,7 @@ public class AddItemMod extends LootModifier {
 	private final float chancePerLoot;
 	private final int countPerLoot;
 	
-	public AddItemMod(ILootCondition[] conditionsIn, Item addItem, float chance, int min, int max, float chancePerLoot,
+	public AddItemMod(LootItemCondition[] conditionsIn, Item addItem, float chance, int min, int max, float chancePerLoot,
 			int countPerLoot) {
 		super(conditionsIn);
 		this.addItem = addItem;
@@ -57,13 +57,13 @@ public class AddItemMod extends LootModifier {
 		public static final String ID = "add_item";
 
 		@Override
-		public AddItemMod read(ResourceLocation location, JsonObject object, ILootCondition[] ailootcondition) {
-            Item addItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation((JSONUtils.getString(object, "addItem"))));
-            float chance = JSONUtils.getFloat(object, "chance");
-        	int min = JSONUtils.getInt(object, "min");
-        	int max = JSONUtils.getInt(object, "max");
-        	float chancePerLoot = JSONUtils.getFloat(object, "chancePerLoot");
-        	int countPerLoot = JSONUtils.getInt(object, "countPerLoot");
+		public AddItemMod read(ResourceLocation location, JsonObject object, LootItemCondition[] ailootcondition) {
+            Item addItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation((GsonHelper.getAsString(object, "addItem"))));
+            float chance = GsonHelper.getAsFloat(object, "chance");
+        	int min = GsonHelper.getAsInt(object, "min");
+        	int max = GsonHelper.getAsInt(object, "max");
+        	float chancePerLoot = GsonHelper.getAsFloat(object, "chancePerLoot");
+        	int countPerLoot = GsonHelper.getAsInt(object, "countPerLoot");
         	return new AddItemMod(ailootcondition, addItem, chance, min, max, chancePerLoot, countPerLoot);
 		}
 

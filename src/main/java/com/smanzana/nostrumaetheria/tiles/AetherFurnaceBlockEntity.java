@@ -3,8 +3,9 @@ package com.smanzana.nostrumaetheria.tiles;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherFurnaceBlock.Type;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 
@@ -12,12 +13,12 @@ public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 	
 	private Type type;
 	
-	public AetherFurnaceBlockEntity() {
-		this(Type.SMALL);
+	public AetherFurnaceBlockEntity(BlockPos pos, BlockState state) {
+		this(pos, state, Type.SMALL);
 	}
 	
-	public AetherFurnaceBlockEntity(Type type) {
-		super(AetheriaTileEntities.Furnace, AetherFurnaceBlock.getFurnaceSlotsForType(type), 0, 500);
+	public AetherFurnaceBlockEntity(BlockPos pos, BlockState state, Type type) {
+		super(AetheriaTileEntities.Furnace, pos, state, AetherFurnaceBlock.getFurnaceSlotsForType(type), 0, 500);
 		this.type = type;
 		
 	}
@@ -27,8 +28,8 @@ public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundTag save(CompoundTag nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.putString(NBT_TYPE, type.name());
 		
@@ -36,8 +37,8 @@ public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		try {
 			this.type = Type.valueOf(nbt.getString(NBT_TYPE));
@@ -58,6 +59,6 @@ public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 
 	@Override
 	protected void onBurningChange(boolean newBurning) {
-		world.setBlockState(pos, AetherFurnaceBlock.GetForType(getFurnceType()).getDefaultState().with(AetherFurnaceBlock.ON, newBurning));
+		level.setBlockAndUpdate(worldPosition, AetherFurnaceBlock.GetForType(getFurnceType()).defaultBlockState().setValue(AetherFurnaceBlock.ON, newBurning));
 	}
 }

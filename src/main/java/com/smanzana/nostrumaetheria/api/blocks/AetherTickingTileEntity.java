@@ -1,14 +1,16 @@
 package com.smanzana.nostrumaetheria.api.blocks;
 
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
+import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
-public abstract class AetherTickingTileEntity extends AetherTileEntity implements ITickableTileEntity {
+public abstract class AetherTickingTileEntity extends AetherTileEntity implements TickableBlockEntity {
 
 	// Automatically send block updates down to the client every n ticks (if there were changes)
 	protected int autoSyncPeriod;
@@ -17,12 +19,12 @@ public abstract class AetherTickingTileEntity extends AetherTileEntity implement
 	protected int ticksExisted;
 	protected boolean aetherDirtyFlag; // for use with auto-sync
 	
-	public AetherTickingTileEntity(TileEntityType<?> type, int defaultAether, int defaultMaxAether) {
-		super(type, defaultAether, defaultMaxAether);
+	public AetherTickingTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int defaultAether, int defaultMaxAether) {
+		super(type, pos, state, defaultAether, defaultMaxAether);
 	}
 	
-	public AetherTickingTileEntity(TileEntityType<?> type) {
-		super(type);
+	public AetherTickingTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 	}
 	
 	public void setAutoSync(int period) {
@@ -46,7 +48,7 @@ public abstract class AetherTickingTileEntity extends AetherTileEntity implement
 		
 		compWrapper.tick();
 		
-		if (!world.isRemote && aetherDirtyFlag && autoSyncPeriod > 0 && (ticksExisted == 1 || ticksExisted % autoSyncPeriod == 0)) {
+		if (!level.isClientSide && aetherDirtyFlag && autoSyncPeriod > 0 && (ticksExisted == 1 || ticksExisted % autoSyncPeriod == 0)) {
 			//worldObj.notifyBlockUpdate(pos, this.worldObj.getBlockState(pos), this.worldObj.getBlockState(pos), 2);
 			syncServerAether();
 			aetherDirtyFlag = false;
@@ -54,18 +56,18 @@ public abstract class AetherTickingTileEntity extends AetherTileEntity implement
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(pkt.getTag());
 	}
 }

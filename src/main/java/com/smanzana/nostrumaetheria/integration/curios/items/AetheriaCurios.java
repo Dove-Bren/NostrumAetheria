@@ -7,7 +7,7 @@ import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -26,13 +26,13 @@ public class AetheriaCurios {
 	
 	public static Item.Properties PropBase() {
 		return new Item.Properties()
-				.group(APIProxy.creativeTab)
+				.tab(APIProxy.creativeTab)
 				;
 	}
 	
 	public static Item.Properties PropCurio() {
 		return PropBase()
-				.maxStackSize(1)
+				.stacksTo(1)
 				;
 	}
 	

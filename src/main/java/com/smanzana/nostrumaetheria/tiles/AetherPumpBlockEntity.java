@@ -6,13 +6,14 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrumaetheria.blocks.AetherPumpBlock;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class AetherPumpBlockEntity extends AetherTickingTileEntity {
 	
-	public AetherPumpBlockEntity() {
-		super(AetheriaTileEntities.Pump, 0, 500);
+	public AetherPumpBlockEntity(BlockPos pos, BlockState state) {
+		super(AetheriaTileEntities.Pump, pos, state, 0, 500);
 	}
 	
 	@Override
@@ -24,10 +25,10 @@ public class AetherPumpBlockEntity extends AetherTickingTileEntity {
 	public void tick() {
 		super.tick();
 		
-		if (!world.isRemote) {
-			BlockState state = world.getBlockState(pos);
+		if (!level.isClientSide) {
+			BlockState state = level.getBlockState(worldPosition);
 			if (!(state.getBlock() instanceof AetherPumpBlock)) {
-				world.removeTileEntity(pos);
+				level.removeBlockEntity(worldPosition);
 				return;
 			}
 			
@@ -39,25 +40,25 @@ public class AetherPumpBlockEntity extends AetherTickingTileEntity {
 				final int maxAether = this.getHandler().getMaxAether(null);
 				final int room = maxAether - this.getHandler().getAether(null);
 				// Attempt to draw from a handler we're pointed at
-				@Nullable IAetherHandler handler = IAetherHandler.GetHandlerAt(world, pos.offset(direction), direction.getOpposite());
+				@Nullable IAetherHandler handler = IAetherHandler.GetHandlerAt(level, worldPosition.relative(direction), direction.getOpposite());
 				if (handler != null) {
 					final int drawn = handler.drawAether(direction.getOpposite(), room);
 					this.getHandler().addAether(null, drawn);
-					this.markDirty();
+					this.setChanged();
 				}
 			}
 			
 			// Push
 			if (this.getHandler().getAether(null) > 0) {
 				// Look up handler at pointed position
-				@Nullable IAetherHandler handler = IAetherHandler.GetHandlerAt(world, pos.offset(direction.getOpposite()), direction);
+				@Nullable IAetherHandler handler = IAetherHandler.GetHandlerAt(level, worldPosition.relative(direction.getOpposite()), direction);
 				if (handler != null && handler.canAdd(direction, 1)) {
 					final int orig = this.getHandler().getAether(null);
 					final int leftover = handler.addAether(direction, orig);
 					if (leftover != orig) {
 						// Pushed some out
 						this.getHandler().drawAether(null, orig - leftover);
-						this.markDirty();
+						this.setChanged();
 					}
 				}
 			}

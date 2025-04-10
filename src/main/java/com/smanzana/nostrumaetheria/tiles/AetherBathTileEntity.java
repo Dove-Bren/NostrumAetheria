@@ -10,30 +10,30 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
 import com.smanzana.nostrumaetheria.api.item.AetherItem;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
-public class AetherBathTileEntity extends NativeAetherTickingTileEntity implements ISidedInventory {
+public class AetherBathTileEntity extends NativeAetherTickingTileEntity implements WorldlyContainer {
 	
 	private ItemStack stack = ItemStack.EMPTY;
 	
-	public AetherBathTileEntity(TileEntityType<? extends AetherBathTileEntity> type, int aether, int maxAether) {
-		super(type, aether, maxAether);
+	public AetherBathTileEntity(BlockEntityType<? extends AetherBathTileEntity> type, BlockPos pos, BlockState state, int aether, int maxAether) {
+		super(type, pos, state, aether, maxAether);
 		
 		this.setAutoSync(5);
 		this.handler.configureInOut(true, false);
 	}
 	
-	public AetherBathTileEntity() {
-		this(AetheriaTileEntities.Bath, 0, 250);
+	public AetherBathTileEntity(BlockPos pos, BlockState state) {
+		this(AetheriaTileEntities.Bath, pos, state, 0, 250);
 	}
 	
 	public @Nonnull ItemStack getItem() {
@@ -49,12 +49,12 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	private static final String NBT_ITEM = "item";
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundTag save(CompoundTag nbt) {
+		nbt = super.save(nbt);
 		
 		if (!stack.isEmpty()) {
-			CompoundNBT tag = new CompoundNBT();
-			tag = stack.write(tag);
+			CompoundTag tag = new CompoundTag();
+			tag = stack.save(tag);
 			nbt.put(NBT_ITEM, tag);
 		}
 		
@@ -62,39 +62,39 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null)
 			return;
 			
-		if (!nbt.contains(NBT_ITEM, NBT.TAG_COMPOUND)) {
+		if (!nbt.contains(NBT_ITEM, Tag.TAG_COMPOUND)) {
 			stack = ItemStack.EMPTY;
 		} else {
-			CompoundNBT tag = nbt.getCompound(NBT_ITEM);
-			stack = ItemStack.read(tag);
+			CompoundTag tag = nbt.getCompound(NBT_ITEM);
+			stack = ItemStack.of(tag);
 		}
 	}
 	
 	private void forceUpdate() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
+		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		setChanged();
 	}
 
 	@Override
-	public int getSizeInventory() {
+	public int getContainerSize() {
 		return 1;
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int index) {
+	public ItemStack getItem(int index) {
 		if (index > 0)
 			return ItemStack.EMPTY;
 		return this.stack;
 	}
 
 	@Override
-	public ItemStack decrStackSize(int index, int count) {
+	public ItemStack removeItem(int index, int count) {
 		if (index > 0)
 			return ItemStack.EMPTY;
 		ItemStack ret = this.stack.split(count);
@@ -105,7 +105,7 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
+	public ItemStack removeItemNoUpdate(int index) {
 		if (index > 0)
 			return ItemStack.EMPTY;
 		ItemStack ret = this.stack;
@@ -115,7 +115,7 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack) {
+	public void setItem(int index, ItemStack stack) {
 		if (index > 0)
 			return;
 		this.stack = stack;
@@ -123,27 +123,27 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 
 	@Override
-	public int getInventoryStackLimit() {
+	public int getMaxStackSize() {
 		return 1;
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(PlayerEntity player) {
+	public void startOpen(Player player) {
 		;
 	}
 
 	@Override
-	public void closeInventory(PlayerEntity player) {
+	public void stopOpen(Player player) {
 		;
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack) {
+	public boolean canPlaceItem(int index, ItemStack stack) {
 		if (index != 0) {
 			return false;
 		}
@@ -159,7 +159,7 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 
 	@Override
-	public void clear() {
+	public void clearContent() {
 		this.stack = ItemStack.EMPTY;
 		forceUpdate();
 	}
@@ -170,15 +170,15 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 
 	@Override
-	public boolean canInsertItem(int index, ItemStack itemStackIn, Direction direction) {
-		if (index != 0 || direction == Direction.DOWN || !this.isItemValidForSlot(0, itemStackIn))
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction) {
+		if (index != 0 || direction == Direction.DOWN || !this.canPlaceItem(0, itemStackIn))
 			return false;
 		
 		return stack.isEmpty();
 	}
 
 	@Override
-	public boolean canExtractItem(int index, ItemStack stack, Direction direction) {
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
 		return index == 0 && direction == Direction.DOWN && !stack.isEmpty() && heldItemFull();
 	}
 	
@@ -215,7 +215,7 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	@Override
 	public void tick() {
 		// If we have an item, try to add aether to it
-		if (!world.isRemote) {
+		if (!level.isClientSide) {
 			
 			if (!stack.isEmpty() && stack.getItem() instanceof AetherItem) {
 				// Pretty dumb thing I'm doing here for these special items.
@@ -243,10 +243,10 @@ public class AetherBathTileEntity extends NativeAetherTickingTileEntity implemen
 	}
 	
 	@Override
-	public void setWorldAndPos(World world, BlockPos pos) {
-		super.setWorldAndPos(world, pos);
+	public void setLevel(Level world) {
+		super.setLevel(world);
 		
-		if (!world.isRemote) {
+		if (!world.isClientSide) {
 			this.handler.setAutoFill(true);
 		}
 	}

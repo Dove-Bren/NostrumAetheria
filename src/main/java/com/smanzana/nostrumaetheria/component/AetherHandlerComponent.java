@@ -18,15 +18,17 @@ import com.smanzana.nostrumaetheria.api.aether.stats.AetherTickIOEntry;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
+
+import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConnection;
 
 public class AetherHandlerComponent implements IAetherHandlerComponent {
 	
@@ -47,7 +49,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	protected boolean allowInboundAether;
 	// "" but for outbound aether
 	protected boolean allowOutboundAether;
-	protected @Nullable RegistryKey<World> dimension;
+	protected @Nullable ResourceKey<Level> dimension;
 	protected @Nullable BlockPos pos;
 	// Connections set via code instead of from parent (usually distant blocks, like relays)
 	private Set<AetherFlowConnection> remoteConnections;
@@ -65,7 +67,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	protected boolean aetherActiveTick; // useful for checking if active after super.tick()
 	protected int aetherLastTick;
 	
-	public AetherHandlerComponent(@Nullable RegistryKey<World> dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
+	public AetherHandlerComponent(@Nullable ResourceKey<Level> dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether, int defaultMaxAether) {
 		maxAether = defaultMaxAether;
 		aether = defaultAether;
 		this.dimension = dimension;
@@ -371,8 +373,8 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 		Iterator<AetherFlowConnection> it = remoteConnections.iterator();
 		while (it.hasNext()) {
 			AetherFlowConnection conn = it.next();
-			if (conn.handler instanceof TileEntity) {
-				if (((TileEntity) conn.handler).isRemoved()) {
+			if (conn.handler instanceof BlockEntity) {
+				if (((BlockEntity) conn.handler).isRemoved()) {
 					it.remove();
 					continue;
 				}
@@ -453,26 +455,26 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 				| (output ? 1 : 0) << 0);
 	}
 	
-	public CompoundNBT writeToNBT(CompoundNBT compound) {
+	public CompoundTag writeToNBT(CompoundTag compound) {
 		compound.putInt(NBT_AETHER, aether);
 		compound.putInt(NBT_MAX_AETHER, maxAether);
 		compound.putByte(NBT_SIDE_CONFIG, configToByte(sideConnections));
 		compound.putByte(NBT_INOUTBOUND_CONFIG, inoutConfigToByte(allowInboundAether, allowOutboundAether));
 		if (dimension != null && pos != null) {
-			compound.putString(NBT_DIM, dimension.getLocation().toString());
-			compound.put(NBT_POS, NBTUtil.writeBlockPos(pos));
+			compound.putString(NBT_DIM, dimension.location().toString());
+			compound.put(NBT_POS, NbtUtils.writeBlockPos(pos));
 		}
 		
 		return compound;
 	}
 	
-	public void readFromNBT(CompoundNBT compound) {
+	public void readFromNBT(CompoundTag compound) {
 		this.aether = compound.getInt(NBT_AETHER);
 		this.maxAether = compound.getInt(NBT_MAX_AETHER);
 		configFromByte(sideConnections, compound.getByte(NBT_SIDE_CONFIG));
 		inoutConfigFromByte(this, compound.getByte(NBT_INOUTBOUND_CONFIG));
 		if (compound.contains(NBT_DIM) && compound.contains(NBT_POS)) {
-			this.dimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString(NBT_DIM)));
+			this.dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(compound.getString(NBT_DIM)));
 		}
 		
 		fixAether();
@@ -484,7 +486,7 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	}
 
 	@Override
-	public RegistryKey<World> getDimension() {
+	public ResourceKey<Level> getDimension() {
 		return this.dimension;
 	}
 
@@ -522,8 +524,8 @@ public class AetherHandlerComponent implements IAetherHandlerComponent {
 	}
 	
 	@Override
-	public void setPosition(World world, BlockPos pos) {
-		this.dimension = world == null ? null : world.getDimensionKey();
+	public void setPosition(Level world, BlockPos pos) {
+		this.dimension = world == null ? null : world.dimension();
 		this.pos = pos;
 		//this.dirty();
 	}

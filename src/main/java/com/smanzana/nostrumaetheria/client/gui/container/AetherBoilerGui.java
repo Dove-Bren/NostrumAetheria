@@ -2,7 +2,7 @@ package com.smanzana.nostrumaetheria.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
@@ -18,16 +18,16 @@ import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -72,7 +72,7 @@ public class AetherBoilerGui {
 		
 		protected AetherBoilerBlockEntity chest;
 		
-		public AetherBoilerContainer(int windowId, PlayerInventory playerInv, AetherBoilerBlockEntity chest) {
+		public AetherBoilerContainer(int windowId, Inventory playerInv, AetherBoilerBlockEntity chest) {
 			super(AetheriaContainers.Boiler, windowId, chest);
 			this.chest = chest;
 						
@@ -89,13 +89,13 @@ public class AetherBoilerGui {
 			}
 			
 			this.addSlot(new Slot(chest, 0, GUI_TOP_INV_HOFFSET, GUI_TOP_INV_VOFFSET) {
-				public boolean isItemValid(@Nonnull ItemStack stack) {
-			        return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
+				public boolean mayPlace(@Nonnull ItemStack stack) {
+			        return this.container.canPlaceItem(this.getSlotIndex(), stack);
 			    }
 			});
 		}
 		
-		public static final AetherBoilerContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+		public static final AetherBoilerContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buffer) {
 			return new AetherBoilerContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}
 		
@@ -108,18 +108,18 @@ public class AetherBoilerGui {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
+		public ItemStack quickMoveStack(Player playerIn, int fromSlot) {
 			ItemStack prev = ItemStack.EMPTY;	
-			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
+			Slot slot = (Slot) this.slots.get(fromSlot);
 			
-			if (slot != null && slot.getHasStack()) {
-				ItemStack cur = slot.getStack();
+			if (slot != null && slot.hasItem()) {
+				ItemStack cur = slot.getItem();
 				prev = cur.copy();
 				
-				if (slot.inventory == this.chest) {
+				if (slot.container == this.chest) {
 					// Trying to take one of our items
-					if (playerIn.inventory.addItemStackToInventory(cur)) {
-						slot.putStack(ItemStack.EMPTY);
+					if (playerIn.inventory.add(cur)) {
+						slot.set(ItemStack.EMPTY);
 						cur = slot.onTake(playerIn, cur);
 					} else {
 						prev = ItemStack.EMPTY;
@@ -127,7 +127,7 @@ public class AetherBoilerGui {
 				} else {
 					// shift-click in player inventory
 					ItemStack leftover = Inventories.addItem(chest, cur);
-					slot.putStack(leftover.isEmpty() ? ItemStack.EMPTY : leftover);
+					slot.set(leftover.isEmpty() ? ItemStack.EMPTY : leftover);
 					if (!leftover.isEmpty() && leftover.getCount() == prev.getCount()) {
 						prev = ItemStack.EMPTY;
 					}
@@ -139,12 +139,12 @@ public class AetherBoilerGui {
 		}
 		
 		@Override
-		public boolean canDragIntoSlot(Slot slotIn) {
+		public boolean canDragTo(Slot slotIn) {
 			return true;
 		}
 		
 		@Override
-		public boolean canInteractWith(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return true;
 		}
 	}
@@ -156,28 +156,28 @@ public class AetherBoilerGui {
 		
 		private ModeButton modeButton;
 		
-		public AetherBoilerGuiContainer(AetherBoilerContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public AetherBoilerGuiContainer(AetherBoilerContainer container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			this.container = container;
 			
-			this.xSize = GUI_TEXT_WIDTH;
-			this.ySize = GUI_TEXT_HEIGHT;
+			this.imageWidth = GUI_TEXT_WIDTH;
+			this.imageHeight = GUI_TEXT_HEIGHT;
 		}
 		
 		@Override
 		public void init() {
 			super.init();
 			
-			modeButton = new ModeButton(guiLeft + GUI_MODE_BUTTON_UI_HOFFSET, guiTop + GUI_MODE_BUTTON_UI_VOFFSET, this);
+			modeButton = new ModeButton(leftPos + GUI_MODE_BUTTON_UI_HOFFSET, topPos + GUI_MODE_BUTTON_UI_VOFFSET, this);
 			this.addButton(modeButton);
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
-			int horizontalMargin = (width - xSize) / 2;
-			int verticalMargin = (height - ySize) / 2;
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+			int horizontalMargin = (width - imageWidth) / 2;
+			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bindTexture(TEXT);
+			mc.getTextureManager().bind(TEXT);
 			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
 			
@@ -207,15 +207,15 @@ public class AetherBoilerGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
-			int horizontalMargin = (width - xSize) / 2;
-			int verticalMargin = (height - ySize) / 2;
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
+			int horizontalMargin = (width - imageWidth) / 2;
+			int verticalMargin = (height - imageHeight) / 2;
 			
 			IAetherHandler boilerHandler = container.chest.getHandler();
 			if (boilerHandler != null) {
 				if (mouseX >= horizontalMargin + GUI_TOP_BAR_HOFFSET && mouseX <= horizontalMargin + GUI_TOP_BAR_HOFFSET + GUI_TOP_BAR_WIDTH
 						&& mouseY >= verticalMargin + GUI_TOP_BAR_VOFFSET && mouseY <= verticalMargin + GUI_TOP_BAR_VOFFSET + GUI_TOP_BAR_HEIGHT) {
-					renderTooltip(matrixStackIn, new StringTextComponent(String.format("%.2f / %.2f", boilerHandler.getAether(null) * .01f, boilerHandler.getMaxAether(null) * .01f)),
+					renderTooltip(matrixStackIn, new TextComponent(String.format("%.2f / %.2f", boilerHandler.getAether(null) * .01f, boilerHandler.getMaxAether(null) * .01f)),
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}
@@ -233,7 +233,7 @@ public class AetherBoilerGui {
 			
 			next = modes[ord];
 			NetworkHandler.getSyncChannel().sendToServer(new AetherBoilerModeChangeMessage(
-					this.container.chest.getPos(), next
+					this.container.chest.getBlockPos(), next
 					));
 		}
 		
@@ -242,14 +242,14 @@ public class AetherBoilerGui {
 			private boolean pressed;
 			
 			public ModeButton(int x, int y, AetherBoilerGuiContainer gui) {
-				super(x, y, GUI_MODE_BUTTON_UI_WIDTH, GUI_MODE_BUTTON_UI_HEIGHT, StringTextComponent.EMPTY, (b) -> {
+				super(x, y, GUI_MODE_BUTTON_UI_WIDTH, GUI_MODE_BUTTON_UI_HEIGHT, TextComponent.EMPTY, (b) -> {
 					gui.modeClicked(b);
 				});
 				pressed = false;
 			}
 			
 			@Override
-			public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 				
 				int textX = GUI_MODE_BUTTON_TEXT_HOFFSET;
@@ -259,9 +259,9 @@ public class AetherBoilerGui {
 					textX += GUI_MODE_BUTTON_TEXT_WIDTH;
 				}
 				
-				mc.getTextureManager().bindTexture(TEXT);
+				mc.getTextureManager().bind(TEXT);
 				RenderSystem.enableBlend();
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(x, y, 0);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 						textX, GUI_MODE_BUTTON_TEXT_VOFFSET,
@@ -272,12 +272,12 @@ public class AetherBoilerGui {
 				// Draw actual mode overlay
 				BoilerBurnMode mode = container.chest.getBoilerMode();
 				drawBoilerMode(matrixStackIn, mc, mode);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 				RenderSystem.disableBlend();
 				
 				// Draw tooltip if hovered
 				if (this.isHovered) {
-					AetherBoilerGuiContainer.this.renderTooltip(matrixStackIn, new TranslationTextComponent("gui.aether_boiler.mode." + mode.getUnlocID()), mouseX + 8, mouseY + 8);
+					AetherBoilerGuiContainer.this.renderTooltip(matrixStackIn, new TranslatableComponent("gui.aether_boiler.mode." + mode.getUnlocID()), mouseX + 8, mouseY + 8);
 				}
 			}
 			
@@ -293,7 +293,7 @@ public class AetherBoilerGui {
 				pressed = true;
 			}
 			
-			protected void drawBoilerMode(MatrixStack matrixStackIn, Minecraft mc, BoilerBurnMode mode) {
+			protected void drawBoilerMode(PoseStack matrixStackIn, Minecraft mc, BoilerBurnMode mode) {
 				int textX = GUI_MODE_ICON_TEXT_HOFFSET;
 				int textY = GUI_MODE_ICON_TEXT_VOFFSET;
 				switch (mode) {
@@ -313,7 +313,7 @@ public class AetherBoilerGui {
 					break;
 				}
 				
-				mc.getTextureManager().bindTexture(TEXT);
+				mc.getTextureManager().bind(TEXT);
 				RenderSystem.enableBlend();
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 1, 1,
 						textX, textY,

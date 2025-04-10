@@ -7,13 +7,13 @@ import com.google.gson.JsonParseException;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetheriaCurios;
 
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapelessRecipe;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 
 public abstract class AetherCloakModificationRecipe extends ShapelessRecipe {
 	
@@ -62,10 +62,10 @@ public abstract class AetherCloakModificationRecipe extends ShapelessRecipe {
 	 * @param inv
 	 * @return
 	 */
-	protected @Nonnull ItemStack findAetherCloak(CraftingInventory inv) {
+	protected @Nonnull ItemStack findAetherCloak(CraftingContainer inv) {
 		@Nonnull ItemStack found = ItemStack.EMPTY;
-		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			@Nonnull ItemStack stack = inv.getStackInSlot(i);
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			@Nonnull ItemStack stack = inv.getItem(i);
 			if (!stack.isEmpty() && stack.getItem() instanceof AetherCloakItem) {
 				if (found.isEmpty()) {
 					found = stack;
@@ -80,15 +80,15 @@ public abstract class AetherCloakModificationRecipe extends ShapelessRecipe {
 	}
 	
 	@Override
-	public ItemStack getCraftingResult(CraftingInventory inv) {
+	public ItemStack assemble(CraftingContainer inv) {
 		@Nonnull ItemStack result = ItemStack.EMPTY;
 		@Nonnull ItemStack cloak = findAetherCloak(inv);
 		
 		if (!cloak.isEmpty()) {
 			NonNullList<ItemStack> extras = NonNullList.create();
 			
-			for (int i = 0; i < inv.getSizeInventory(); i++) {
-				@Nonnull ItemStack stack = inv.getStackInSlot(i);
+			for (int i = 0; i < inv.getContainerSize(); i++) {
+				@Nonnull ItemStack stack = inv.getItem(i);
 				if (!stack.isEmpty() && stack != cloak) {
 					extras.add(stack);
 				}
@@ -103,12 +103,12 @@ public abstract class AetherCloakModificationRecipe extends ShapelessRecipe {
 	}
 
 	@Override
-	public boolean canFit(int width, int height) {
+	public boolean canCraftInDimensions(int width, int height) {
 		return width * height >= ingredients.size();
 	}
 
 	@Override
-	public ItemStack getRecipeOutput() {
+	public ItemStack getResultItem() {
 		return displayStack;
 	}
 
@@ -123,6 +123,6 @@ public abstract class AetherCloakModificationRecipe extends ShapelessRecipe {
 	}
 	
 	@Override
-	public abstract IRecipeSerializer<?> getSerializer();
+	public abstract RecipeSerializer<?> getSerializer();
 	
 }

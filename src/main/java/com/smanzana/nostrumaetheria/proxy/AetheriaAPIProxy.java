@@ -8,6 +8,7 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerItem;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandlerProvider;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTileEntity;
+import com.smanzana.nostrumaetheria.api.capability.AetherBurnableWrapper;
 import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
@@ -18,7 +19,6 @@ import com.smanzana.nostrumaetheria.api.item.IAetherVisionProvider;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherRepairerRecipe;
 import com.smanzana.nostrumaetheria.api.recipes.IAetherUnravelerRecipe;
-import com.smanzana.nostrumaetheria.capability.AetherBurnableCapability;
 import com.smanzana.nostrumaetheria.component.AetherHandlerComponent;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 import com.smanzana.nostrumaetheria.network.messages.AetherTileEntityMessage;
@@ -26,18 +26,18 @@ import com.smanzana.nostrumaetheria.recipes.RepairerRecipeManager;
 import com.smanzana.nostrumaetheria.recipes.UnravelerRecipeManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
+import net.minecraftforge.fmllegacy.network.PacketDistributor.TargetPoint;
 
 public class AetheriaAPIProxy extends APIProxy {
 
@@ -49,17 +49,17 @@ public class AetheriaAPIProxy extends APIProxy {
 	@Override
 	protected void handleSyncTEAether(AetherTileEntity te) {
 		NetworkHandler.getSyncChannel().send(PacketDistributor.NEAR.with(() ->
-				new TargetPoint(te.getPos().getX(), te.getPos().getY(), te.getPos().getZ(), 64, te.getWorld().getDimensionKey())),
+				new TargetPoint(te.getBlockPos().getX(), te.getBlockPos().getY(), te.getBlockPos().getZ(), 64, te.getLevel().dimension())),
 				new AetherTileEntityMessage(te));
 	}
 
 	@Override
-	protected boolean handleIsBlockLoaded(World world, BlockPos pos) {
+	protected boolean handleIsBlockLoaded(Level world, BlockPos pos) {
 		return NostrumMagica.isBlockLoaded(world, pos);
 	}
 
 	@Override
-	protected int handleDrawFromInventory(@Nullable World world, @Nullable Entity entity, IInventory inventory, int amount, @Nonnull ItemStack ignore) {
+	protected int handleDrawFromInventory(@Nullable Level world, @Nullable Entity entity, Container inventory, int amount, @Nonnull ItemStack ignore) {
 		final int origAmt = amount;
 		
 		if (entity instanceof LivingEntity) {
@@ -70,8 +70,8 @@ public class AetheriaAPIProxy extends APIProxy {
 		
 		if (amount > 0 && inventory != null) {
 			final int start = amount;
-			for (int i = 0; i < inventory.getSizeInventory() && amount > 0; i++) {
-				ItemStack inSlot = inventory.getStackInSlot(i);
+			for (int i = 0; i < inventory.getContainerSize() && amount > 0; i++) {
+				ItemStack inSlot = inventory.getItem(i);
 				if (!inSlot.isEmpty() && inSlot != ignore) {
 					if (inSlot.getItem() instanceof AetherItem) {
 						AetherItem otherItem = (AetherItem) inSlot.getItem();
@@ -113,12 +113,12 @@ public class AetheriaAPIProxy extends APIProxy {
 	}
 	
 	@Override
-	protected int handlePushToInventory(World world, Entity entity, IInventory inventory, int amount) {
+	protected int handlePushToInventory(Level world, Entity entity, Container inventory, int amount) {
 		
 		if (amount > 0 && inventory != null) {
 			final int start = amount;
-			for (int i = 0; i < inventory.getSizeInventory() && amount > 0; i++) {
-				ItemStack inSlot = inventory.getStackInSlot(i);
+			for (int i = 0; i < inventory.getContainerSize() && amount > 0; i++) {
+				ItemStack inSlot = inventory.getItem(i);
 				if (!inSlot.isEmpty()) {
 					if (inSlot.getItem() instanceof AetherItem) {
 						AetherItem otherItem = (AetherItem) inSlot.getItem();
@@ -147,7 +147,7 @@ public class AetheriaAPIProxy extends APIProxy {
 	}
 
 	@Override
-	protected IAetherHandlerComponent handleCreateHandlerComponent(@Nullable RegistryKey<World> dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether,
+	protected IAetherHandlerComponent handleCreateHandlerComponent(@Nullable ResourceKey<Level> dimension, @Nullable BlockPos pos, IAetherComponentListener listener, int defaultAether,
 			int defaultMaxAether) {
 		return new AetherHandlerComponent(dimension, pos, listener, defaultAether, defaultMaxAether);
 	}
@@ -163,14 +163,14 @@ public class AetheriaAPIProxy extends APIProxy {
 	}
 
 	@Override
-	protected PlayerEntity handleGetClientPlayer() {
+	protected Player handleGetClientPlayer() {
 		return NostrumAetheria.proxy.getPlayer();
 	}
 
 	@Override
-	protected boolean handleHasAetherVision(PlayerEntity player) {
-		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-			ItemStack stack = player.getItemStackFromSlot(slot);
+	protected boolean handleHasAetherVision(Player player) {
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			ItemStack stack = player.getItemBySlot(slot);
 			if (!stack.isEmpty() && stack.getItem() instanceof IAetherVisionProvider) {
 				if (((IAetherVisionProvider) stack.getItem()).shouldProvideAetherVision(stack, player, slot)) {
 					return true;
@@ -178,10 +178,10 @@ public class AetheriaAPIProxy extends APIProxy {
 			}
 		}
 		
-		@Nullable IInventory curioInv = NostrumAetheria.curios.getCurios(player);
+		@Nullable Container curioInv = NostrumAetheria.curios.getCurios(player);
 		if (curioInv != null) {
-			for (int i = 0; i < curioInv.getSizeInventory(); i++) {
-				ItemStack stack = curioInv.getStackInSlot(i);
+			for (int i = 0; i < curioInv.getContainerSize(); i++) {
+				ItemStack stack = curioInv.getItem(i);
 				if (!stack.isEmpty() && stack.getItem() instanceof IAetherVisionProvider) {
 					if (((IAetherVisionProvider) stack.getItem()).shouldProvideAetherVision(stack, player, null)) {
 						return true;
@@ -195,7 +195,7 @@ public class AetheriaAPIProxy extends APIProxy {
 
 	@Override
 	protected IAetherBurnable handleMakeBurnable(int burnTicks, float aether) {
-		return new AetherBurnableCapability(burnTicks, aether);
+		return new AetherBurnableWrapper(burnTicks, aether);
 	}
 	
 }
