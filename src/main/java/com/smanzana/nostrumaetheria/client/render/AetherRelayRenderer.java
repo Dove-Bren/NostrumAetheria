@@ -2,6 +2,7 @@ package com.smanzana.nostrumaetheria.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix3f;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay;
@@ -24,10 +25,19 @@ public class AetherRelayRenderer extends BlockEntityRendererBase<AetherRelayEnti
 		super(rendererDispatcherIn);
 	}
 	
-	private void addVertex(PoseStack matrixStackIn, VertexConsumer buffer, int combinedLightIn, float red, float green, float blue, float alpha, Vec3 point, boolean repeat) {
-		buffer.vertex(matrixStackIn.last().pose(), (float) point.x, (float) point.y, (float) point.z).color(red, green, blue, alpha).uv2(combinedLightIn).endVertex();
+	private void addVertex(PoseStack matrixStackIn, VertexConsumer buffer, int combinedLightIn, float red, float green, float blue, float alpha, Vec3 point, Vec3 next, boolean repeat) {
+		// calculate normal
+		final Vec3 diff = next.subtract(point);
+		final double dist = diff.length();
+		final float nx = (float) (diff.x / dist);
+		final float ny = (float) (diff.y / dist);
+		final float nz = (float) (diff.z / dist);
+		final Matrix3f normal = matrixStackIn.last().normal();
+		
+		buffer.vertex(matrixStackIn.last().pose(), (float) point.x, (float) point.y, (float) point.z).color(red, green, blue, alpha).normal(normal, nx, ny, nz).endVertex();
+		
 		if (repeat) {
-			this.addVertex(matrixStackIn, buffer, combinedLightIn, red, green, blue, alpha, point, false);
+			addVertex(matrixStackIn, buffer, combinedLightIn, red, green, blue, alpha, point, next, false);
 		}
 	}
 	
@@ -59,6 +69,9 @@ public class AetherRelayRenderer extends BlockEntityRendererBase<AetherRelayEnti
 			float prog = (float) i / (float) intervals;
 			Vec3 point = Curves.bezier(prog, Vec3.ZERO, control1, control2, offset);
 			
+			float progNext = (float) i / (float) intervals;
+			Vec3 pointNext = Curves.bezier(progNext, Vec3.ZERO, control1, control2, offset);
+			
 			float dotAmt = Math.max(0f, 1f - (perI * Math.abs(dotI - (float) i)));
 			if (dotAmt == 0f) {
 				float pretendI = (prog > .5f ? i - intervals : i + intervals);
@@ -74,7 +87,7 @@ public class AetherRelayRenderer extends BlockEntityRendererBase<AetherRelayEnti
 			// We can do this simply by just adding each point twice except the first and last one.
 			final boolean repeat = (i != 0 && i != intervals);
 			
-			addVertex(matrixStackIn, buffer, combinedLightIn, red, green, blue, alpha, point, repeat);
+			addVertex(matrixStackIn, buffer, combinedLightIn, red, green, blue, alpha, point, pointNext, repeat);
 		}
 	}
 	

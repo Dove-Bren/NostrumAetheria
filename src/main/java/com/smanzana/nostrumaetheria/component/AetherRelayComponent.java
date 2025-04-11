@@ -14,15 +14,13 @@ import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.Constants.NBT;
-
-import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConnection;
 
 public class AetherRelayComponent extends AetherHandlerComponent {
 	
@@ -341,7 +339,7 @@ public class AetherRelayComponent extends AetherHandlerComponent {
 		links.clear();
 		linkCache.clear();
 		missingLinks.clear();
-		ListTag list = nbt.getList(NBT_LINK, NBT.TAG_COMPOUND);
+		ListTag list = nbt.getList(NBT_LINK, Tag.TAG_COMPOUND);
 		for (int i = 0; i < list.size(); i++) {
 			BlockPos pos = NbtUtils.readBlockPos(list.getCompound(i));
 			if (links.add(pos)) { // prevents dupes :)

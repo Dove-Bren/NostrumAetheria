@@ -18,17 +18,15 @@ import com.smanzana.nostrumaetheria.api.aether.stats.AetherTickIOEntry;
 import com.smanzana.nostrumaetheria.api.component.IAetherComponentListener;
 import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
-
-import com.smanzana.nostrumaetheria.api.aether.IAetherFlowHandler.AetherFlowConnection;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class AetherHandlerComponent implements IAetherHandlerComponent {
 	

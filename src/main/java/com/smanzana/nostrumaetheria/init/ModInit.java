@@ -12,7 +12,6 @@ import com.smanzana.nostrumaetheria.items.ItemAetherLens.LensType;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 import com.smanzana.nostrumaetheria.rituals.OutcomeCreateAetherInfuser;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumPotions;
 import com.smanzana.nostrummagica.effect.NostrumPotions.PotionIngredient;
@@ -99,7 +98,6 @@ public class ModInit {
 	@SubscribeEvent
 	public static final void registerCapabilities(RegisterCapabilitiesEvent event) {
 		event.register(IAetherBurnable.class);
-		new CapabilityHandler();
 	}
 	
 	private static final void postinit() {

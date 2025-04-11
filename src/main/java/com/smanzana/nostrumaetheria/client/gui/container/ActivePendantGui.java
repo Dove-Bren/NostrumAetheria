@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.items.ActivePendant;
@@ -71,14 +72,13 @@ public class ActivePendantGui {
 				for (int x = 0; x < 9; x++) {
 					this.addSlot(new Slot(playerInv, x + y * 9 + 9, GUI_PLAYER_INV_HOFFSET + (x * 18), GUI_PLAYER_INV_VOFFSET + (y * 18)) {
 						@Override
-						public ItemStack onTake(Player playerIn, ItemStack stack) {
+						public void onTake(Player playerIn, ItemStack stack) {
 							if (!stack.isEmpty() && stack.getItem() instanceof ActivePendant) {
 								if (Objects.equals(ActivePendant.lyonGetID(stack), ActivePendant.lyonGetID(pendant))) {
 									//playerIn.closeScreen(); // Assumes just one player is looking
 									valid = false;
 								}
 							}
-							return stack;
 						}
 					});
 				}
@@ -88,14 +88,13 @@ public class ActivePendantGui {
 			for (int x = 0; x < 9; x++) {
 				this.addSlot(new Slot(playerInv, x, GUI_HOTBAR_INV_HOFFSET + x * 18, GUI_HOTBAR_INV_VOFFSET) {
 					@Override
-					public ItemStack onTake(Player playerIn, ItemStack stack) {
+					public void onTake(Player playerIn, ItemStack stack) {
 						if (!stack.isEmpty() && stack.getItem() instanceof ActivePendant) {
 							if (Objects.equals(ActivePendant.lyonGetID(stack), ActivePendant.lyonGetID(pendant))) {
 								//playerIn.closeScreen(); // Assumes just one player is looking
 								valid = false;
 							}
 						}
-						return stack;
 					}
 				});
 			}
@@ -140,9 +139,9 @@ public class ActivePendantGui {
 				
 				if (slot.container == this.pendantInvWrapper) {
 					// Trying to take out the reagent
-					if (playerIn.inventory.add(cur)) {
+					if (playerIn.getInventory().add(cur)) {
 						slot.set(ItemStack.EMPTY);
-						cur = slot.onTake(playerIn, cur);
+						slot.onTake(playerIn, cur);
 					} else {
 						prev = ItemStack.EMPTY;
 					}
@@ -200,7 +199,7 @@ public class ActivePendantGui {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
 			
 		}

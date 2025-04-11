@@ -3,7 +3,7 @@ package com.smanzana.nostrumaetheria.api.aether.stats;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 /**
  * Collection of information about aether consumer/producer (user).
@@ -83,9 +83,9 @@ public class AetherStatInstance {
 	
 	public void readFromNBT(CompoundTag tag) {
 		final int count = tag.getInt(NBT_INTERVALS);
-		final ListTag totalList = tag.getList(NBT_TOTAL_LIST, NBT.TAG_INT);
-		final ListTag inputList = tag.getList(NBT_INPUT_LIST, NBT.TAG_INT);
-		final ListTag outputList = tag.getList(NBT_OUTPUT_LIST, NBT.TAG_INT);
+		final ListTag totalList = tag.getList(NBT_TOTAL_LIST, Tag.TAG_INT);
+		final ListTag inputList = tag.getList(NBT_INPUT_LIST, Tag.TAG_INT);
+		final ListTag outputList = tag.getList(NBT_OUTPUT_LIST, Tag.TAG_INT);
 		for (int i = 0; i < TOTAL_INTERVALS; i++) {
 			final int total;
 			final int input;

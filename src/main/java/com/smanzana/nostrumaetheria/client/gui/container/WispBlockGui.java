@@ -2,6 +2,7 @@ package com.smanzana.nostrumaetheria.client.gui.container;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
@@ -14,15 +15,15 @@ import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -213,7 +214,7 @@ public class WispBlockGui {
 				
 				if (slot == this.scrollSlot) {
 					// Trying to take our scroll
-					if (playerIn.inventory.add(cur)) {
+					if (playerIn.getInventory().add(cur)) {
 						scrollSlot.set(ItemStack.EMPTY);
 						scrollSlot.onTake(playerIn, cur);
 					} else {
@@ -221,7 +222,7 @@ public class WispBlockGui {
 					}
 				} else if (slot == this.reagentSlot) {
 					// Trying to take our reagent
-					if (playerIn.inventory.add(cur)) {
+					if (playerIn.getInventory().add(cur)) {
 						reagentSlot.set(ItemStack.EMPTY);
 						reagentSlot.onTake(playerIn, cur);
 					} else {
@@ -302,7 +303,7 @@ public class WispBlockGui {
 			float G = (float) ((color & 0x0000FF00) >> 8) / 256f;
 			float B = (float) ((color & 0x000000FF) >> 0) / 256f;
 			
-			mc.getTextureManager().bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			

@@ -2,6 +2,7 @@ package com.smanzana.nostrumaetheria.client.gui.container;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.aether.IAetherHandler;
@@ -103,9 +104,9 @@ public class AetherFurnaceGui {
 				
 				if (slot.container == this.chest) {
 					// Trying to take one of our items
-					if (playerIn.inventory.add(cur)) {
+					if (playerIn.getInventory().add(cur)) {
 						slot.set(ItemStack.EMPTY);
-						cur = slot.onTake(playerIn, cur);
+						slot.onTake(playerIn, cur);
 					} else {
 						prev = ItemStack.EMPTY;
 					}
@@ -161,15 +162,15 @@ public class AetherFurnaceGui {
 			
 			switch (container.chest.getFurnceType()) {
 			case LARGE:
-				mc.getTextureManager().bind(TEXT_LARGE);
+				RenderSystem.setShaderTexture(0, TEXT_LARGE);
 				fireX = (GUI_TOP_INV_HOFFSET - 9);
 				break;
 			case MEDIUM:
-				mc.getTextureManager().bind(TEXT_MEDIUM);
+				RenderSystem.setShaderTexture(0, TEXT_MEDIUM);
 				fireX = (GUI_TOP_INV_HOFFSET - 27);
 				break;
 			case SMALL:
-				mc.getTextureManager().bind(TEXT_SMALL);
+				RenderSystem.setShaderTexture(0, TEXT_SMALL);
 				fireX = (GUI_TOP_INV_HOFFSET - 45);
 				break;
 			}

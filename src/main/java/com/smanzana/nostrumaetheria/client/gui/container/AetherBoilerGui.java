@@ -118,9 +118,9 @@ public class AetherBoilerGui {
 				
 				if (slot.container == this.chest) {
 					// Trying to take one of our items
-					if (playerIn.inventory.add(cur)) {
+					if (playerIn.getInventory().add(cur)) {
 						slot.set(ItemStack.EMPTY);
-						cur = slot.onTake(playerIn, cur);
+						slot.onTake(playerIn, cur);
 					} else {
 						prev = ItemStack.EMPTY;
 					}
@@ -169,7 +169,7 @@ public class AetherBoilerGui {
 			super.init();
 			
 			modeButton = new ModeButton(leftPos + GUI_MODE_BUTTON_UI_HOFFSET, topPos + GUI_MODE_BUTTON_UI_VOFFSET, this);
-			this.addButton(modeButton);
+			this.addRenderableWidget(modeButton);
 		}
 		
 		@Override
@@ -177,7 +177,7 @@ public class AetherBoilerGui {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0,0, GUI_TEXT_WIDTH, GUI_TEXT_HEIGHT, 256, 256);
 			
@@ -259,7 +259,7 @@ public class AetherBoilerGui {
 					textX += GUI_MODE_BUTTON_TEXT_WIDTH;
 				}
 				
-				mc.getTextureManager().bind(TEXT);
+				RenderSystem.setShaderTexture(0, TEXT);
 				RenderSystem.enableBlend();
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(x, y, 0);
@@ -313,7 +313,7 @@ public class AetherBoilerGui {
 					break;
 				}
 				
-				mc.getTextureManager().bind(TEXT);
+				RenderSystem.setShaderTexture(0, TEXT);
 				RenderSystem.enableBlend();
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 1, 1,
 						textX, textY,

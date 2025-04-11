@@ -18,7 +18,7 @@ public class RenderAetherBatteryMinecart extends MinecartRenderer<EntityAetherBa
 	
 	@Override
 	protected void renderMinecartContents(EntityAetherBatteryMinecart cart, float partialTicks, BlockState stateIn, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
-		super.renderMinecartContents(cart, partialTicks, stateIn, matrixStackIn, bufferIn, packedLightIn);
+		int unused; // this doesn't work
 		if (cart.getAether() > 0) {
 			final VertexConsumer buffer = bufferIn.getBuffer(AetheriaRenderTypes.AETHER_FLAT);
 			final double time = (double) cart.level.getGameTime() + partialTicks;
@@ -29,5 +29,6 @@ public class RenderAetherBatteryMinecart extends MinecartRenderer<EntityAetherBa
 			AetherBatteryRenderer.renderBatteryLiquid(matrixStackIn, buffer, packedLightIn, time, cart.getAether(), cart.getMaxAether(), true);
 			matrixStackIn.popPose();
 		}
+		super.renderMinecartContents(cart, partialTicks, stateIn, matrixStackIn, bufferIn, packedLightIn);
 	}
 }
