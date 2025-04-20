@@ -127,12 +127,10 @@ public abstract class AetherTileEntity extends BlockEntity implements IAetherHan
 //	}
 	
 	@Override
-	public CompoundTag save(CompoundTag compound) {
-		super.save(compound);
+	public void saveAdditional(CompoundTag compound) {
+		super.saveAdditional(compound);
 		
 		compound.put(NBT_HANDLER, compWrapper.toNBT());
-		
-		return compound;
 	}
 	
 	@Override

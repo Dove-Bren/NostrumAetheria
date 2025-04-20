@@ -1,44 +1,42 @@
 modLoader="javafml" #mandatory
-loaderVersion="[36,)"
+loaderVersion="${loader_version_range}"
 
 # The license for your mod. This is mandatory and allows for easier comprehension of your redistributive properties.
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
-license="All Rights Reserved"
+license="${mod_license}"
 
 [[mods]]
-modId="nostrumaetheria"
-version="${file.jarVersion}"
-displayName="Nostrum Aetheria"
+modId="${mod_id}" 
+version="${mod_version}"
+displayName="${mod_name}"
 #logoFile="examplemod.png" #optional
-authors="Skyler Manzanares"
-description='''
-Magical energy add-on for Nostrum Magica
-'''
+authors="{$mod_authors}"
+description='''${mod_description}'''
 
 [[dependencies.nostrumaetheria]]
 	modId="forge"
 	mandatory=true
-	versionRange="[36,)"
+	versionRange="${loader_version_range}"
 	ordering="NONE"
 	side="BOTH"
 
 [[dependencies.nostrumaetheria]]
 	modId="curios"
 	mandatory=false
-	versionRange="[1.16.4-4.0.3.5,)"
+	versionRange="[${curios_version},)"
 	ordering="AFTER"
 	side="BOTH"
 
 [[dependencies.nostrumaetheria]]
 	modId="nostrummagica"
 	mandatory=true
-	versionRange="[1.16.5-1.11.0,)"
+	versionRange="[${nostrummagica_version},)"
 	ordering="AFTER"
 	side="BOTH"
 
 [[dependencies.nostrumaetheria]]
 	modId="petcommand"
 	mandatory=true
-	versionRange="[1.16.5-1.0.0,)"
+	versionRange="[${petcommand_version},)"
 	ordering="AFTER"
 	side="BOTH"

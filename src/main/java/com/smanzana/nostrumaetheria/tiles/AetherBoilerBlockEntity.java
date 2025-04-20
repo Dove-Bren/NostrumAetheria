@@ -234,12 +234,10 @@ public class AetherBoilerBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		nbt.putString(NBT_BOILER_MODE, this.mode.name());
-		
-		return nbt;
 	}
 	
 	@Override

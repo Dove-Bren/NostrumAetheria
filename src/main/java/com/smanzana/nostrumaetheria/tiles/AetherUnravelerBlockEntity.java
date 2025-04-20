@@ -76,8 +76,8 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 	private static final String NBT_WORK_TICKS = "work_ticks";
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		if (!stack.isEmpty()) {
 			CompoundTag tag = new CompoundTag();
@@ -88,8 +88,6 @@ public class AetherUnravelerBlockEntity extends NativeAetherTickingTileEntity im
 		if (workTicks > 0) {
 			nbt.putInt(NBT_WORK_TICKS, workTicks);
 		}
-		
-		return nbt;
 	}
 	
 	@Override

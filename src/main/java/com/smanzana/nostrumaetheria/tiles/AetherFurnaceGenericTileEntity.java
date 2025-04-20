@@ -173,8 +173,8 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		nbt.putInt(NBT_INVENTORY_SLOTS, slots.size());
 		nbt.put(NBT_INVENTORY, Inventories.serializeInventory(this));
@@ -182,8 +182,6 @@ public abstract class AetherFurnaceGenericTileEntity extends NativeAetherTicking
 		nbt.putFloat(NBT_AETHER_PER, this.aetherPerTick);
 		nbt.putInt(NBT_TICKS_MAX, burnTicksMax);
 		nbt.putInt(NBT_TICKS_LEFT, burnTicksRemaining);
-		
-		return nbt;
 	}
 	
 	@Override

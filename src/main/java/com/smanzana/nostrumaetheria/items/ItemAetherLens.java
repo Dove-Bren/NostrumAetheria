@@ -389,7 +389,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos().set(
 				down ? center.below().below() : center.above().above().above()
 				);
-		while (cursor.getY() >= 0 && cursor.getY() < world.getMaxBuildHeight()) {
+		while (cursor.getY() >= world.getMinBuildHeight() && cursor.getY() < world.getMaxBuildHeight()) {
 			if (world.isEmptyBlock(cursor)) {
 				cursor.move(down ? Direction.DOWN : Direction.UP);
 				continue;

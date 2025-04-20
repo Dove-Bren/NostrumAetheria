@@ -31,7 +31,7 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ForgeModelBakery;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -101,7 +101,7 @@ public class ClientInit {
 	public static void registerAllModels(ModelRegistryEvent event) {
 		// Register extra models to load even if block and items don't reference them.
 		for (ResourceLocation loc : AetherCloakItem.AetherCloakModels.AllCapeModels) {
-			ModelLoader.addSpecialModel(loc);
+			ForgeModelBakery.addSpecialModel(loc);
 		}
 	}
 	

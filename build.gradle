@@ -1,30 +1,25 @@
-buildscript {
-    repositories {
-		mavenCentral()
-		maven { url = 'https://maven.minecraftforge.net/' }
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-    }
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
-apply plugin: 'net.minecraftforge.gradle'
-// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
 
+version = mod_version
+group = mod_group_id
 
-version = "1.17.1-1.4.0"
-group= "com.smanzana.nostrumaetheria" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "nostrumaetheria"
+base {
+    archivesName = mod_id
+}
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16) // Mojang ships Java 8 to end users, so your mod should target Java 8.
+java.toolchain.languageVersion = JavaLanguageVersion.of(17) // Mojang ships Java 8 to end users, so your mod should target Java 8.
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-	mappings channel: 'official', version: "1.17.1"
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+	mappings channel: mapping_channel, version: mapping_version
 	
-	// accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
+	copyIdeResources = true
+	
 	runs {
         client {
             workingDirectory project.file('run')
@@ -133,13 +128,13 @@ repositories {
 }
 
 dependencies {
-	minecraft 'net.minecraftforge:forge:1.17.1-37.1.1'
+	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
 	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
 	
-	compileOnly fg.deobf("com.smanzana:nostrummagica:${magica_version}") //At compile time, use actual eclipse project
-	runtimeOnly fg.deobf("com.smanzana:nostrummagica:${magica_version}")
+	compileOnly fg.deobf("com.smanzana:nostrummagica:${nostrummagica_version}") //At compile time, use actual eclipse project
+	runtimeOnly fg.deobf("com.smanzana:nostrummagica:${nostrummagica_version}")
 	
 	runtimeOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}")
 	compileOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}:api")
@@ -147,12 +142,12 @@ dependencies {
 }
 
 task sourcesJar(type: Jar) {
-    classifier = 'sources'
+    archiveClassifier.set('sources')
     from sourceSets.main.allJava
 }
 
 task deobfJar(type: Jar) {
-    classifier = 'deobf'
+    archiveClassifier.set('deobf')
     from sourceSets.main.output
 }
 
@@ -161,26 +156,48 @@ task apiJar(type: Jar) {
 	from(sourceSets.main.output)
 	include 'com/smanzana/nostrumaetheria/api/**'
 	
-	classifier = 'api'
+	archiveClassifier.set('api')
 }
 
 tasks.build.dependsOn sourcesJar, deobfJar, apiJar
 
-jar {
-	//from(coreJar.archivePath.absolutePath) {
-	//	include '*'
-	//	into ("META-INF/libraries")
-	//}
-	manifest {
-		attributes ([
-			//"ContainedDeps": coreJar.archivePath.name,
-			"Specification-Title": "nostrumaetheria",
-            "Specification-Vendor": "smanzanares",
-            "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"smanzanares",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-		])
-	}
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
+            forge_version: forge_version, forge_version_range: forge_version_range,
+            loader_version_range: loader_version_range,
+            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            mod_authors: mod_authors, mod_description: mod_description,
+			
+			curios_version: curios_version,
+			petcommand_version: petcommand_version,
+			nostrummagica_version: nostrummagica_version,
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
+}
+
+// Example for how to get properties into the manifest for reading by the runtime..
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title'     : mod_id,
+                'Specification-Vendor'    : mod_authors,
+                'Specification-Version'   : '1', // We are version 1 of ourselves
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_authors,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+
+    // This is the preferred method to reobfuscate your jar file
+    finalizedBy 'reobfJar'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }

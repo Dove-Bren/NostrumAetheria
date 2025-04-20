@@ -299,15 +299,13 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		if (nbt == null)
 			nbt = new CompoundTag();
 		
 		nbt.putInt(NBT_CHARGE, charge);
-		
-		return nbt;
 	}
 	
 	@Override

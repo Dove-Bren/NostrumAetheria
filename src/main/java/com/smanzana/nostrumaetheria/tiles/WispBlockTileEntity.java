@@ -239,8 +239,8 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		if (nbt == null)
 			nbt = new CompoundTag();
@@ -262,8 +262,6 @@ public class WispBlockTileEntity extends AetherTickingTileEntity implements IAut
 //			nbt.putBoolean("active", activated);
 //			nbt.putInt("wisps", wisps.size());
 //		}
-		
-		return nbt;
 	}
 	
 	@Override

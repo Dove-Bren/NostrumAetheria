@@ -49,16 +49,14 @@ public class AetherRepairerBlockEntity extends NativeAetherTickingTileEntity imp
 	private static final String NBT_ITEM = "item";
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		if (!stack.isEmpty()) {
 			CompoundTag tag = new CompoundTag();
 			tag = stack.save(tag);
 			nbt.put(NBT_ITEM, tag);
 		}
-		
-		return nbt;
 	}
 	
 	@Override

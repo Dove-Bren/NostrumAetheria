@@ -27,8 +27,8 @@ public class InfiniteAetherBlockEntity extends NativeAetherTickingTileEntity {
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		return super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 	}
 	
 	@Override

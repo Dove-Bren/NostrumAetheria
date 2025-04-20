@@ -141,11 +141,10 @@ public class AetherBatteryEntity extends NativeAetherTickingTileEntity {
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		nbt.putString(NBT_SIZE, this.size.name());
-		return nbt;
 	}
 	
 	@Override

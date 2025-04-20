@@ -177,23 +177,23 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 		
 		@Override
 		public ClientboundBlockEntityDataPacket getUpdatePacket() {
-			return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
+			return ClientboundBlockEntityDataPacket.create(this);
 		}
 
 		@Override
 		public CompoundTag getUpdateTag() {
-			return this.save(new CompoundTag());
+			return this.saveWithId(); // Always send ID so that empty lists also get sent and parsed instead of nulled and no-called
 		}
 		
 		@Override
 		public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 			super.onDataPacket(net, pkt);
-			handleUpdateTag(pkt.getTag());
+			//handleUpdateTag(pkt.getTag());
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag compound) {
-			super.save(compound);
+		public void saveAdditional(CompoundTag compound) {
+			super.saveAdditional(compound);
 			
 			compound.putByte(NBT_SIDE, (byte) this.side.ordinal());
 			if (!this.links.isEmpty()) {
@@ -204,8 +204,6 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 				compound.put(NBT_LINKS, list);
 			}
 			compound.putString(NBT_MODE, this.mode.name());
-			
-			return compound;
 		}
 		
 		@Override

@@ -28,12 +28,10 @@ public class AetherFurnaceBlockEntity extends AetherFurnaceGenericTileEntity {
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		nbt.putString(NBT_TYPE, type.name());
-		
-		return nbt;
 	}
 	
 	@Override
