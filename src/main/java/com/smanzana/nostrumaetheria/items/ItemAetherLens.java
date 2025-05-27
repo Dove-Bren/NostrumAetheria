@@ -8,14 +8,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
+import com.smanzana.nostrumaetheria.api.capability.IAetherAccepter;
 import com.smanzana.nostrumaetheria.api.item.IAetherInfuserLens;
 import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.INostrumMana;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumPotions;
-import com.smanzana.nostrummagica.entity.IMagicEntity;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -23,36 +23,39 @@ import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -274,7 +277,7 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		@Nullable BlockPos growPos = ElementalArmor.DoEarthGrow(world, center); 
 		if (growPos != null) {
 			AetherInfuserTileEntity.DoChargeEffect(world,
-					new Vec3(center.getX() + .5, center.getY() + 1, center.getZ() + .5),
+					new Vec3(center.getX() + .5, center.getY() + .5, center.getZ() + .5),
 					new Vec3(growPos.getX() + .5, growPos.getY() + .5, growPos.getZ() + .5),
 					1, 0x6622FF44);
 			
@@ -444,27 +447,57 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 		int cost = 0;
 		for (LivingEntity ent : Entities.GetEntities(world, (e) -> {
 			return e.isAlive()
-					&& (e instanceof Player || (e instanceof IMagicEntity))
+					&& NostrumMagica.getManaWrapper(e) != null
 					&& e.distanceToSqr(center.getX() + .5, center.getY() + .5, center.getZ() + .5) < MAX_DIST_SQ;
 		})) {
-			if (ent instanceof Player) {
-				INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
-				if (attr.getMana() < attr.getMaxMana()) {
-					cost++;
-					attr.addMana(MANA_PER_AETHER);
-					AetherInfuserTileEntity.DoChargeEffect(ent, 1, 0xFFBB6DFF);
-				}
-			} else /* if (ent instanceof IMagicEntity) */ {
-				IMagicEntity ment = (IMagicEntity) ent;
-				if (ment.getMana() < ment.getMaxMana()) {
-					cost++;
-					ment.addMana(MANA_PER_AETHER);
-					AetherInfuserTileEntity.DoChargeEffect(ent, 1, 0xFFBB6DFF);
-				}
+			INostrumMana mana = NostrumMagica.getManaWrapper(ent);
+			if (mana.getMana() < mana.getMaxMana()) {
+				cost++;
+				mana.addMana(MANA_PER_AETHER);
+				AetherInfuserTileEntity.DoChargeEffect(ent, 1, 0xFFBB6DFF);
 			}
-			
 		}
 		return cost;
+	}
+	
+	protected static class AetherLensCapabilityWrapper implements IAetherAccepter {
+		
+		protected final ItemStack stack;
+		protected final IAetherInfuserLens lens;
+		
+		public AetherLensCapabilityWrapper(ItemStack stack, IAetherInfuserLens lens) {
+			this.stack = stack;
+			this.lens = lens;
+		}
+
+		@Override
+		public boolean canAcceptAether(IAetherInfuserTileEntity source, BlockPos pos, int maxAether) {
+			return lens.canAcceptAetherInfuse(stack, pos, source, maxAether);
+		}
+
+		@Override
+		public int acceptAether(IAetherInfuserTileEntity source, BlockPos pos, int maxAether) {
+			return lens.acceptAetherInfuse(stack, pos, source, maxAether);
+		}
+		
+	}
+	
+	@Override
+	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
+		// Capture itemstack for context
+		final LazyOptional<IAetherAccepter> AetherAccepterOptional = LazyOptional.of(() -> new AetherLensCapabilityWrapper(stack, this));
+		
+		// Return a provider wrapper around optional context
+		return new ICapabilityProvider() {
+			@Override
+			public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+				if (cap != null && cap == IAetherAccepter.CAPABILITY && cap.isRegistered()) {
+					return AetherAccepterOptional.cast();
+				}
+				
+				return LazyOptional.empty();
+			}
+		};
 	}
 
 }

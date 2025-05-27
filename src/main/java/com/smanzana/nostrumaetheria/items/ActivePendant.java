@@ -309,7 +309,7 @@ public class ActivePendant extends Item implements ILoreTagged, ISpellEquipment 
 			inHand = playerIn.getOffhandItem();
 			pos = Inventories.getPlayerHandSlotIndex(playerIn.getInventory(), InteractionHand.OFF_HAND);
 		}
-		NostrumMagica.instance.proxy.openContainer(playerIn, ActivePendantGui.ActivePendantContainer.Make(pos));
+		NostrumMagica.Proxy.openContainer(playerIn, ActivePendantGui.ActivePendantContainer.Make(pos));
 		
 		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, playerIn.getItemInHand(hand));
 	}

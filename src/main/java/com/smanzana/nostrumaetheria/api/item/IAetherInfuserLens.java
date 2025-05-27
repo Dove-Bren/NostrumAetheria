@@ -2,16 +2,16 @@ package com.smanzana.nostrumaetheria.api.item;
 
 import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
 
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
 
 /**
- * Item may provide functionallity when aether from an aether infuser is used on it
+ * Item may provide functionallity when aether from an aether infuser is used on it.
  * @author Skyler
  *
  */
 public interface IAetherInfuserLens {
-
+	
 	/**
 	 * Quick check whether this item can even attempt to accept any aether.
 	 * No work should be done by this func besides checking if things look roughly right.

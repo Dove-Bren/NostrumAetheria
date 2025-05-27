@@ -9,8 +9,8 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
-import com.smanzana.nostrumaetheria.api.blocks.IAetherInfusableTileEntity;
 import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
+import com.smanzana.nostrumaetheria.api.capability.IAetherAccepter;
 import com.smanzana.nostrumaetheria.api.item.IAetherInfuserLens;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.items.AetheriaItems;
@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.Inventories.ItemStackArrayWrapper;
+import com.smanzana.nostrummagica.util.TargetLocation;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
@@ -39,6 +40,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
@@ -61,7 +63,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 	// Transient
 	private boolean active; // use getter+setter to sync to client
 	private @Nullable AltarTileEntity centerAltar;
-	private Map<BlockPos, IAetherInfusableTileEntity> nearbyChargeables; // note: NOT center altar
+	private Map<BlockPos, IAetherAccepter> nearbyChargeables; // note: NOT center altar
 	private int lastScanRadius;
 	
 	// Client-only + transient
@@ -83,7 +85,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 				count,
 				entity.getX(), entity.getY() + entity.getBbHeight()/2f, entity.getZ(), 2.0,
 				40, 0,
-				entity.getId()
+				new TargetLocation(entity, true)
 				).color(color));
 	}
 	
@@ -96,7 +98,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 				count,
 				center.x, center.y, center.z, 2.0,
 				40, 0,
-				center
+				new TargetLocation(center)
 				).color(color));
 	}
 	
@@ -105,7 +107,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 				count,
 				start.x, start.y, start.z, .5,
 				60, 20,
-				end
+				new TargetLocation(end)
 				).color(color));
 	}
 	
@@ -116,7 +118,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 		Container inv = player.getInventory();
 		chargeAmount -= APIProxy.pushToInventory(level, player, inv, chargeAmount);
 		
-		inv = NostrumMagica.instance.curios.getCurios(player);
+		inv = NostrumMagica.CuriosProxy.getCurios(player);
 		if (inv != null) {
 			chargeAmount -= APIProxy.pushToInventory(level, player, inv, chargeAmount);
 		}
@@ -218,25 +220,24 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 				final int originalMax = maxAether;
 				int lastAether = maxAether;
 				if (this.hasAreaInfuse()) {
-					for (IAetherInfusableTileEntity te : this.nearbyChargeables.values()) {
-						if (te.canAcceptAetherInfuse(this, maxAether)) {
-							maxAether = te.acceptAetherInfuse(this, maxAether);
+					for (Map.Entry<BlockPos, IAetherAccepter> row : this.nearbyChargeables.entrySet()) {
+						final IAetherAccepter accepter = row.getValue();
+						final BlockPos pos = row.getKey();
+						if (accepter.canAcceptAether(this, pos, maxAether)) {
+							maxAether = accepter.acceptAether(this, pos, maxAether);
 							
 							if (lastAether != maxAether) {
-								if (te instanceof BlockEntity) {
-									final BlockEntity teRaw = (BlockEntity) te;
-									final int diff = lastAether - maxAether;
-									float countRaw = (float) diff / (float) (CHARGE_PER_TICK / 3);
-									final int whole = (int) countRaw;
-									if (whole > 0 || NostrumMagica.rand.nextFloat() < countRaw) {
-										DoChargeEffect(level,
-												new Vec3(worldPosition.getX() + .5, worldPosition.getY() + 1.2, worldPosition.getZ() + .5),
-												new Vec3(teRaw.getBlockPos().getX() + .5, teRaw.getBlockPos().getY() + 1.2, teRaw.getBlockPos().getZ() + .5),
-												whole > 0 ? whole : 1,
-												0x4D3366FF);
-										
-										
-									}
+								final int diff = lastAether - maxAether;
+								float countRaw = (float) diff / (float) (CHARGE_PER_TICK / 3);
+								final int whole = (int) countRaw;
+								if (whole > 0 || NostrumMagica.rand.nextFloat() < countRaw) {
+									DoChargeEffect(level,
+											new Vec3(worldPosition.getX() + .5, worldPosition.getY() + 1.2, worldPosition.getZ() + .5),
+											new Vec3(pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5),
+											whole > 0 ? whole : 1,
+											0x4D3366FF);
+									
+									
 								}
 								
 								lastAether = maxAether;
@@ -677,12 +678,25 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 		}
 	}
 	
-	protected @Nullable IAetherInfusableTileEntity checkBlock(BlockPos blockpos) {
+	protected @Nullable IAetherAccepter getAetherAccepter(BlockEntity ent) {
+		if (ent == null) {
+			return null;
+		}
+		
+		if (ent instanceof IAetherAccepter accepter) {
+			return accepter;
+		}
+		
+		final LazyOptional<IAetherAccepter> capOptional = ent.getCapability(IAetherAccepter.CAPABILITY, null);
+		//if (capOptional.isPresent()) {
+			return capOptional.orElse(null);
+		//}
+	}
+	
+	protected @Nullable IAetherAccepter checkBlock(BlockPos blockpos) {
 		if (!blockpos.equals(this.worldPosition.above())) { // ignore altar above platform
 			BlockEntity te = level.getBlockEntity(blockpos);
-			if (te != null && te instanceof IAetherInfusableTileEntity) {
-				return (IAetherInfusableTileEntity) te;
-			}
+			return getAetherAccepter(te);
 		}
 		return null;
 	}
@@ -696,9 +710,9 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 				new BlockPos(worldPosition.getX() - radius, worldPosition.getY() - radius, worldPosition.getZ() - radius),
 				new BlockPos(worldPosition.getX() + radius, worldPosition.getY() + radius, worldPosition.getZ() + radius),
 				(world, blockpos) -> {
-					IAetherInfusableTileEntity te = checkBlock(blockpos);
+					IAetherAccepter te = checkBlock(blockpos);
 					if (te != null) {
-						nearbyChargeables.put(blockpos.immutable(), (IAetherInfusableTileEntity) te);
+						nearbyChargeables.put(blockpos.immutable(), te);
 					}
 					return true;
 				});
@@ -738,9 +752,9 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 	protected void refreshNearbyBlock(BlockPos blockpos) {
 		nearbyChargeables.remove(blockpos);
 		
-		IAetherInfusableTileEntity te = checkBlock(blockpos);
+		IAetherAccepter te = checkBlock(blockpos);
 		if (te != null) {
-			nearbyChargeables.put(blockpos.immutable(), (IAetherInfusableTileEntity) te);
+			nearbyChargeables.put(blockpos.immutable(), te);
 		}
 	}
 	

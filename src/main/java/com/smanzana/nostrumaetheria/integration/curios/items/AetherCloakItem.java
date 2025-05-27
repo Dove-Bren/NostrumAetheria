@@ -347,7 +347,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	@Override
 	public boolean canEquip(ItemStack itemstack, SlotContext slot) {
 		final LivingEntity player = slot.entity();
-		if (player.level.isClientSide && player != NostrumMagica.instance.proxy.getPlayer()) {
+		if (player.level.isClientSide && player != NostrumMagica.Proxy.getPlayer()) {
 			return true;
 		}
 		
@@ -397,7 +397,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 			if (event.getAmtRemaining() > 0 && event.getEntity() instanceof Player) {
 				Player player = (Player) event.getEntity();
 				
-				Container inv = NostrumMagica.instance.curios.getCurios(player);
+				Container inv = NostrumMagica.CuriosProxy.getCurios(player);
 				if (inv != null) {
 					for (int i = 0; i < inv.getContainerSize(); i++) {
 						ItemStack stack = inv.getItem(i);

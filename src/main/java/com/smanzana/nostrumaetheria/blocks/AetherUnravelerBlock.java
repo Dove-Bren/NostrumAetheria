@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
@@ -78,7 +79,7 @@ public class AetherUnravelerBlock extends BaseEntityBlock implements ILoreTagged
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		AetherUnravelerBlockEntity unraveler = (AetherUnravelerBlockEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(player, AetherUnravelerGui.AetherUnravelerContainer.Make(unraveler));
+		NostrumMagica.Proxy.openContainer(player, AetherUnravelerGui.AetherUnravelerContainer.Make(unraveler));
 		return InteractionResult.SUCCESS;
 	}
 	
@@ -247,11 +248,11 @@ public class AetherUnravelerBlock extends BaseEntityBlock implements ILoreTagged
 			NonNullList<ItemStack> ret = NonNullList.create();
 			ret.add(stack.copy());
 			
-			List<Spell> spells = SpellTome.getSpellLibrary(stack);
+			List<RegisteredSpell> spells = SpellTome.getSpellLibrary(stack);
 			if (spells == null || spells.isEmpty()) {
 				;
 			} else {
-				for (Spell spell : spells) {
+				for (RegisteredSpell spell : spells) {
 					ItemStack scroll = SpellScroll.create(spell);
 					ret.add(scroll);
 				}

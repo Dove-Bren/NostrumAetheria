@@ -38,6 +38,7 @@ public class AetheriaBlocks {
 	@ObjectHolder(AetheriaIDs.PUMP) public static AetherPumpBlock pump;
 	@ObjectHolder(AetheriaIDs.WISP_BLOCK) public static Block wispBlock;
 	@ObjectHolder(AetheriaIDs.AETHER_INFUSER) public static Block infuser;
+	@ObjectHolder(AetheriaIDs.LENS_HOLDER) public static Block lensHolder;
 
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -71,6 +72,7 @@ public class AetheriaBlocks {
     	registerBlockItem(wispBlock, wispBlock.getRegistryName(), registry);
     	registerBlockItem(infuser, infuser.getRegistryName(), registry);
     	registerBlockItem(enhancedRelay, enhancedRelay.getRegistryName(), registry);
+    	registerBlockItem(lensHolder, lensHolder.getRegistryName(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -104,5 +106,6 @@ public class AetheriaBlocks {
     	registerBlock(new WispBlock(), AetheriaIDs.WISP_BLOCK, registry);
     	registerBlock(new AetherInfuser(), AetheriaIDs.AETHER_INFUSER, registry);
     	registerBlock(new EnhancedAetherRelay(), AetheriaIDs.ENHANCED_RELAY, registry);
+    	registerBlock(new LensHolderBlock(), AetheriaIDs.LENS_HOLDER, registry);
 	}
 }

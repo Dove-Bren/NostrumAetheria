@@ -122,7 +122,7 @@ public class AetherFurnaceBlock extends BaseEntityBlock implements ILoreTagged {
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		AetherFurnaceBlockEntity furnace = (AetherFurnaceBlockEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(player, AetherFurnaceGui.AetherFurnaceContainer.Make(furnace));
+		NostrumMagica.Proxy.openContainer(player, AetherFurnaceGui.AetherFurnaceContainer.Make(furnace));
 		return InteractionResult.SUCCESS;
 	}
 	

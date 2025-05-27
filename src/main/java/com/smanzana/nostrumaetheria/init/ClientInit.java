@@ -13,6 +13,7 @@ import com.smanzana.nostrumaetheria.client.gui.container.WispBlockGui;
 import com.smanzana.nostrumaetheria.client.render.AetherBathRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherBatteryRenderer;
 import com.smanzana.nostrumaetheria.client.render.AetherRelayRenderer;
+import com.smanzana.nostrumaetheria.client.render.LensHolderBlockEntityRenderer;
 import com.smanzana.nostrumaetheria.client.render.RenderAetherBatteryMinecart;
 import com.smanzana.nostrumaetheria.client.render.TileEntityAetherDebugRenderer;
 import com.smanzana.nostrumaetheria.client.render.TileEntityAetherInfuserRenderer;
@@ -20,7 +21,7 @@ import com.smanzana.nostrumaetheria.client.render.TileEntityWispBlockRenderer;
 import com.smanzana.nostrumaetheria.entity.AetheriaEntityTypes;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrumaetheria.tiles.AetheriaTileEntities;
-import com.smanzana.nostrummagica.client.render.entity.RenderWisp;
+import com.smanzana.nostrummagica.client.render.entity.WispRenderer;
 
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -68,6 +69,7 @@ public class ClientInit {
 		event.registerBlockEntityRenderer(AetheriaTileEntities.Bath, AetherBathRenderer::new);
 		event.registerBlockEntityRenderer(AetheriaTileEntities.AetherInfuserEnt, TileEntityAetherInfuserRenderer::new);
 		event.registerBlockEntityRenderer(AetheriaTileEntities.WispBlockEnt, TileEntityWispBlockRenderer::new);
+		event.registerBlockEntityRenderer(AetheriaTileEntities.LensHolder, LensHolderBlockEntityRenderer::new);
 	}
 	
 	private static final void registerBlockRenderLayers() {
@@ -89,12 +91,13 @@ public class ClientInit {
 		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.enhancedRelay, RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.infiteAetherBlock, RenderType.solid());
 		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.wispBlock, RenderType.solid()); // actually invisible
+		ItemBlockRenderTypes.setRenderLayer(AetheriaBlocks.lensHolder, RenderType.solid());
 	}
 	
 	@SubscribeEvent
 	public static final void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
 		event.registerEntityRenderer(AetheriaEntityTypes.batteryCart, RenderAetherBatteryMinecart::new);
-		event.registerEntityRenderer(AetheriaEntityTypes.sentinelWisp, RenderWisp::new);
+		event.registerEntityRenderer(AetheriaEntityTypes.sentinelWisp, WispRenderer::new);
 	}
 	
 	@SubscribeEvent

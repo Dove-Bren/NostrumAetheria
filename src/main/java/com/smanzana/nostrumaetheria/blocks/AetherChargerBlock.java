@@ -72,7 +72,7 @@ public class AetherChargerBlock extends BaseEntityBlock implements ILoreTagged {
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		AetherChargerBlockEntity charger = (AetherChargerBlockEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(player, AetherChargerGui.AetherChargerContainer.Make(charger));
+		NostrumMagica.Proxy.openContainer(player, AetherChargerGui.AetherChargerContainer.Make(charger));
 		return InteractionResult.SUCCESS;
 	}
 	

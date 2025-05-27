@@ -43,4 +43,5 @@ public class AetheriaIDs {
 	public static final String PUMP = "aether_pump";
 	public static final String WISP_BLOCK = "wisp_block";
 	public static final String AETHER_INFUSER = "infuser_multiblk";
+	public static final String LENS_HOLDER = "lens_holder";
 }

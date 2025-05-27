@@ -84,7 +84,7 @@ public class AetherRepairerBlock extends BaseEntityBlock implements ILoreTagged 
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		AetherRepairerBlockEntity repairer = (AetherRepairerBlockEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(player, AetherRepairerGui.AetherRepairerContainer.Make(repairer));
+		NostrumMagica.Proxy.openContainer(player, AetherRepairerGui.AetherRepairerContainer.Make(repairer));
 		return InteractionResult.SUCCESS;
 	}
 	

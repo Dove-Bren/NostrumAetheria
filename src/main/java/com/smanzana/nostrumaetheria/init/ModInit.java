@@ -1,6 +1,7 @@
 package com.smanzana.nostrumaetheria.init;
 
 import com.smanzana.nostrumaetheria.NostrumAetheria;
+import com.smanzana.nostrumaetheria.api.capability.IAetherAccepter;
 import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
@@ -12,6 +13,7 @@ import com.smanzana.nostrumaetheria.items.ItemAetherLens.LensType;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
 import com.smanzana.nostrumaetheria.rituals.OutcomeCreateAetherInfuser;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumPotions;
 import com.smanzana.nostrummagica.effect.NostrumPotions.PotionIngredient;
@@ -98,6 +100,7 @@ public class ModInit {
 	@SubscribeEvent
 	public static final void registerCapabilities(RegisterCapabilitiesEvent event) {
 		event.register(IAetherBurnable.class);
+		event.register(IAetherAccepter.class);
 	}
 	
 	private static final void postinit() {
@@ -219,6 +222,7 @@ public class ModInit {
 			.hiddenParent("aether_battery")
 			.parent("aether_charger")
 			.reference("ritual::construct_aether_infuser", "ritual.construct_aether_infuser.name")
+			.reference("ritual::make_lens_holder", "ritual.make_lens_holder.name")
 			.reference("ritual::make_lens_spread", "ritual.make_lens_spread.name")
 			.reference("ritual::make_lens_charge", "ritual.make_lens_wide_charge.name")
 			.reference("ritual::make_lens_grow", "ritual.make_lens_grow.name")
@@ -478,6 +482,18 @@ public class ModInit {
 						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.pump, 1))
 						)
 				);
+		
+		registry.register(
+				RitualRecipe.createTier3("make_lens_holder",
+						new ItemStack(AetheriaBlocks.lensHolder),
+						null,
+						new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
+						Ingredient.of(NostrumBlocks.altar),
+						new Ingredient[] {Ingredient.EMPTY, Ingredient.EMPTY, Ingredient.of(NostrumTags.Items.CrystalSmall), Ingredient.EMPTY},
+						new ResearchRequirement("aether_infusers"),
+						new OutcomeSpawnItem(new ItemStack(AetheriaBlocks.lensHolder, 8))
+				)
+			);
 		
 		for (LensType type : LensType.values()) {
 			Ingredient ingredient = type.getIngredient();

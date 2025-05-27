@@ -35,7 +35,7 @@ public class EludeCloakItem extends NostrumCurio {
 		if (event.getAmount() > 0f && event.getEntityLiving() instanceof Player && event.getSource() instanceof EntityDamageSource) {
 			Entity source = ((EntityDamageSource) event.getSource()).getEntity();
 			Player player = (Player) event.getEntityLiving();
-			Container inv = NostrumMagica.instance.curios.getCurios(player);
+			Container inv = NostrumMagica.CuriosProxy.getCurios(player);
 			if (inv != null) {
 				for (int i = 0; i < inv.getContainerSize(); i++) {
 					ItemStack stack = inv.getItem(i);

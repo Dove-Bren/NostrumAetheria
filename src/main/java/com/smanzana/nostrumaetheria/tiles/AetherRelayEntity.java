@@ -12,6 +12,7 @@ import com.smanzana.nostrumaetheria.blocks.AetherRelay;
 import com.smanzana.nostrumaetheria.blocks.AetherRelay.RelayMode;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.util.TargetLocation;
 import com.smanzana.nostrummagica.util.TileEntities;
 
 import net.minecraft.Util;
@@ -254,7 +255,8 @@ public class AetherRelayEntity extends NativeAetherTickingTileEntity {
 					
 					if (count > 0) {
 						NostrumParticles.FILLED_ORB.spawn(level, new SpawnParams(
-								count, dest.getX() + .5, dest.getY() + .5, dest.getZ() + .5, 0, 30 * 1, 10, new Vec3(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5)
+								count, dest.getX() + .5, dest.getY() + .5, dest.getZ() + .5, 0, 30 * 1, 10,
+								new TargetLocation(new Vec3(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5))
 							).color(color));
 					}
 					

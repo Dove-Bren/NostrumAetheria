@@ -72,7 +72,7 @@ public class AetherBoilerBlock extends BaseEntityBlock implements ILoreTagged {
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		AetherBoilerBlockEntity boiler = (AetherBoilerBlockEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(player, AetherBoilerGui.AetherBoilerContainer.Make(boiler));
+		NostrumMagica.Proxy.openContainer(player, AetherBoilerGui.AetherBoilerContainer.Make(boiler));
 		return InteractionResult.SUCCESS;
 	}
 	

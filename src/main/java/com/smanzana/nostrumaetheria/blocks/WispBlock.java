@@ -82,7 +82,7 @@ public class WispBlock extends BaseEntityBlock {
 		}
 		
 		WispBlockTileEntity te = (WispBlockTileEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(playerIn, WispBlockGui.WispBlockContainer.Make(te));
+		NostrumMagica.Proxy.openContainer(playerIn, WispBlockGui.WispBlockContainer.Make(te));
 		
 		return InteractionResult.SUCCESS;
 	}

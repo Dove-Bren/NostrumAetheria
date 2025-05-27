@@ -28,6 +28,7 @@ public class AetheriaTileEntities {
 	private static final String ID_WISPBLOCK = AetheriaIDs.WISP_BLOCK + "_entity";
 	private static final String ID_INFUSER = AetheriaIDs.AETHER_INFUSER + "_entity";
 	private static final String ID_ENHANCED_RELAY = "enhanced_aether_relay_te";
+	private static final String ID_LENS_HOLDER = "lens_holder";
 
 	@ObjectHolder(ID_BATH) public static BlockEntityType<AetherBathTileEntity> Bath;
 	@ObjectHolder(ID_BATTERY) public static BlockEntityType<AetherBatteryEntity> Battery;
@@ -42,6 +43,7 @@ public class AetheriaTileEntities {
 	@ObjectHolder(ID_WISPBLOCK) public static BlockEntityType<WispBlockTileEntity> WispBlockEnt;
 	@ObjectHolder(ID_INFUSER) public static BlockEntityType<AetherInfuserTileEntity> AetherInfuserEnt;
 	@ObjectHolder(ID_ENHANCED_RELAY) public static BlockEntityType<EnhancedAetherRelayEntity> EnhancedRelay;
+	@ObjectHolder(ID_LENS_HOLDER) public static BlockEntityType<LensHolderBlockEntity> LensHolder;
 	
 	private static void register(IForgeRegistry<BlockEntityType<?>> registry, BlockEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -64,5 +66,6 @@ public class AetheriaTileEntities {
     	register(registry, BlockEntityType.Builder.of(WispBlockTileEntity::new, AetheriaBlocks.wispBlock).build(null), ID_WISPBLOCK);
     	register(registry, BlockEntityType.Builder.of(AetherInfuserTileEntity::new, AetheriaBlocks.infuser).build(null), ID_INFUSER);
     	register(registry, BlockEntityType.Builder.of(EnhancedAetherRelayEntity::new, AetheriaBlocks.enhancedRelay).build(null), ID_ENHANCED_RELAY);
+    	register(registry, BlockEntityType.Builder.of(LensHolderBlockEntity::new, AetheriaBlocks.lensHolder).build(null), ID_LENS_HOLDER);
 	}
 }

@@ -17,6 +17,7 @@
     "block.nostrumaetheria.wisp_block": "Wisp Crystal",
     "block.nostrumaetheria.infuser_multiblk": "Aether Infuser",
 	"block.nostrumaetheria.enhanced_aether_relay": "Enhanced Aether Relay",
+	"block.nostrumaetheria.lens_holder": "Infusion Lens Holder",
 
     "item.nostrumaetheria.pendant_active": "Lyon Pendant",
     "item.nostrumaetheria.pendant_passive": "Aen Pendant",
@@ -122,6 +123,7 @@
     "ritual.make_lens_bore.name": "Make Bore Lens",
     "ritual.make_lens_mana_regen.name": "Make Mana Regen Lens",
     "ritual.make_lens_no_spawn.name": "Make Anti-Spawn Lens",
+    "ritual.make_lens_holder.name": "Make Lens Holders",
 	
     "ritual.outcome.create_aether_infuser.desc": "Creates an Aether Infuser at|the center of the ritual",
 
