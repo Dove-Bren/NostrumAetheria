@@ -95,6 +95,12 @@ repositories {
 	}
 	
 	maven {
+		// Local mods that aren't available on the net
+		name = "Local Maven"
+		url = "file://${local_maven_path}"
+	}
+	
+	maven {
         url = "https://maven.blamejared.com"
     }
     maven {
@@ -133,11 +139,11 @@ dependencies {
 	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
 	
-	compileOnly fg.deobf("com.smanzana:nostrummagica:${nostrummagica_version}") //At compile time, use actual eclipse project
-	runtimeOnly fg.deobf("com.smanzana:nostrummagica:${nostrummagica_version}")
+	compileOnly fg.deobf("com.smanzana.nostrummagica:nostrummagica:${nostrummagica_version}")
+	runtimeOnly fg.deobf("com.smanzana.nostrummagica:nostrummagica:${nostrummagica_version}")
 	
-	runtimeOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}")
-	compileOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}:api")
+	runtimeOnly fg.deobf("com.smanzana.petcommand:petcommand:${petcommand_version}")
+	compileOnly fg.deobf("com.smanzana.petcommand:petcommand:${petcommand_version}:api")
 
 }
 
@@ -196,6 +202,22 @@ tasks.named('jar', Jar).configure {
 
     // This is the preferred method to reobfuscate your jar file
     finalizedBy 'reobfJar'
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifact jar
+			artifact apiJar
+			artifact sourcesJar
+			artifactId = mod_id
+        }
+    }
+    repositories {
+        maven {
+            url "file://${local_maven_path}"
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
