@@ -6,7 +6,7 @@ import com.smanzana.nostrumaetheria.client.gui.container.AetherBoilerGui;
 import com.smanzana.nostrumaetheria.tiles.AetherBoilerBlockEntity;
 import com.smanzana.nostrumaetheria.tiles.AetheriaTileEntities;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
@@ -190,7 +190,7 @@ public class AetherBoilerBlock extends BaseEntityBlock implements ILoreTagged {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_BLOCKS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.BLOCK;
 	}
 }

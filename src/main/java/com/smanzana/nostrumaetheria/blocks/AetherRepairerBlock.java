@@ -10,8 +10,8 @@ import com.smanzana.nostrumaetheria.recipes.RepairerRecipeManager;
 import com.smanzana.nostrumaetheria.tiles.AetherRepairerBlockEntity;
 import com.smanzana.nostrumaetheria.tiles.AetheriaTileEntities;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.item.equipment.SpellScroll;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
@@ -179,8 +179,8 @@ public class AetherRepairerBlock extends BaseEntityBlock implements ILoreTagged 
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_BLOCKS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.BLOCK;
 	}
 	
 	public static @Nonnull ItemStack RepairTool(ItemStack tool, int amt) {

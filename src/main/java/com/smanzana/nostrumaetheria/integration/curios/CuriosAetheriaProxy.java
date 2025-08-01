@@ -3,20 +3,24 @@ package com.smanzana.nostrumaetheria.integration.curios;
 import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetheriaCurios;
 import com.smanzana.nostrumaetheria.items.AetheriaItems;
+import com.smanzana.nostrumaetheria.research.AetheriaResearches;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
+import com.smanzana.nostrummagica.integration.curios.CuriosProxy;
 import com.smanzana.nostrummagica.integration.curios.inventory.CurioInventoryWrapper;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.progression.requirement.ResearchRequirement;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch;
-import com.smanzana.nostrummagica.progression.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch.Size;
+import com.smanzana.nostrummagica.progression.research.NostrumResearchTab;
+import com.smanzana.nostrummagica.progression.research.NostrumResearches;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.ritual.RitualRegistry;
 import com.smanzana.nostrummagica.ritual.outcome.OutcomeModifyCenterItemGeneric;
@@ -25,12 +29,13 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.Ingredients;
 
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -40,7 +45,17 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.SlotTypePreset;
 
-public class CuriosProxy {
+public class CuriosAetheriaProxy {
+	
+	public static final ResourceLocation ID_RESEARCH_Shield_Ring = NostrumAetheria.Loc("shield_rings");
+	public static final ResourceLocation ID_RESEARCH_Elude_Cape = NostrumAetheria.Loc("elude_capes");
+	public static final ResourceLocation ID_RESEARCH_Aether_Cloak = NostrumAetheria.Loc("aether_cloaks");
+	public static final ResourceLocation ID_RESEARCH_Aether_Sight_Pendant = NostrumAetheria.Loc("aether_sight_pendant");
+	
+	public static NostrumResearch ShieldRingResearch;
+	public static NostrumResearch EludeCapeResearch;
+	public static NostrumResearch AetherCloakResearch;
+	public static NostrumResearch AetherSightPendantResearch;
 
 	@SubscribeEvent
 	public void sendImc(InterModEnqueueEvent evt) {
@@ -51,7 +66,7 @@ public class CuriosProxy {
 	
 	private boolean enabled;
 	
-	public CuriosProxy() {
+	public CuriosAetheriaProxy() {
 		FMLJavaModLoadingContext.get().getModEventBus().register(this);
 	}
 	
@@ -93,7 +108,7 @@ public class CuriosProxy {
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
 				Ingredient.of(NostrumCurios.ringSilver),
 				new Ingredient[] {Ingredient.of(NostrumTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(NostrumSpellShapes.Self)), Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.of(NostrumTags.Items.CrystalSmall)},
-				new ResearchRequirement("shield_rings"),
+				new ResearchRequirement(ID_RESEARCH_Shield_Ring),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.ringShieldSmall)));
 		registry.register(recipe);
 		
@@ -103,7 +118,7 @@ public class CuriosProxy {
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
 				Ingredient.of(AetheriaCurios.ringShieldSmall),
 				new Ingredient[] {Ingredient.of(NostrumTags.Items.CrystalSmall), silver, Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.of(NostrumTags.Items.CrystalSmall)},
-				new ResearchRequirement("shield_rings"),
+				new ResearchRequirement(ID_RESEARCH_Shield_Ring),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.ringShieldLarge)));
 		registry.register(recipe);
 		
@@ -113,7 +128,7 @@ public class CuriosProxy {
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
 				Ingredient.of(ItemTags.WOOL),
 				new Ingredient[] {Ingredient.of(NostrumTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(NostrumSpellShapes.OnDamage)), Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.of(NostrumTags.Items.CrystalSmall)},
-				new ResearchRequirement("elude_capes"),
+				new ResearchRequirement(ID_RESEARCH_Elude_Cape),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.eludeCape)));
 		registry.register(recipe);
 		
@@ -123,7 +138,7 @@ public class CuriosProxy {
 				new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL, ReagentType.SKY_ASH},
 				Ingredient.of(AetheriaBlocks.smallBattery),
 				new Ingredient[] {Ingredient.of(AetheriaItems.aetherGem), Ingredient.of(AetheriaCurios.eludeCape), Ingredient.of(NostrumTags.Items.CrystalLarge), Ingredient.of(AetheriaItems.aetherGem)},
-				new ResearchRequirement("aether_cloaks"),
+				new ResearchRequirement(ID_RESEARCH_Aether_Cloak),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.aetherCloak)));
 		registry.register(recipe);
 		
@@ -135,7 +150,7 @@ public class CuriosProxy {
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
 				Ingredient.of(AetheriaCurios.aetherCloak),
 				new Ingredient[] {Ingredient.of(AetheriaItems.passivePendant), Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.EMPTY, Ingredient.of(AetheriaItems.passivePendant)},
-				new ResearchRequirement("aether_cloaks"),
+				new ResearchRequirement(ID_RESEARCH_Aether_Cloak),
 				new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
 					if (!item.isEmpty() && item.getItem() instanceof AetherCloakItem) {
 						((AetherCloakItem) item.getItem()).setAetherCaster(item, true);
@@ -149,36 +164,36 @@ public class CuriosProxy {
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
 				Ingredient.of(AetheriaItems.aetherSightTool),
 				new Ingredient[] {Ingredient.of(Tags.Items.INGOTS_GOLD)},
-				new ResearchRequirement("aether_sight_pendant"),
+				new ResearchRequirement(ID_RESEARCH_Aether_Sight_Pendant),
 				new OutcomeSpawnItem(new ItemStack(AetheriaCurios.sightPendant)));
 		registry.register(recipe);
 	}
 	
 	private void registerCurioResearch() {
-		NostrumResearch.startBuilding()
-			.hiddenParent("rings")
-			.hiddenParent("kani")
-			.hiddenParent("aether_gem")
+		ShieldRingResearch = NostrumResearch.startBuilding()
+			.hiddenParent(CuriosProxy.ID_Rings)
+			.hiddenParent(NostrumResearches.ID_Kani)
+			.hiddenParent(AetheriaResearches.ID_Aether_Gem)
 			.reference("ritual::shield_ring_small", "ritual.shield_ring_small.name")
 			.reference("ritual::shield_ring_large", "ritual.shield_ring_large.name")
-		.build("shield_rings", (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 1, 0, true, new ItemStack(AetheriaCurios.ringShieldSmall));
+		.build(ID_RESEARCH_Shield_Ring, (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 1, 0, true, new ItemStack(AetheriaCurios.ringShieldSmall));
 
-		NostrumResearch.startBuilding()
-			.hiddenParent("belts")
-			.hiddenParent("shield_rings")
+		EludeCapeResearch = NostrumResearch.startBuilding()
+			.hiddenParent(CuriosProxy.ID_Belts)
+			.hiddenParent(ID_RESEARCH_Shield_Ring)
 			.reference("ritual::elude_cape_small", "ritual.elude_cape_small.name")
-		.build("elude_capes", (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 2, 0, true, new ItemStack(AetheriaCurios.eludeCape));
+		.build(ID_RESEARCH_Elude_Cape, (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 2, 0, true, new ItemStack(AetheriaCurios.eludeCape));
 		
-		NostrumResearch.startBuilding()
-			.parent("elude_capes")
+		AetherCloakResearch = NostrumResearch.startBuilding()
+			.parent(ID_RESEARCH_Elude_Cape)
 			.reference("ritual::aether_cloak", "ritual.aether_cloak.name")
 			.reference("ritual::aether_cloak_caster_upgrade", "ritual.aether_cloak_caster_upgrade.name")
-		.build("aether_cloaks", (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 2, 1, true, new ItemStack(AetheriaCurios.aetherCloak));
+		.build(ID_RESEARCH_Aether_Cloak, (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 2, 1, true, new ItemStack(AetheriaCurios.aetherCloak));
 		
-		NostrumResearch.startBuilding()
-			.parent("aether_sight_item")
+		AetherSightPendantResearch = NostrumResearch.startBuilding()
+			.parent(AetheriaResearches.ID_Aether_Sight_Item)
 			.reference("ritual::aether_sight_pendant", "ritual.aether_sight_pendant.name")
-		.build("aether_sight_pendant", (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 0, 1, true, new ItemStack(AetheriaCurios.sightPendant));
+		.build(ID_RESEARCH_Aether_Sight_Pendant, (NostrumResearchTab) APIProxy.AetherGearResearchTab, Size.NORMAL, 0, 1, true, new ItemStack(AetheriaCurios.sightPendant));
 	}
 	
 	private void registerLore() {

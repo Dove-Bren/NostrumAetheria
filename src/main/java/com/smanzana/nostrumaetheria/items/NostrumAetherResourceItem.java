@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.api.capability.AetherBurnableWrapper;
 import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -52,10 +52,10 @@ public class NostrumAetherResourceItem extends Item implements ILoreTagged, ICap
 	public Lore getDeepLore() {
 		return new Lore().add("Flowers of mandrake and ginseng with high levels of aether.", "These flowers cannot be used as reagents by themselves but produce more aether than regular reagents when burned.");
 	}
-	
+
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	private LazyOptional<IAetherBurnable> BurnableOptional = LazyOptional.of(() -> new AetherBurnableWrapper(getBurnTicks(), getAetherYield()));

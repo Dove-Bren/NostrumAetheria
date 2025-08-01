@@ -8,6 +8,7 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
 import com.smanzana.nostrumaetheria.api.capability.IAetherAccepter;
@@ -17,10 +18,9 @@ import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 import com.smanzana.nostrummagica.util.Inventories.ItemStackArrayWrapper;
 import com.smanzana.nostrummagica.util.TargetLocation;
-import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
 import net.minecraft.core.BlockPos;
@@ -62,7 +62,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 	
 	// Transient
 	private boolean active; // use getter+setter to sync to client
-	private @Nullable AltarTileEntity centerAltar;
+	private @Nullable PedestalBlockEntity centerAltar;
 	private Map<BlockPos, IAetherAccepter> nearbyChargeables; // note: NOT center altar
 	private int lastScanRadius;
 	
@@ -143,7 +143,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 		// TODO look at held item for lenses
 	}
 	
-	protected void chargeAltar(BlockPos pos, AltarTileEntity te) {
+	protected void chargeAltar(BlockPos pos, PedestalBlockEntity te) {
 		int chargeAmount = Math.min(CHARGE_PER_TICK, this.getCharge());
 		final int startAmount = chargeAmount;
 		if (te != null && !te.getItem().isEmpty()) {
@@ -271,7 +271,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 					this.getHandler().drawAether(null, originalMax - maxAether);
 				}
 			} else {
-				chargeAltar(worldPosition.above(), (AltarTileEntity) level.getBlockEntity(worldPosition.above()));
+				chargeAltar(worldPosition.above(), (PedestalBlockEntity) level.getBlockEntity(worldPosition.above()));
 			}
 		} else {
 			// Check for entities in AoE
@@ -452,8 +452,8 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 		this.centerAltar = null;
 		BlockPos pos = this.worldPosition.above();
 		BlockEntity te = level.getBlockEntity(pos);
-		if (te != null && te instanceof AltarTileEntity) {
-			this.centerAltar = (AltarTileEntity) te;
+		if (te != null && te instanceof PedestalBlockEntity) {
+			this.centerAltar = (PedestalBlockEntity) te;
 			if (this.hasAreaInfuse() && getInfuseAreaRadius() != lastScanRadius) {
 				lastScanRadius = getInfuseAreaRadius();
 				this.onInfuseAreaChange();
@@ -668,7 +668,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity implements 
 		final int radius = getInfuseAreaRadius() + 16; // easier than looking at both min and max
 		final ChunkAccess chunk = event.getChunk();
 		final BlockPos chunkMin = new BlockPos(chunk.getPos().x << 4, this.getBlockPos().getY(), chunk.getPos().z << 4);
-		if (WorldUtil.getBlockDistance(chunkMin, this.getBlockPos()) < radius) {
+		if (chunkMin.distManhattan(this.getBlockPos()) < radius) {
 			// ""
 			NostrumMagica.playerListener.registerTimer((type, entity, data) -> {
 				refreshChunk(chunk);

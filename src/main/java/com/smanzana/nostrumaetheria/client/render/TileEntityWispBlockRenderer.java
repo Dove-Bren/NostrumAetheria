@@ -11,7 +11,7 @@ import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.render.tile.BlockEntityRendererBase;
-import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.item.equipment.SpellScroll;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;

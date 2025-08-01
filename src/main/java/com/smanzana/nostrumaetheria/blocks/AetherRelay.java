@@ -4,8 +4,8 @@ import java.util.Random;
 
 import com.smanzana.nostrumaetheria.tiles.AetherRelayEntity;
 import com.smanzana.nostrumaetheria.tiles.AetheriaTileEntities;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.PositionCrystal;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -231,7 +231,7 @@ public class AetherRelay extends BaseEntityBlock implements ILoreTagged {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_BLOCKS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.BLOCK;
 	}
 }

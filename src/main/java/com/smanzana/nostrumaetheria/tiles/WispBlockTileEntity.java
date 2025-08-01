@@ -13,7 +13,7 @@ import com.smanzana.nostrumaetheria.entity.SentinelWispEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.WispEntity;
 import com.smanzana.nostrummagica.item.ReagentItem;
-import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.item.equipment.SpellScroll;
 import com.smanzana.nostrummagica.util.Inventories;
 
 import net.minecraft.core.BlockPos;

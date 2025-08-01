@@ -9,7 +9,7 @@ import com.smanzana.nostrumaetheria.tiles.WispBlockTileEntity;
 import com.smanzana.nostrummagica.client.gui.container.AutoContainer;
 import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
 import com.smanzana.nostrummagica.item.ReagentItem;
-import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.item.equipment.SpellScroll;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;

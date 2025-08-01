@@ -12,10 +12,10 @@ import com.smanzana.nostrumaetheria.client.gui.container.AetherUnravelerGui;
 import com.smanzana.nostrumaetheria.tiles.AetherUnravelerBlockEntity;
 import com.smanzana.nostrumaetheria.tiles.AetheriaTileEntities;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.SpellRune;
-import com.smanzana.nostrummagica.item.SpellScroll;
-import com.smanzana.nostrummagica.item.SpellTome;
+import com.smanzana.nostrummagica.item.equipment.SpellScroll;
+import com.smanzana.nostrummagica.item.equipment.SpellTome;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spell.RegisteredSpell;
@@ -174,8 +174,8 @@ public class AetherUnravelerBlock extends BaseEntityBlock implements ILoreTagged
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_BLOCKS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.BLOCK;
 	}
 	
 	protected static class ScrollUnravelerRecipe implements IAetherUnravelerRecipe {

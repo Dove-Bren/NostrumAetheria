@@ -4,15 +4,15 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrumaetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.entity.WispEntity;
-import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.item.equipment.SpellScroll;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
 public class SentinelWispEntity extends WispEntity {

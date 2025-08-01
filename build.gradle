@@ -139,11 +139,14 @@ dependencies {
 	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
 	
-	compileOnly fg.deobf("com.smanzana.nostrummagica:nostrummagica:${nostrummagica_version}")
-	runtimeOnly fg.deobf("com.smanzana.nostrummagica:nostrummagica:${nostrummagica_version}")
-	
 	runtimeOnly fg.deobf("com.smanzana.petcommand:petcommand:${petcommand_version}")
 	compileOnly fg.deobf("com.smanzana.petcommand:petcommand:${petcommand_version}:api")
+	
+	runtimeOnly fg.deobf("com.smanzana.autodungeons:autodungeons:${autodungeons_version}")
+	compileOnly fg.deobf("com.smanzana.autodungeons:autodungeons:${autodungeons_version}")
+	
+	compileOnly fg.deobf("com.smanzana.nostrummagica:nostrummagica:${nostrummagica_version}")
+	runtimeOnly fg.deobf("com.smanzana.nostrummagica:nostrummagica:${nostrummagica_version}")
 
 }
 

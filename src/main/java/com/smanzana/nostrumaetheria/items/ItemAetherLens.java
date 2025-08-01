@@ -13,10 +13,10 @@ import com.smanzana.nostrumaetheria.api.item.IAetherInfuserLens;
 import com.smanzana.nostrumaetheria.tiles.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMana;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumPotions;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.Entities;
@@ -201,8 +201,8 @@ public class ItemAetherLens extends Item implements ILoreTagged, IAetherInfuserL
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	@Override

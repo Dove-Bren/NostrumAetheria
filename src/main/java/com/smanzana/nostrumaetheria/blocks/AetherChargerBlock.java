@@ -6,7 +6,7 @@ import com.smanzana.nostrumaetheria.client.gui.container.AetherChargerGui;
 import com.smanzana.nostrumaetheria.tiles.AetherChargerBlockEntity;
 import com.smanzana.nostrumaetheria.tiles.AetheriaTileEntities;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
@@ -187,7 +187,7 @@ public class AetherChargerBlock extends BaseEntityBlock implements ILoreTagged {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_BLOCKS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.BLOCK;
 	}
 }
