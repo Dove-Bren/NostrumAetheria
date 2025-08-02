@@ -4,12 +4,12 @@ import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
+import com.smanzana.nostrumaetheria.api.lib.AetheriaResearches;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetheriaBlocks;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrumaetheria.integration.curios.items.AetheriaCurios;
 import com.smanzana.nostrumaetheria.items.AetheriaItems;
-import com.smanzana.nostrumaetheria.research.AetheriaResearches;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.integration.curios.CuriosProxy;
 import com.smanzana.nostrummagica.integration.curios.inventory.CurioInventoryWrapper;

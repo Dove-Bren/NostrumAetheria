@@ -3,6 +3,7 @@ package com.smanzana.nostrumaetheria.init;
 import com.smanzana.nostrumaetheria.NostrumAetheria;
 import com.smanzana.nostrumaetheria.api.capability.IAetherAccepter;
 import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
+import com.smanzana.nostrumaetheria.api.lib.AetheriaResearches;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrumaetheria.blocks.AetherRepairerBlock;
 import com.smanzana.nostrumaetheria.blocks.AetherUnravelerBlock;
@@ -11,7 +12,7 @@ import com.smanzana.nostrumaetheria.items.AetheriaItems;
 import com.smanzana.nostrumaetheria.items.ItemAetherLens;
 import com.smanzana.nostrumaetheria.items.ItemAetherLens.LensType;
 import com.smanzana.nostrumaetheria.network.NetworkHandler;
-import com.smanzana.nostrumaetheria.research.AetheriaResearches;
+import com.smanzana.nostrumaetheria.research.AetheriaResearchesImpl;
 import com.smanzana.nostrumaetheria.rituals.OutcomeCreateAetherInfuser;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
@@ -86,10 +87,10 @@ public class ModInit {
 	private static final void init() {
 		APIProxy.AetherResearchTab = new NostrumResearchTab("aether", () -> new ItemStack(AetheriaItems.aetherGem));
     	APIProxy.AetherGearResearchTab = new NostrumResearchTab("aether_gear", () -> new ItemStack(AetheriaItems.aetherSightTool));
-		AetheriaResearches.init();
+		AetheriaResearchesImpl.init();
 		AetherRepairerBlock.initDefaultRecipes();
 		AetherUnravelerBlock.initDefaultRecipes();
-		NostrumMagica.instance.registerResearchReloadHook(AetheriaResearches::init);
+		NostrumMagica.instance.registerResearchReloadHook(AetheriaResearchesImpl::init);
 	}
 	
 	@SubscribeEvent
